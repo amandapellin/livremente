@@ -8,7 +8,7 @@ Repositório do backend: [livremente_backend](https://github.com/amandapellin/li
 
 - React + TypeScript
 - [Vite](https://vitejs.dev/) como ferramenta de build e servidor de desenvolvimento
-- [React Router](https://reactrouter.com/) — Declarative Mode (`BrowserRouter`, `Routes`, `Route`)
+- [React Router](https://reactrouter.com/) — Data Mode (`createBrowserRouter`, `RouterProvider`)
 - [Material UI (MUI)](https://mui.com/) como biblioteca de componentes
 - [pnpm](https://pnpm.io/) como gerenciador de pacotes
 
@@ -44,7 +44,22 @@ Por padrão, o Vite sobe em `http://localhost:5173`. É essa porta que já está
 
 ## Estrutura de páginas e rotas
 
-**inserir a descrição conforme implementar**
+O roteamento usa o **Data Mode** do React Router: as rotas são declaradas num manifest central (`src/routes/router.tsx`, via `createBrowserRouter`) e injetadas em `src/main.tsx` com `<RouterProvider>`. A rota `/` usa `src/App.tsx` como layout raiz (renderiza um `<Outlet />`), e cada tela vive em `src/pages/` como uma rota filha.
+
+| Caminho | Página | Descrição |
+|---|---|---|
+| `/` | `LandingPage` | Página inicial |
+| `/login` | `LoginPage` | Login |
+| `/cadastro` | `CadastroPage` | Cadastro de usuário |
+| `/perfil` | `PerfilPage` | Edição de perfil |
+| `/catalogo` | `CatalogoPage` | Busca/catálogo de obras |
+| `/obra/:id` | `DetalhesObraPage` | Detalhes de uma obra/artigo |
+| `/leitura/:id` | `LeitorPage` | Leitor (EPUB/PDF) |
+| `/estante` | `EstantePage` | Minha Estante |
+| `/recomendacoes` | `RecomendacoesPage` | Recomendações personalizadas |
+| `*` | `NotFoundPage` | 404 — rota não encontrada |
+
+> As telas são placeholders nesta fase; cada uma será implementada na issue correspondente. O header/navegação definitivo e a alternância de tema entram no layout base (issue #3).
 
 ## Design system
 
