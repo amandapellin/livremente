@@ -10,6 +10,7 @@ Repositório do backend: [livremente_backend](https://github.com/amandapellin/li
 - [Vite](https://vitejs.dev/) como ferramenta de build e servidor de desenvolvimento
 - [React Router](https://reactrouter.com/) — Data Mode (`createBrowserRouter`, `RouterProvider`)
 - [Material UI (MUI)](https://mui.com/) como biblioteca de componentes
+- [TanStack Query](https://tanstack.com/query) para data-fetching, com cliente HTTP gerado do OpenAPI via [orval](https://orval.dev/) + validação [Zod](https://zod.dev/)
 - [pnpm](https://pnpm.io/) como gerenciador de pacotes
 
 ## Pré-requisitos
@@ -32,7 +33,22 @@ O frontend consome a API do backend através de uma variável de ambiente, em ve
 
 2. No código, o valor é acessado via `import.meta.env.VITE_API_URL`, nunca digitado diretamente numa chamada `fetch`.
 
-Ajuste o valor caso a porta do backend local seja diferente, ou para a URL de produção quando o backend estiver hospedado no Azure.
+Ajuste o valor caso a porta do backend local seja diferente, ou para a URL de produção quando o backend estiver hospedado no Azure. Use `.env.example` como referência.
+
+### Cliente HTTP gerado a partir do OpenAPI
+
+O cliente é **gerado** com [orval](https://orval.dev/) a partir do contrato OpenAPI do backend, produzindo de uma vez: tipos TypeScript, schemas [Zod](https://zod.dev/) (validação em runtime) e hooks do [TanStack Query](https://tanstack.com/query). A configuração está em `orval.config.ts`.
+
+- **Contrato:** um snapshot versionado em `src/api/openapi.json` (fonte da geração).
+- **Gerar:** `pnpm gen:api` — escreve em `src/api/generated/` (código gerado, commitado; não editar à mão).
+- **Cliente:** as chamadas usam `fetch` através de `src/api/fetcher.ts`, que prefixa a `VITE_API_URL` e é o ponto único para, no futuro, injetar o token JWT.
+
+Para **atualizar o contrato** quando o backend mudar, com o backend rodando (perfil `http`):
+
+```bash
+curl http://localhost:5091/swagger/v1/swagger.json -o src/api/openapi.json
+pnpm gen:api
+```
 
 ## Rodando o projeto localmente
 
