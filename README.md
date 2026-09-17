@@ -85,7 +85,7 @@ As definições de cores, tipografia, espaçamento e o mapeamento dos tokens par
 
 - Branches: `feature/rfXX-descricao-curta` (código do requisito + descrição curta)
 - Pull requests devem referenciar a issue correspondente (`Closes #N`) e passar por revisão da outra desenvolvedora antes do merge
-- Board de acompanhamento: [Project "Livremente"](https://github.com/users/amandapellin/projects/1)
+- Board de acompanhamento: [Project "Livremente"](https://github.com/users/amandapellin/projects/3)
 
 ## Padrão de commits
 
