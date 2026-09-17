@@ -22,7 +22,7 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { colors, fontFamilies } from "../../../theme/tokens";
+import { colors, fontFamilies } from "@/theme/tokens";
 
 const navItems = [
 	{ label: "Início", to: "/" },

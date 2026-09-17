@@ -5,19 +5,29 @@
  * OpenAPI spec version: 1.0
  */
 import {
+  useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult
 } from '@tanstack/react-query';
+
+import type {
+  ErrorResponse,
+  RegisterRequest,
+  RegisterResponse
+} from './model';
 
 import { customFetch } from '../fetcher';
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
@@ -139,3 +149,121 @@ export function useGetApiHealth<TData = Awaited<ReturnType<typeof getApiHealth>>
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export type postApiAuthRegisterResponse201 = {
+  data: RegisterResponse
+  status: 201
+}
+
+export type postApiAuthRegisterResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postApiAuthRegisterResponse409 = {
+  data: ErrorResponse
+  status: 409
+}
+
+export type postApiAuthRegisterResponseSuccess = (postApiAuthRegisterResponse201) & {
+  headers: Headers;
+};
+export type postApiAuthRegisterResponseError = (postApiAuthRegisterResponse400 | postApiAuthRegisterResponse409) & {
+  headers: Headers;
+};
+
+export type postApiAuthRegisterResponse = (postApiAuthRegisterResponseSuccess | postApiAuthRegisterResponseError)
+
+export const getPostApiAuthRegisterUrl = () => {
+
+
+
+
+  return `/api/auth/register`
+}
+
+/**
+ * @summary Cria uma nova conta de usuário (RF01).
+ */
+export const postApiAuthRegister = async (registerRequest: RegisterRequest, options?: Parameters<typeof customFetch>[1]): Promise<postApiAuthRegisterResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postApiAuthRegisterResponse>(getPostApiAuthRegisterUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(registerRequest)
+  }
+);}
+
+
+
+
+
+export const getPostApiAuthRegisterMutationKey = () => ['postApiAuthRegister'] as const;
+
+export const getPostApiAuthRegisterMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthRegister>>, TError,PostApiAuthRegisterMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiAuthRegister>>, TError,PostApiAuthRegisterMutationVariables, TContext> => {
+
+const mutationKey = getPostApiAuthRegisterMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiAuthRegister>>, PostApiAuthRegisterMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiAuthRegister(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiAuthRegisterMutationResult = NonNullable<Awaited<ReturnType<typeof postApiAuthRegister>>>
+    export type PostApiAuthRegisterMutationBody = RegisterRequest
+    export type PostApiAuthRegisterMutationError = ErrorResponse
+    export type PostApiAuthRegisterMutationVariables = {data: RegisterRequest}
+
+    /**
+ * @summary Cria uma nova conta de usuário (RF01).
+ */
+export const usePostApiAuthRegister = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthRegister>>, TError,PostApiAuthRegisterMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiAuthRegister>>,
+        TError,
+        PostApiAuthRegisterMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostApiAuthRegisterMutationOptions(options), queryClient);
+    }

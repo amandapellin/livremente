@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router'
 import { Box, Button, Stack, Typography } from '@mui/material'
-import { colors } from '../../../theme/tokens'
+import { colors } from '@/theme/tokens'
 export default function Hero(){
     return (
         <Box

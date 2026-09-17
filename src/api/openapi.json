@@ -16,7 +16,206 @@
           }
         }
       }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Cria uma nova conta de usuário (RF01).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conta criada. Um e-mail de confirmação é enviado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "E-mail já cadastrado (RN).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
-  "components": { }
+  "components": {
+    "schemas": {
+      "Gender": {
+        "type": "string",
+        "description": "Gênero informado no cadastro.",
+        "enum": [
+          "female",
+          "male",
+          "non_binary",
+          "other",
+          "prefer_not_to_say"
+        ]
+      },
+      "ReadingLanguage": {
+        "type": "string",
+        "description": "Idioma de leitura de preferência.",
+        "enum": [
+          "pt",
+          "en",
+          "es",
+          "fr",
+          "ru"
+        ]
+      },
+      "MaterialType": {
+        "type": "string",
+        "description": "Tipo de material de interesse.",
+        "enum": [
+          "books",
+          "scientific_articles"
+        ]
+      },
+      "RegisterPreferences": {
+        "type": "object",
+        "description": "Preferências de leitura usadas para gerar recomendações. Opcionais no cadastro.",
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadingLanguage"
+            }
+          },
+          "materials": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MaterialType"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Categorias de livros e/ou áreas de artigos (slugs).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "literaryGenres": {
+            "type": "array",
+            "description": "Gêneros literários (slugs), aplicáveis a livros.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password",
+          "birthDate",
+          "gender",
+          "lgpdConsent"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120,
+            "description": "Nome completo."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de nascimento no formato ISO (YYYY-MM-DD)."
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/RegisterPreferences"
+          },
+          "lgpdConsent": {
+            "type": "boolean",
+            "description": "Consentimento LGPD (RN03). Obrigatório e deve ser true."
+          },
+          "marketingConsent": {
+            "type": "boolean",
+            "description": "Aceite opcional de avisos sobre novas obras."
+          }
+        }
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem amigável para exibição."
+          },
+          "code": {
+            "type": "string",
+            "description": "Código estável do erro (ex.: EMAIL_ALREADY_EXISTS)."
+          }
+        }
+      }
+    }
+  }
 }
