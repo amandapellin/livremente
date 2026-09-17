@@ -22,7 +22,7 @@ import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
-import { colors, fontFamilies } from "../../theme/tokens";
+import { colors, fontFamilies } from "../../../theme/tokens";
 
 const navItems = [
 	{ label: "Início", to: "/" },
@@ -38,8 +38,8 @@ function ColorModeToggle() {
 		<Tooltip title={isDark ? "Modo claro" : "Modo escuro"}>
 			<IconButton
 				aria-label="Alternar tema claro/escuro"
+				color="contrast"
 				onClick={() => setMode(isDark ? "light" : "dark")}
-				sx={{ bgcolor: "action.hover", color: "text.secondary" }}
 			>
 				{isDark ? <LightModeIcon /> : <DarkModeIcon />}
 			</IconButton>
@@ -120,7 +120,7 @@ export default function Header() {
 								component="span"
 								sx={{ whiteSpace: "nowrap" }}
 							>
-								<Box component="span" sx={{ color: colors.gold600 }}>
+								<Box component="span" sx={{ color: colors.gold[600] }}>
 									Livre
 								</Box>
 								<Box component="span" sx={{ color: "primary.main" }}>
@@ -156,20 +156,18 @@ export default function Header() {
 					<Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
 						<IconButton
 							aria-label="Buscar"
+							color="contrast"
 							sx={{
 								display: { xs: "none", sm: "inline-flex" },
-								bgcolor: "action.hover",
-								color: "text.secondary",
 							}}
 						>
 							<SearchIcon />
 						</IconButton>
 						<IconButton
 							aria-label="Notificações"
+							color="contrast"
 							sx={{
 								display: { xs: "none", sm: "inline-flex" },
-								bgcolor: "action.hover",
-								color: "text.secondary",
 							}}
 						>
 							<NotificationsNoneIcon />
@@ -177,11 +175,7 @@ export default function Header() {
 						<ColorModeToggle />
 						<IconButton
 							aria-label="Conta"
-							sx={{
-								bgcolor: "primary.main",
-								color: "primary.contrastText",
-								"&:hover": { bgcolor: "primary.dark" },
-							}}
+							color="brand"
 						>
 							<AccountCircleIcon />
 						</IconButton>

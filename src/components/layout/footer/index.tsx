@@ -1,6 +1,6 @@
 import { Box, Link, Stack, Typography } from '@mui/material'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
-import { colors } from '../../theme/tokens'
+import { colors } from '../../../theme/tokens'
 
 const footerLinks = [
     { label: 'Institucional', href: '#' },
@@ -11,7 +11,7 @@ const footerLinks = [
 
 export default function Footer() {
     const linkSx = {
-        color: colors.primary50,
+        color: colors.primary[50],
         fontSize: 12,
         lineHeight: '16px',
         letterSpacing: '0.4px',
@@ -19,16 +19,16 @@ export default function Footer() {
     return (
         <Box
             component="footer"
-            sx={{ bgcolor: colors.papel900, borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}
+            sx={{ bgcolor: colors.papel[900], borderTop: '1px solid rgba(255, 255, 255, 0.12)' }}
         >
             <Stack
                 direction={{ xs: 'column', md: 'row' }}
                 sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 2, px: 3, py: 2, minHeight: 81 }}
             >
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
-                    <AutoStoriesIcon sx={{ fontSize: 24, color: colors.gold500 }} />
+                    <AutoStoriesIcon sx={{ fontSize: 24, color: colors.gold[500] }} />
                     <Typography variant="h5" component="span" sx={{ whiteSpace: 'nowrap' }}>
-                        <Box component="span" sx={{ color: colors.gold500 }}>
+                        <Box component="span" sx={{ color: colors.gold[500] }}>
                             Livre
                         </Box>
                         <Box component="span" sx={{ color: 'common.white' }}>
