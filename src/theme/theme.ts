@@ -48,7 +48,7 @@ export const theme = createTheme({
 				brand: { 
 					main: c.primary[800], 
 					contrastText: c.white 
-				}, //        conta
+				}, 
 			},
 		},
 		dark: {
@@ -216,6 +216,31 @@ export const theme = createTheme({
 					paddingBlock: '10px',
 				},
 			},
-		}
+		},
+		MuiStepIcon: {
+			styleOverrides: {
+				// Ativo/concluído em azul de ação; etapas futuras em cinza.
+				root: ({ theme }) => ({
+					color: c.papel[500],
+					'&.Mui-active, &.Mui-completed': {
+						color: theme.palette.info.main,
+					},
+				}),
+			},
+		},
+		MuiStepLabel: {
+			styleOverrides: {
+				label: ({ theme }) => ({
+					marginTop: 8,
+					fontWeight: 500,
+					fontSize: 14,
+					letterSpacing: '0.1px',
+					color: theme.palette.text.primary,
+					'&.Mui-active, &.Mui-completed': {
+						fontWeight: 500,
+					},
+				}),
+			},
+		},
 	},
 })

@@ -1,6 +1,6 @@
 import { Box, Link, Stack, Typography } from '@mui/material'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
-import { colors } from '../../../theme/tokens'
+import { colors } from '@/theme/tokens'
 
 const footerLinks = [
     { label: 'Institucional', href: '#' },

@@ -7,3 +7,39 @@
 import * as zod from 'zod';
 
 export const GetApiHealthResponse = zod.unknown()
+
+
+/**
+ * @summary Cria uma nova conta de usuário (RF01).
+ */
+export const postApiAuthRegisterBodyNameMin = 2;
+export const postApiAuthRegisterBodyNameMax = 120;
+
+export const postApiAuthRegisterBodyEmailMax = 254;
+
+export const postApiAuthRegisterBodyPasswordMin = 8;
+export const postApiAuthRegisterBodyPasswordMax = 128;
+
+
+
+export const PostApiAuthRegisterBody = zod.object({
+  "name": zod.string().min(postApiAuthRegisterBodyNameMin).max(postApiAuthRegisterBodyNameMax).describe('Nome completo.'),
+  "email": zod.email().max(postApiAuthRegisterBodyEmailMax),
+  "password": zod.string().min(postApiAuthRegisterBodyPasswordMin).max(postApiAuthRegisterBodyPasswordMax),
+  "birthDate": zod.iso.date().describe('Data de nascimento no formato ISO (YYYY-MM-DD).'),
+  "gender": zod.enum(['female', 'male', 'non_binary', 'other', 'prefer_not_to_say']).describe('Gênero informado no cadastro.'),
+  "preferences": zod.object({
+  "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
+  "materials": zod.array(zod.enum(['books', 'scientific_articles']).describe('Tipo de material de interesse.')).optional(),
+  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
+  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs), aplicáveis a livros.')
+}).optional().describe('Preferências de leitura usadas para gerar recomendações. Opcionais no cadastro.'),
+  "lgpdConsent": zod.boolean().describe('Consentimento LGPD (RN03). Obrigatório e deve ser true.'),
+  "marketingConsent": zod.boolean().optional().describe('Aceite opcional de avisos sobre novas obras.')
+})
+
+export const PostApiAuthRegisterResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.email()
+})

@@ -1,6 +1,6 @@
 import { Box, Paper, Stack, Typography } from '@mui/material'
 import type { SvgIconComponent } from '@mui/icons-material'
-import { colors } from '../../../theme/tokens'
+import { colors } from '@/theme/tokens'
 
 export interface FeatureCardProps {
 	icon: SvgIconComponent

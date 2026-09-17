@@ -2,8 +2,8 @@ import { Box } from '@mui/material'
 import MenuBookIcon from '@mui/icons-material/MenuBook'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 import DevicesIcon from '@mui/icons-material/Devices'
-import Hero from '../components/landing/hero'
-import FeatureCard, { type FeatureCardProps } from '../components/landing/feature-card'
+import Hero from '@/components/landing/hero'
+import FeatureCard, { type FeatureCardProps } from '@/components/landing/feature-card'
 
 const features: FeatureCardProps[] = [
 	{ icon: MenuBookIcon, title: 'Acervo Rico', text: 'Milhares de títulos de domínio público e publicações acadêmicas à sua disposição.' },
