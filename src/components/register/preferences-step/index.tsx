@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import { Stack, Typography } from '@mui/material'
-import type { StepProps } from '@/types/stepper-types'
 import ChipGroup from '../chip-group'
+import type { CadastroForm } from '@/schemas/register-schemas'
 import {
 	areasArtigos,
 	categoriasLivros,
@@ -26,9 +27,11 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
  * gênero literário aparecem conforme o material escolhido (livros e/ou artigos),
  * espelhando o comportamento do design.
  */
-export default function PreferenciasStep({ form, onField }: StepProps) {
-	const showBooks = form.materials.includes('books')
-	const showArticles = form.materials.includes('scientific_articles')
+export default function PreferenciasStep() {
+	const { control } = useFormContext<CadastroForm>()
+	const materials = useWatch({ control, name: 'materials' })
+	const showBooks = materials.includes('books')
+	const showArticles = materials.includes('scientific_articles')
 
 	return (
 		<Stack sx={{ gap: 4, width: '100%' }}>
@@ -43,52 +46,82 @@ export default function PreferenciasStep({ form, onField }: StepProps) {
 
 			<Stack sx={{ gap: 3 }}>
 				<Section label="Idioma">
-					<ChipGroup
-						label="Idioma"
-						options={idiomaOptions}
-						value={form.languages}
-						onChange={(languages) => onField({ languages })}
+					<Controller
+						name="languages"
+						control={control}
+						render={({ field }) => (
+							<ChipGroup
+								label="Idioma"
+								options={idiomaOptions}
+								value={field.value}
+								onChange={field.onChange}
+							/>
+						)}
 					/>
 				</Section>
 
 				<Section label="Material">
-					<ChipGroup
-						label="Material"
-						options={materialOptions}
-						value={form.materials}
-						onChange={(materials) => onField({ materials })}
+					<Controller
+						name="materials"
+						control={control}
+						render={({ field }) => (
+							<ChipGroup
+								label="Material"
+								options={materialOptions}
+								value={field.value}
+								onChange={field.onChange}
+							/>
+						)}
 					/>
 				</Section>
 
 				{showBooks && (
 					<Section label="Categorias">
-						<ChipGroup
-							label="Categorias de livros"
-							options={categoriasLivros}
-							value={form.categories}
-							onChange={(categories) => onField({ categories })}
+						<Controller
+							name="bookCategories"
+							control={control}
+							render={({ field }) => (
+								<ChipGroup
+									label="Categorias de livros"
+									options={categoriasLivros}
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
 					</Section>
 				)}
 
 				{showBooks && (
 					<Section label="Gênero literário">
-						<ChipGroup
-							label="Gênero literário"
-							options={generosLiterarios}
-							value={form.literaryGenres}
-							onChange={(literaryGenres) => onField({ literaryGenres })}
+						<Controller
+							name="literaryGenres"
+							control={control}
+							render={({ field }) => (
+								<ChipGroup
+									label="Gênero literário"
+									options={generosLiterarios}
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
 					</Section>
 				)}
 
 				{showArticles && (
 					<Section label={showBooks ? 'Áreas de artigos' : 'Categorias'}>
-						<ChipGroup
-							label="Áreas de artigos"
-							options={areasArtigos}
-							value={form.categories}
-							onChange={(categories) => onField({ categories })}
+						<Controller
+							name="articleAreas"
+							control={control}
+							render={({ field }) => (
+								<ChipGroup
+									label="Áreas de artigos"
+									options={areasArtigos}
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
 					</Section>
 				)}

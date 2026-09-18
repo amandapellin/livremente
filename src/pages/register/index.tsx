@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router'
+import { FormProvider, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined'
 import Stepper from '@/components/stepper'
@@ -7,19 +9,13 @@ import DadosStep from '@/components/register/personal-data-step'
 import PreferenciasStep from '@/components/register/preferences-step'
 import LgpdStep from '@/components/register/lgpd-step'
 import {
-	dadosSchema,
-	fieldErrors,
+	cadastroSchema,
 	initialCadastroForm,
-	lgpdSchema,
+	stepFields,
 	type CadastroForm,
 } from '@/schemas/register-schemas'
 import { usePostApiAuthRegister } from '@/api/generated/endpoints'
-import type {
-	Gender,
-	MaterialType,
-	ReadingLanguage,
-	RegisterRequest,
-} from '@/api/generated/model'
+import type { Gender, MaterialType, ReadingLanguage, RegisterRequest } from '@/api/generated/model'
 import { HttpError } from '@/api/fetcher'
 
 const STEPS = ['Dados Cadastrais', 'Preferências', 'LGPD'] as const
@@ -34,7 +30,8 @@ function buildPayload(form: CadastroForm): RegisterRequest {
 		preferences: {
 			languages: form.languages as ReadingLanguage[],
 			materials: form.materials as MaterialType[],
-			categories: form.categories,
+			// A API recebe categorias e áreas num único array de slugs.
+			categories: [...form.bookCategories, ...form.articleAreas],
 			literaryGenres: form.literaryGenres,
 		},
 		lgpdConsent: form.lgpdConsent,
@@ -44,49 +41,30 @@ function buildPayload(form: CadastroForm): RegisterRequest {
 
 export default function CadastroPage() {
 	const [activeStep, setActiveStep] = useState(0)
-	const [form, setForm] = useState<CadastroForm>(initialCadastroForm)
-	const [errors, setErrors] = useState<Record<string, string>>({})
 	const [submitError, setSubmitError] = useState<string | null>(null)
 	const [createdEmail, setCreatedEmail] = useState<string | null>(null)
 
 	const register = usePostApiAuthRegister()
 
-	const onField = (patch: Partial<CadastroForm>) => {
-		setForm((f) => ({ ...f, ...patch }))
-		// Limpa os erros dos campos alterados e o erro de envio.
-		setErrors((prev) => {
-			const next = { ...prev }
-			for (const key of Object.keys(patch)) delete next[key]
-			return next
-		})
-		setSubmitError(null)
-	}
+	const methods = useForm<CadastroForm>({
+		resolver: zodResolver(cadastroSchema),
+		defaultValues: initialCadastroForm,
+	})
 
-	const validateStep = (step: number): boolean => {
-		if (step === 0) {
-			const result = dadosSchema.safeParse(form)
-			setErrors(result.success ? {} : fieldErrors(result.error))
-			return result.success
-		}
-		if (step === 2) {
-			const result = lgpdSchema.safeParse({ lgpdConsent: form.lgpdConsent })
-			setErrors(result.success ? {} : fieldErrors(result.error))
-			return result.success
-		}
-		return true
-	}
-
-	const submit = () => {
+	const submit = (values: CadastroForm) => {
 		register.mutate(
-			{ data: buildPayload(form) },
+			{ data: buildPayload(values) },
 			{
-				onSuccess: () => setCreatedEmail(form.email.trim()),
+				onSuccess: (response) => {
+					if (response.status !== 201) return
+					setCreatedEmail(values.email.trim())
+				},
 				onError: (error) => {
 					if (error instanceof HttpError && error.status === 409) {
 						const message =
 							(error.data as { message?: string } | undefined)?.message ??
 							'Este e-mail já está cadastrado.'
-						setErrors({ email: message })
+						methods.setError('email', { message })
 						setSubmitError(message)
 						setActiveStep(0)
 						return
@@ -97,10 +75,12 @@ export default function CadastroPage() {
 		)
 	}
 
-	const handleNext = () => {
-		if (!validateStep(activeStep)) return
+	const handleNext = async () => {
+		setSubmitError(null)
+		const valid = await methods.trigger([...stepFields[activeStep]])
+		if (!valid) return
 		if (activeStep === STEPS.length - 1) {
-			submit()
+			submit(methods.getValues())
 			return
 		}
 		setActiveStep((s) => s + 1)
@@ -140,11 +120,13 @@ export default function CadastroPage() {
 
 				{submitError && <Alert severity="error">{submitError}</Alert>}
 
-				<Paper elevation={3} sx={{ p: { xs: 3, sm: 5 }, borderRadius: '12px' }}>
-					{activeStep === 0 && <DadosStep form={form} errors={errors} onField={onField} />}
-					{activeStep === 1 && <PreferenciasStep form={form} errors={errors} onField={onField} />}
-					{activeStep === 2 && <LgpdStep form={form} errors={errors} onField={onField} />}
-				</Paper>
+				<FormProvider {...methods}>
+					<Paper elevation={3} sx={{ p: { xs: 3, sm: 5 }, borderRadius: '12px' }}>
+						{activeStep === 0 && <DadosStep />}
+						{activeStep === 1 && <PreferenciasStep />}
+						{activeStep === 2 && <LgpdStep />}
+					</Paper>
+				</FormProvider>
 
 				<Stack direction="row" sx={{ justifyContent: 'flex-end', gap: 2 }}>
 					{activeStep === 0 ? (

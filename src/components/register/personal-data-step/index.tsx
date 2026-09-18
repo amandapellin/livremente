@@ -1,12 +1,15 @@
+import { Controller, useFormContext } from 'react-hook-form'
 import { MenuItem, Stack, TextField, Typography } from '@mui/material'
-import type { StepProps } from '@/types/stepper-types'
 import { generoOptions } from '@/schemas/category-schemas'
+import type { CadastroForm } from '@/schemas/register-schemas'
 
 /**
  * Etapa 1 do cadastro — dados cadastrais exigidos pelo RF01: nome, data de
  * nascimento, gênero, e-mail e senha (com confirmação).
  */
-export default function DadosStep({ form, errors, onField }: StepProps) {
+export default function DadosStep() {
+	const { control } = useFormContext<CadastroForm>()
+
 	return (
 		<Stack sx={{ gap: 4, width: '100%' }}>
 			<Stack sx={{ gap: 1 }}>
@@ -19,77 +22,107 @@ export default function DadosStep({ form, errors, onField }: StepProps) {
 			</Stack>
 
 			<Stack sx={{ gap: 3 }}>
-				<TextField
-					label="Nome Completo"
-					required
-					fullWidth
-					value={form.name}
-					onChange={(e) => onField({ name: e.target.value })}
-					error={Boolean(errors.name)}
-					helperText={errors.name}
+				<Controller
+					name="name"
+					control={control}
+					render={({ field, fieldState }) => (
+						<TextField
+							{...field}
+							label="Nome Completo"
+							required
+							fullWidth
+							error={Boolean(fieldState.error)}
+							helperText={fieldState.error?.message}
+						/>
+					)}
 				/>
 
 				<Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 3 }}>
-					<TextField
-						label="Data de Nascimento"
-						type="date"
-						required
-						fullWidth
-						value={form.birthDate}
-						onChange={(e) => onField({ birthDate: e.target.value })}
-						error={Boolean(errors.birthDate)}
-						helperText={errors.birthDate}
-						slotProps={{ inputLabel: { shrink: true } }}
+					<Controller
+						name="birthDate"
+						control={control}
+						render={({ field, fieldState }) => (
+							<TextField
+								{...field}
+								label="Data de Nascimento"
+								type="date"
+								required
+								fullWidth
+								error={Boolean(fieldState.error)}
+								helperText={fieldState.error?.message}
+								slotProps={{ inputLabel: { shrink: true } }}
+							/>
+						)}
 					/>
-					<TextField
-						label="Gênero"
-						select
-						required
-						value={form.gender}
-						onChange={(e) => onField({ gender: e.target.value })}
-						error={Boolean(errors.gender)}
-						helperText={errors.gender}
-						sx={{ width: { xs: '100%', sm: 220 } }}
-					>
-						{generoOptions.map((opt) => (
-							<MenuItem key={opt.value} value={opt.value}>
-								{opt.label}
-							</MenuItem>
-						))}
-					</TextField>
+					<Controller
+						name="gender"
+						control={control}
+						render={({ field, fieldState }) => (
+							<TextField
+								{...field}
+								label="Gênero"
+								select
+								required
+								error={Boolean(fieldState.error)}
+								helperText={fieldState.error?.message}
+								sx={{ width: { xs: '100%', sm: 220 } }}
+							>
+								{generoOptions.map((opt) => (
+									<MenuItem key={opt.value} value={opt.value}>
+										{opt.label}
+									</MenuItem>
+								))}
+							</TextField>
+						)}
+					/>
 				</Stack>
 
-				<TextField
-					label="E-mail"
-					type="email"
-					required
-					fullWidth
-					value={form.email}
-					onChange={(e) => onField({ email: e.target.value })}
-					error={Boolean(errors.email)}
-					helperText={errors.email}
+				<Controller
+					name="email"
+					control={control}
+					render={({ field, fieldState }) => (
+						<TextField
+							{...field}
+							label="E-mail"
+							type="email"
+							required
+							fullWidth
+							error={Boolean(fieldState.error)}
+							helperText={fieldState.error?.message}
+						/>
+					)}
 				/>
 
 				<Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 3 }}>
-					<TextField
-						label="Senha"
-						type="password"
-						required
-						fullWidth
-						value={form.password}
-						onChange={(e) => onField({ password: e.target.value })}
-						error={Boolean(errors.password)}
-						helperText={errors.password ?? 'Mínimo 8 caracteres'}
+					<Controller
+						name="password"
+						control={control}
+						render={({ field, fieldState }) => (
+							<TextField
+								{...field}
+								label="Senha"
+								type="password"
+								required
+								fullWidth
+								error={Boolean(fieldState.error)}
+								helperText={fieldState.error?.message ?? 'Mínimo 8 caracteres'}
+							/>
+						)}
 					/>
-					<TextField
-						label="Confirmar senha"
-						type="password"
-						required
-						fullWidth
-						value={form.confirmPassword}
-						onChange={(e) => onField({ confirmPassword: e.target.value })}
-						error={Boolean(errors.confirmPassword)}
-						helperText={errors.confirmPassword}
+					<Controller
+						name="confirmPassword"
+						control={control}
+						render={({ field, fieldState }) => (
+							<TextField
+								{...field}
+								label="Confirmar senha"
+								type="password"
+								required
+								fullWidth
+								error={Boolean(fieldState.error)}
+								helperText={fieldState.error?.message}
+							/>
+						)}
 					/>
 				</Stack>
 			</Stack>

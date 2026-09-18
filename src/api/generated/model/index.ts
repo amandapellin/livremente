@@ -5,8 +5,11 @@
  * OpenAPI spec version: 1.0
  */
 
+export * from './authUser';
 export * from './errorResponse';
 export * from './gender';
+export * from './loginRequest';
+export * from './loginResponse';
 export * from './materialType';
 export * from './readingLanguage';
 export * from './registerPreferences';

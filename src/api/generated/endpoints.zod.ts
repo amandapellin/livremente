@@ -43,3 +43,28 @@ export const PostApiAuthRegisterResponse = zod.object({
   "name": zod.string(),
   "email": zod.email()
 })
+
+
+/**
+ * @summary Autentica o usuário com e-mail e senha (RF02).
+ */
+export const postApiAuthLoginBodyEmailMax = 254;
+
+export const postApiAuthLoginBodyPasswordMax = 128;
+
+
+
+export const PostApiAuthLoginBody = zod.object({
+  "email": zod.email().max(postApiAuthLoginBodyEmailMax),
+  "password": zod.string().max(postApiAuthLoginBodyPasswordMax),
+  "rememberMe": zod.boolean().optional().describe('Mantém o usuário conectado entre sessões (RF02).')
+})
+
+export const PostApiAuthLoginResponse = zod.object({
+  "token": zod.string().describe('Token de acesso (JWT) a ser enviado no header Authorization.'),
+  "user": zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.email()
+})
+})
