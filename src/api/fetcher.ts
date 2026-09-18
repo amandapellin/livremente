@@ -1,3 +1,5 @@
+import { getAuthToken } from './auth-storage'
+
 const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 /**
@@ -33,6 +35,11 @@ export const customFetch = async <T>(url: string, options: RequestInit = {}): Pr
   // Content-Type só quando há corpo — evita preflight CORS desnecessário em GETs.
   if (options.body != null && !headers.has('Content-Type')) {
     headers.set('Content-Type', 'application/json')
+  }
+  // Injeta o token JWT (quando há sessão) — ponto único de autenticação.
+  const token = getAuthToken()
+  if (token && !headers.has('Authorization')) {
+    headers.set('Authorization', `Bearer ${token}`)
   }
 
   const response = await fetch(`${baseURL}${url}`, { ...options, headers })

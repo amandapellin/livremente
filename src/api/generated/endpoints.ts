@@ -25,6 +25,8 @@ import type {
 
 import type {
   ErrorResponse,
+  LoginRequest,
+  LoginResponse,
   RegisterRequest,
   RegisterResponse
 } from './model';
@@ -266,4 +268,116 @@ export const usePostApiAuthRegister = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostApiAuthRegisterMutationOptions(options), queryClient);
+    }
+
+export type postApiAuthLoginResponse200 = {
+  data: LoginResponse
+  status: 200
+}
+
+export type postApiAuthLoginResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type postApiAuthLoginResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postApiAuthLoginResponseSuccess = (postApiAuthLoginResponse200) & {
+  headers: Headers;
+};
+export type postApiAuthLoginResponseError = (postApiAuthLoginResponse400 | postApiAuthLoginResponse401) & {
+  headers: Headers;
+};
+
+export type postApiAuthLoginResponse = (postApiAuthLoginResponseSuccess | postApiAuthLoginResponseError)
+
+export const getPostApiAuthLoginUrl = () => {
+
+
+
+
+  return `/api/auth/login`
+}
+
+/**
+ * @summary Autentica o usuário com e-mail e senha (RF02).
+ */
+export const postApiAuthLogin = async (loginRequest: LoginRequest, options?: Parameters<typeof customFetch>[1]): Promise<postApiAuthLoginResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postApiAuthLoginResponse>(getPostApiAuthLoginUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(loginRequest)
+  }
+);}
+
+
+
+
+
+export const getPostApiAuthLoginMutationKey = () => ['postApiAuthLogin'] as const;
+
+export const getPostApiAuthLoginMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthLogin>>, TError,PostApiAuthLoginMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiAuthLogin>>, TError,PostApiAuthLoginMutationVariables, TContext> => {
+
+const mutationKey = getPostApiAuthLoginMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiAuthLogin>>, PostApiAuthLoginMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiAuthLogin(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiAuthLoginMutationResult = NonNullable<Awaited<ReturnType<typeof postApiAuthLogin>>>
+    export type PostApiAuthLoginMutationBody = LoginRequest
+    export type PostApiAuthLoginMutationError = ErrorResponse
+    export type PostApiAuthLoginMutationVariables = {data: LoginRequest}
+
+    /**
+ * @summary Autentica o usuário com e-mail e senha (RF02).
+ */
+export const usePostApiAuthLogin = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthLogin>>, TError,PostApiAuthLoginMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiAuthLogin>>,
+        TError,
+        PostApiAuthLoginMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostApiAuthLoginMutationOptions(options), queryClient);
     }

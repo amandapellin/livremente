@@ -1,3 +1,4 @@
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
 import {
 	Box,
 	Checkbox,
@@ -8,7 +9,7 @@ import {
 	Typography,
 } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutlined'
-import type { StepProps } from '@/types/stepper-types'
+import type { CadastroForm } from '@/schemas/register-schemas'
 import { colors } from '@/theme/tokens'
 
 const consentParagraphs = [
@@ -22,7 +23,13 @@ const consentParagraphs = [
  * tratamento de dados (RN03) e aceite opcional de avisos, além do aviso de
  * confirmação por e-mail.
  */
-export default function LgpdStep({ form, errors, onField }: StepProps) {
+export default function LgpdStep() {
+	const {
+		control,
+		formState: { errors },
+	} = useFormContext<CadastroForm>()
+	const email = useWatch({ control, name: 'email' })
+
 	return (
 		<Stack sx={{ gap: 4, width: '100%' }}>
 			<Stack sx={{ gap: 1 }}>
@@ -53,25 +60,31 @@ export default function LgpdStep({ form, errors, onField }: StepProps) {
 			</Box>
 
 			<FormControl error={Boolean(errors.lgpdConsent)} component="fieldset" variant="standard">
-				<FormControlLabel
-					control={
-						<Checkbox
-							checked={form.lgpdConsent}
-							onChange={(e) => onField({ lgpdConsent: e.target.checked })}
+				<Controller
+					name="lgpdConsent"
+					control={control}
+					render={({ field }) => (
+						<FormControlLabel
+							control={
+								<Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+							}
+							label="Concordo com o tratamento dos meus dados pessoais conforme descrito acima."
 						/>
-					}
-					label="Concordo com o tratamento dos meus dados pessoais conforme descrito acima."
+					)}
 				/>
-				<FormControlLabel
-					control={
-						<Checkbox
-							checked={form.marketingConsent}
-							onChange={(e) => onField({ marketingConsent: e.target.checked })}
+				<Controller
+					name="marketingConsent"
+					control={control}
+					render={({ field }) => (
+						<FormControlLabel
+							control={
+								<Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+							}
+							label="Quero receber avisos sobre novas obras nas minhas áreas de interesse."
 						/>
-					}
-					label="Quero receber avisos sobre novas obras nas minhas áreas de interesse."
+					)}
 				/>
-				{errors.lgpdConsent && <FormHelperText>{errors.lgpdConsent}</FormHelperText>}
+				{errors.lgpdConsent && <FormHelperText>{errors.lgpdConsent.message}</FormHelperText>}
 			</FormControl>
 
 			<Stack
@@ -90,7 +103,7 @@ export default function LgpdStep({ form, errors, onField }: StepProps) {
 				<Typography variant="caption" sx={{ color: 'text.primary' }}>
 					Ao concluir, enviamos um link de confirmação para{' '}
 					<Box component="span" sx={{ fontWeight: 500 }}>
-						{form.email || 'seu e-mail'}
+						{email || 'seu e-mail'}
 					</Box>
 					. A conta é ativada após a confirmação.
 				</Typography>
