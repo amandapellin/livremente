@@ -17,13 +17,16 @@ const confirmedFeedback: Record<string, Feedback> = {
 export default function LoginPage() {
 	const { control, handleSubmit, errors, submitError, loginIsPending, onSubmit } = useLoginForm()
 	const [searchParams, setSearchParams] = useSearchParams()
-	const [feedback, setFeedback] = useState<Feedback | null>(null)
+	// Deriva o feedback do parâmetro ?confirmed= na montagem (inicializador lazy),
+	// evitando setState dentro do efeito.
+	const [feedback, setFeedback] = useState<Feedback | null>(() => {
+		const confirmed = searchParams.get('confirmed')
+		return (confirmed && confirmedFeedback[confirmed]) || null
+	})
 
 	useEffect(() => {
-		const confirmed = searchParams.get('confirmed')
-		if (confirmed && confirmedFeedback[confirmed]) {
-			setFeedback(confirmedFeedback[confirmed])
-			// Remove o parâmetro da URL para não reexibir o toast ao recarregar.
+		// O efeito só sincroniza a URL: remove o parâmetro para não reexibir o toast ao recarregar.
+		if (searchParams.get('confirmed')) {
 			searchParams.delete('confirmed')
 			setSearchParams(searchParams, { replace: true })
 		}
