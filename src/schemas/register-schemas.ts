@@ -26,7 +26,7 @@ export const cadastroSchema = z
 		confirmPassword: z.string().min(1, 'Confirme sua senha.'),
 		// Etapa 2 — Preferências de leitura (opcionais)
 		languages: z.array(z.string()),
-		materials: z.array(z.string()),
+		publications: z.array(z.string()),
 		bookCategories: z.array(z.string()),
 		articleAreas: z.array(z.string()),
 		literaryGenres: z.array(z.string()),
@@ -51,7 +51,7 @@ export const initialCadastroForm: CadastroForm = {
 	password: '',
 	confirmPassword: '',
 	languages: [],
-	materials: [],
+	publications: [],
 	bookCategories: [],
 	articleAreas: [],
 	literaryGenres: [],

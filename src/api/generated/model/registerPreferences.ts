@@ -4,7 +4,7 @@
  * LivreMente.Api
  * OpenAPI spec version: 1.0
  */
-import type { MaterialType } from './materialType';
+import type { PublicationType } from './publicationType';
 import type { ReadingLanguage } from './readingLanguage';
 
 /**
@@ -12,7 +12,7 @@ import type { ReadingLanguage } from './readingLanguage';
  */
 export interface RegisterPreferences {
   languages?: ReadingLanguage[];
-  materials?: MaterialType[];
+  publications?: PublicationType[];
   /** Categorias de livros e/ou áreas de artigos (slugs). */
   categories?: string[];
   /** Gêneros literários (slugs), aplicáveis a livros. */

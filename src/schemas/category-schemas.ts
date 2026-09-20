@@ -11,8 +11,8 @@ export const idiomaOptions: readonly Opcao[] = [
 	{ value: 'es', label: 'Espanhol' }, { value: 'fr', label: 'Francês' }, { value: 'ru', label: 'Russo' },
 ]
 
-export const materialOptions: readonly Opcao[] = [
-	{ value: 'books', label: 'Livros' }, { value: 'scientific_articles', label: 'Artigos' },
+export const publicationOptions: readonly Opcao[] = [
+	{ value: 'book', label: 'Livros' }, { value: 'scientific_article', label: 'Artigos' },
 ]
 
 export const categoriasLivros: readonly Opcao[] = [

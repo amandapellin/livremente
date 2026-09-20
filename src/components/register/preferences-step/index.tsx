@@ -8,7 +8,7 @@ import {
 	categoriasLivros,
 	generosLiterarios,
 	idiomaOptions,
-	materialOptions,
+	publicationOptions,
 } from '@/schemas/category-schemas'
 
 function Section({ label, children }: { label: string; children: ReactNode }) {
@@ -24,14 +24,14 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
 
 /**
  * Etapa 2 do cadastro — preferências de leitura. As seções de categorias e
- * gênero literário aparecem conforme o material escolhido (livros e/ou artigos),
- * espelhando o comportamento do design.
+ * gênero literário aparecem conforme a publicação escolhida (livros e/ou
+ * artigos), espelhando o comportamento do design.
  */
 export default function PreferenciasStep() {
 	const { control } = useFormContext<CadastroForm>()
-	const materials = useWatch({ control, name: 'materials' })
-	const showBooks = materials.includes('books')
-	const showArticles = materials.includes('scientific_articles')
+	const publications = useWatch({ control, name: 'publications' })
+	const showBooks = publications.includes('book')
+	const showArticles = publications.includes('scientific_article')
 
 	return (
 		<Stack sx={{ gap: 4, width: '100%' }}>
@@ -60,14 +60,14 @@ export default function PreferenciasStep() {
 					/>
 				</Section>
 
-				<Section label="Material">
+				<Section label="Publicações">
 					<Controller
-						name="materials"
+						name="publications"
 						control={control}
 						render={({ field }) => (
 							<ChipGroup
-								label="Material"
-								options={materialOptions}
+								label="Publicações"
+								options={publicationOptions}
 								value={field.value}
 								onChange={field.onChange}
 							/>

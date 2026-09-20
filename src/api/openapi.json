@@ -116,6 +116,46 @@
           }
         }
       }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Renova o token de acesso (RF02).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens renovados com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token inválido ou expirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -142,12 +182,12 @@
           "ru"
         ]
       },
-      "MaterialType": {
+      "PublicationType": {
         "type": "string",
-        "description": "Tipo de material de interesse.",
+        "description": "Tipo de publicação de interesse (obra: livro ou artigo).",
         "enum": [
-          "books",
-          "scientific_articles"
+          "book",
+          "scientific_article"
         ]
       },
       "RegisterPreferences": {
@@ -160,10 +200,10 @@
               "$ref": "#/components/schemas/ReadingLanguage"
             }
           },
-          "materials": {
+          "publications": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MaterialType"
+              "$ref": "#/components/schemas/PublicationType"
             }
           },
           "categories": {
@@ -312,6 +352,7 @@
         "type": "object",
         "required": [
           "token",
+          "refreshToken",
           "user"
         ],
         "properties": {
@@ -319,8 +360,41 @@
             "type": "string",
             "description": "Token de acesso (JWT) a ser enviado no header Authorization."
           },
+          "refreshToken": {
+            "type": "string",
+            "description": "Token de atualização (Refresh Token) para renovar a sessão."
+          },
           "user": {
             "$ref": "#/components/schemas/AuthUser"
+          }
+        }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Token de atualização (Refresh Token) atual."
+          }
+        }
+      },
+      "RefreshResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "refreshToken"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Novo token de acesso (JWT)."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Novo token de atualização (Refresh Token)."
           }
         }
       }
