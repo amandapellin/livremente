@@ -9,4 +9,15 @@ export default defineConfig({
 		},
 	},
 	plugins: [react()],
+	server: {
+		// Encaminha as chamadas /api para o backend em dev. Com isso o front usa
+		// caminhos relativos (baseURL vazia) e o browser vê tudo na mesma origem,
+		// dispensando VITE_API_URL e CORS. Ajuste o target se a porta do backend mudar.
+		proxy: {
+			'/api': {
+				target: 'http://localhost:5091',
+				changeOrigin: true,
+			},
+		},
+	},
 })

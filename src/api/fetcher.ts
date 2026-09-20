@@ -1,4 +1,4 @@
-import { getAuthToken } from './auth-storage'
+import { getAuthToken, getAuthTokens, saveAuthTokens, clearAuthTokens } from './auth-storage'
 
 const baseURL = import.meta.env.VITE_API_URL ?? ''
 
@@ -20,15 +20,38 @@ export class HttpError extends Error {
   }
 }
 
+let refreshPromise: Promise<boolean> | null = null
+
+async function performTokenRefresh(): Promise<boolean> {
+  const { refreshToken, storage } = getAuthTokens()
+  if (!refreshToken || !storage) return false
+
+  try {
+    const response = await fetch(`${baseURL}/api/auth/refresh`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refreshToken }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Refresh failed')
+    }
+
+    const data = await response.json()
+    saveAuthTokens(data.token, data.refreshToken, storage === 'local')
+    return true
+  } catch {
+    clearAuthTokens()
+    return false
+  } finally {
+    refreshPromise = null
+  }
+}
+
 /**
  * Custom fetch usado pelo cliente gerado (orval, httpClient: 'fetch').
- * Prefixa a baseURL vinda do ambiente e centraliza o tratamento de resposta —
- * ponto único para, no futuro, injetar o token JWT nos headers.
- *
- * Segue a convenção do cliente fetch do orval: devolve o envelope
- * `{ data, status, headers }`, onde `data` é o corpo já desserializado.
- * Em requests não-ok, lança um `HttpError` — o React Query então marca a
- * query/mutation como erro, com status e corpo disponíveis para a UI.
+ * Prefixa a baseURL vinda do ambiente e centraliza o tratamento de resposta.
+ * Injeta o token JWT e intercepta respostas 401 para renovação automática (RF02).
  */
 export const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
   const headers = new Headers(options.headers)
@@ -37,17 +60,39 @@ export const customFetch = async <T>(url: string, options: RequestInit = {}): Pr
     headers.set('Content-Type', 'application/json')
   }
   // Injeta o token JWT (quando há sessão) — ponto único de autenticação.
-  const token = getAuthToken()
+  let token = getAuthToken()
   if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`)
   }
 
-  const response = await fetch(`${baseURL}${url}`, { ...options, headers })
+  let response = await fetch(`${baseURL}${url}`, { ...options, headers })
+
+  // Intercepta 401 para tentar renovar o token (se não for nas rotas de login/refresh)
+  if (response.status === 401 && !url.includes('/api/auth/login') && !url.includes('/api/auth/refresh')) {
+    if (!refreshPromise) {
+      refreshPromise = performTokenRefresh()
+    }
+
+    const refreshed = await refreshPromise
+
+    if (refreshed) {
+      token = getAuthToken()
+      if (token) {
+        headers.set('Authorization', `Bearer ${token}`)
+        response = await fetch(`${baseURL}${url}`, { ...options, headers })
+      }
+    }
+  }
 
   const text = await response.text()
   const data = text ? JSON.parse(text) : undefined
 
   if (!response.ok) {
+    // Se o erro continua sendo 401 (refresh falhou ou url era auth), desloga e redireciona
+    if (response.status === 401 && !url.includes('/api/auth/login')) {
+      clearAuthTokens()
+      window.location.href = '/login'
+    }
     throw new HttpError(response.status, data, url)
   }
 

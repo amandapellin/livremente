@@ -1,95 +1,24 @@
-import { useState } from 'react'
 import { NavLink } from 'react-router'
-import { FormProvider, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { FormProvider } from 'react-hook-form'
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material'
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutlined'
 import Stepper from '@/components/stepper'
 import DadosStep from '@/components/register/personal-data-step'
 import PreferenciasStep from '@/components/register/preferences-step'
 import LgpdStep from '@/components/register/lgpd-step'
-import {
-	cadastroSchema,
-	initialCadastroForm,
-	stepFields,
-	type CadastroForm,
-} from '@/schemas/register-schemas'
-import { usePostApiAuthRegister } from '@/api/generated/endpoints'
-import type { Gender, MaterialType, ReadingLanguage, RegisterRequest } from '@/api/generated/model'
-import { HttpError } from '@/api/fetcher'
-
-const STEPS = ['Dados Cadastrais', 'Preferências', 'LGPD'] as const
-
-function buildPayload(form: CadastroForm): RegisterRequest {
-	return {
-		name: form.name.trim(),
-		email: form.email.trim(),
-		password: form.password,
-		birthDate: form.birthDate,
-		gender: form.gender as Gender,
-		preferences: {
-			languages: form.languages as ReadingLanguage[],
-			materials: form.materials as MaterialType[],
-			// A API recebe categorias e áreas num único array de slugs.
-			categories: [...form.bookCategories, ...form.articleAreas],
-			literaryGenres: form.literaryGenres,
-		},
-		lgpdConsent: form.lgpdConsent,
-		marketingConsent: form.marketingConsent,
-	}
-}
+import { useRegisterForm } from '@/hooks/useRegisterForm'
 
 export default function CadastroPage() {
-	const [activeStep, setActiveStep] = useState(0)
-	const [submitError, setSubmitError] = useState<string | null>(null)
-	const [createdEmail, setCreatedEmail] = useState<string | null>(null)
-
-	const register = usePostApiAuthRegister()
-
-	const methods = useForm<CadastroForm>({
-		resolver: zodResolver(cadastroSchema),
-		defaultValues: initialCadastroForm,
-	})
-
-	const submit = (values: CadastroForm) => {
-		register.mutate(
-			{ data: buildPayload(values) },
-			{
-				onSuccess: (response) => {
-					if (response.status !== 201) return
-					setCreatedEmail(values.email.trim())
-				},
-				onError: (error) => {
-					if (error instanceof HttpError && error.status === 409) {
-						const message =
-							(error.data as { message?: string } | undefined)?.message ??
-							'Este e-mail já está cadastrado.'
-						methods.setError('email', { message })
-						setSubmitError(message)
-						setActiveStep(0)
-						return
-					}
-					setSubmitError('Não foi possível criar sua conta. Tente novamente.')
-				},
-			},
-		)
-	}
-
-	const handleNext = async () => {
-		setSubmitError(null)
-		const valid = await methods.trigger([...stepFields[activeStep]])
-		if (!valid) return
-		if (activeStep === STEPS.length - 1) {
-			submit(methods.getValues())
-			return
-		}
-		setActiveStep((s) => s + 1)
-	}
-
-	const handleBack = () => {
-		setSubmitError(null)
-		setActiveStep((s) => Math.max(0, s - 1))
-	}
+	const {
+		activeStep,
+		submitError,
+		createdEmail,
+		methods,
+		registerIsPending,
+		handleNext,
+		handleBack,
+		STEPS,
+	} = useRegisterForm()
 
 	if (createdEmail) {
 		return (
@@ -138,9 +67,9 @@ export default function CadastroPage() {
 							Voltar
 						</Button>
 					)}
-					<Button variant="contained" onClick={handleNext} disabled={register.isPending}>
+					<Button variant="contained" onClick={handleNext} disabled={registerIsPending}>
 						{activeStep === STEPS.length - 1
-							? register.isPending
+							? registerIsPending
 								? 'Criando…'
 								: 'Criar conta'
 							: 'Continuar'}

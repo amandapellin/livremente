@@ -27,6 +27,8 @@ import type {
   ErrorResponse,
   LoginRequest,
   LoginResponse,
+  RefreshRequest,
+  RefreshResponse,
   RegisterRequest,
   RegisterResponse
 } from './model';
@@ -380,4 +382,111 @@ export const usePostApiAuthLogin = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostApiAuthLoginMutationOptions(options), queryClient);
+    }
+
+export type postApiAuthRefreshResponse200 = {
+  data: RefreshResponse
+  status: 200
+}
+
+export type postApiAuthRefreshResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postApiAuthRefreshResponseSuccess = (postApiAuthRefreshResponse200) & {
+  headers: Headers;
+};
+export type postApiAuthRefreshResponseError = (postApiAuthRefreshResponse401) & {
+  headers: Headers;
+};
+
+export type postApiAuthRefreshResponse = (postApiAuthRefreshResponseSuccess | postApiAuthRefreshResponseError)
+
+export const getPostApiAuthRefreshUrl = () => {
+
+
+
+
+  return `/api/auth/refresh`
+}
+
+/**
+ * @summary Renova o token de acesso (RF02).
+ */
+export const postApiAuthRefresh = async (refreshRequest: RefreshRequest, options?: Parameters<typeof customFetch>[1]): Promise<postApiAuthRefreshResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postApiAuthRefreshResponse>(getPostApiAuthRefreshUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(refreshRequest)
+  }
+);}
+
+
+
+
+
+export const getPostApiAuthRefreshMutationKey = () => ['postApiAuthRefresh'] as const;
+
+export const getPostApiAuthRefreshMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthRefresh>>, TError,PostApiAuthRefreshMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiAuthRefresh>>, TError,PostApiAuthRefreshMutationVariables, TContext> => {
+
+const mutationKey = getPostApiAuthRefreshMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiAuthRefresh>>, PostApiAuthRefreshMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiAuthRefresh(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiAuthRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof postApiAuthRefresh>>>
+    export type PostApiAuthRefreshMutationBody = RefreshRequest
+    export type PostApiAuthRefreshMutationError = ErrorResponse
+    export type PostApiAuthRefreshMutationVariables = {data: RefreshRequest}
+
+    /**
+ * @summary Renova o token de acesso (RF02).
+ */
+export const usePostApiAuthRefresh = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthRefresh>>, TError,PostApiAuthRefreshMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiAuthRefresh>>,
+        TError,
+        PostApiAuthRefreshMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostApiAuthRefreshMutationOptions(options), queryClient);
     }

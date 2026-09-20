@@ -30,7 +30,7 @@ export const PostApiAuthRegisterBody = zod.object({
   "gender": zod.enum(['female', 'male', 'non_binary', 'other', 'prefer_not_to_say']).describe('Gênero informado no cadastro.'),
   "preferences": zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
-  "materials": zod.array(zod.enum(['books', 'scientific_articles']).describe('Tipo de material de interesse.')).optional(),
+  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
   "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
   "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs), aplicáveis a livros.')
 }).optional().describe('Preferências de leitura usadas para gerar recomendações. Opcionais no cadastro.'),
@@ -62,9 +62,23 @@ export const PostApiAuthLoginBody = zod.object({
 
 export const PostApiAuthLoginResponse = zod.object({
   "token": zod.string().describe('Token de acesso (JWT) a ser enviado no header Authorization.'),
+  "refreshToken": zod.string().describe('Token de atualização (Refresh Token) para renovar a sessão.'),
   "user": zod.object({
   "id": zod.string(),
   "name": zod.string(),
   "email": zod.email()
 })
+})
+
+
+/**
+ * @summary Renova o token de acesso (RF02).
+ */
+export const PostApiAuthRefreshBody = zod.object({
+  "refreshToken": zod.string().describe('Token de atualização (Refresh Token) atual.')
+})
+
+export const PostApiAuthRefreshResponse = zod.object({
+  "token": zod.string().describe('Novo token de acesso (JWT).'),
+  "refreshToken": zod.string().describe('Novo token de atualização (Refresh Token).')
 })

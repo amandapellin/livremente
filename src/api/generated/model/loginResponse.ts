@@ -9,5 +9,7 @@ import type { AuthUser } from './authUser';
 export interface LoginResponse {
   /** Token de acesso (JWT) a ser enviado no header Authorization. */
   token: string;
+  /** Token de atualização (Refresh Token) para renovar a sessão. */
+  refreshToken: string;
   user: AuthUser;
 }
