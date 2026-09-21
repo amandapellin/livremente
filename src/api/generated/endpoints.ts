@@ -30,7 +30,9 @@ import type {
   RefreshRequest,
   RefreshResponse,
   RegisterRequest,
-  RegisterResponse
+  RegisterResponse,
+  UpdateProfileRequest,
+  UserProfile
 } from './model';
 
 import { customFetch } from '../fetcher';
@@ -489,4 +491,236 @@ export const usePostApiAuthRefresh = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostApiAuthRefreshMutationOptions(options), queryClient);
+    }
+
+export type getApiUsersMeResponse200 = {
+  data: UserProfile
+  status: 200
+}
+
+export type getApiUsersMeResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getApiUsersMeResponseSuccess = (getApiUsersMeResponse200) & {
+  headers: Headers;
+};
+export type getApiUsersMeResponseError = (getApiUsersMeResponse401) & {
+  headers: Headers;
+};
+
+export type getApiUsersMeResponse = (getApiUsersMeResponseSuccess | getApiUsersMeResponseError)
+
+export const getGetApiUsersMeUrl = () => {
+
+
+
+
+  return `/api/users/me`
+}
+
+/**
+ * @summary Retorna o perfil do usuário autenticado (RF03).
+ */
+export const getApiUsersMe = async ( options?: Parameters<typeof customFetch>[1]): Promise<getApiUsersMeResponse> => {
+
+  return customFetch<getApiUsersMeResponse>(getGetApiUsersMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApiUsersMeQueryKey = () => {
+    return [
+    `/api/users/me`
+    ] as const;
+    }
+
+
+export const getGetApiUsersMeQueryOptions = <TData = Awaited<ReturnType<typeof getApiUsersMe>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiUsersMeQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiUsersMe>>> = ({ signal }) => getApiUsersMe({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMe>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiUsersMeQueryResult = NonNullable<Awaited<ReturnType<typeof getApiUsersMe>>>
+export type GetApiUsersMeQueryError = ErrorResponse
+
+
+export function useGetApiUsersMe<TData = Awaited<ReturnType<typeof getApiUsersMe>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMe>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMe>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMe<TData = Awaited<ReturnType<typeof getApiUsersMe>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMe>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMe>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMe>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMe<TData = Awaited<ReturnType<typeof getApiUsersMe>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Retorna o perfil do usuário autenticado (RF03).
+ */
+
+export function useGetApiUsersMe<TData = Awaited<ReturnType<typeof getApiUsersMe>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMe>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiUsersMeQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putApiUsersMeResponse200 = {
+  data: UserProfile
+  status: 200
+}
+
+export type putApiUsersMeResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putApiUsersMeResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putApiUsersMeResponseSuccess = (putApiUsersMeResponse200) & {
+  headers: Headers;
+};
+export type putApiUsersMeResponseError = (putApiUsersMeResponse400 | putApiUsersMeResponse401) & {
+  headers: Headers;
+};
+
+export type putApiUsersMeResponse = (putApiUsersMeResponseSuccess | putApiUsersMeResponseError)
+
+export const getPutApiUsersMeUrl = () => {
+
+
+
+
+  return `/api/users/me`
+}
+
+/**
+ * @summary Atualiza os dados cadastrais do perfil (RF03).
+ */
+export const putApiUsersMe = async (updateProfileRequest: UpdateProfileRequest, options?: Parameters<typeof customFetch>[1]): Promise<putApiUsersMeResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putApiUsersMeResponse>(getPutApiUsersMeUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateProfileRequest)
+  }
+);}
+
+
+
+
+
+export const getPutApiUsersMeMutationKey = () => ['putApiUsersMe'] as const;
+
+export const getPutApiUsersMeMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMe>>, TError,PutApiUsersMeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMe>>, TError,PutApiUsersMeMutationVariables, TContext> => {
+
+const mutationKey = getPutApiUsersMeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApiUsersMe>>, PutApiUsersMeMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  putApiUsersMe(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutApiUsersMeMutationResult = NonNullable<Awaited<ReturnType<typeof putApiUsersMe>>>
+    export type PutApiUsersMeMutationBody = UpdateProfileRequest
+    export type PutApiUsersMeMutationError = ErrorResponse
+    export type PutApiUsersMeMutationVariables = {data: UpdateProfileRequest}
+
+    /**
+ * @summary Atualiza os dados cadastrais do perfil (RF03).
+ */
+export const usePutApiUsersMe = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMe>>, TError,PutApiUsersMeMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putApiUsersMe>>,
+        TError,
+        PutApiUsersMeMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutApiUsersMeMutationOptions(options), queryClient);
     }

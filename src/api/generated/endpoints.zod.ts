@@ -82,3 +82,32 @@ export const PostApiAuthRefreshResponse = zod.object({
   "token": zod.string().describe('Novo token de acesso (JWT).'),
   "refreshToken": zod.string().describe('Novo token de atualização (Refresh Token).')
 })
+
+
+/**
+ * @summary Retorna o perfil do usuário autenticado (RF03).
+ */
+export const GetApiUsersMeResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.email()
+})
+
+
+/**
+ * @summary Atualiza os dados cadastrais do perfil (RF03).
+ */
+export const putApiUsersMeBodyNameMin = 2;
+export const putApiUsersMeBodyNameMax = 120;
+
+
+
+export const PutApiUsersMeBody = zod.object({
+  "name": zod.string().min(putApiUsersMeBodyNameMin).max(putApiUsersMeBodyNameMax).describe('Nome completo.')
+})
+
+export const PutApiUsersMeResponse = zod.object({
+  "id": zod.string(),
+  "name": zod.string(),
+  "email": zod.email()
+})
