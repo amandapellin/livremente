@@ -1,67 +1,28 @@
-import { Chip, Paper, Stack, Typography } from '@mui/material'
-import type { Opcao } from '@/schemas/category-schemas'
-import {
-	categoriasLivros,
-	generosLiterarios,
-	idiomaOptions,
-	publicationOptions,
-} from '@/schemas/category-schemas'
-import { colors } from '@/theme/tokens'
-
-// Seleção ilustrativa — este bloco é apenas visual (as preferências serão
-// editáveis no RF04). Os slugs abaixo espelham o design.
-const preselected = new Set([
-	'pt',
-	'book',
-	'literature',
-	'science_technology',
-	'art_culture',
-	'hobbies',
-	'classics',
-	'romance',
-	'science_fiction_fantasy',
-	'crime_thriller_mystery',
-	'mythology',
-])
-
-function StaticChips({ label, options }: { label: string; options: readonly Opcao[] }) {
-	return (
-		<Stack sx={{ gap: 1.5 }}>
-			<Typography variant="overline" sx={{ color: 'text.secondary' }}>
-				{label}
-			</Typography>
-			<Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1.5 }}>
-				{options.map((opt) => {
-					const selected = preselected.has(opt.value)
-					return (
-						<Chip
-							key={opt.value}
-							label={opt.label}
-							size="small"
-							variant="outlined"
-							sx={{
-								borderRadius: '100px',
-								fontSize: 12,
-								letterSpacing: '0.4px',
-								...(selected
-									? { bgcolor: colors.acao[50], borderColor: colors.acao[200], color: colors.acao[600] }
-									: { borderColor: colors.papel[300], color: 'text.secondary' }),
-							}}
-						/>
-					)
-				})}
-			</Stack>
-		</Stack>
-	)
-}
+import { FormProvider } from 'react-hook-form'
+import { Alert, Box, Button, CircularProgress, Paper, Snackbar, Stack, Typography } from '@mui/material'
+import PreferencesFields from '@/components/preferences/preferences-fields'
+import { useProfilePreferences } from '@/hooks/useProfilePreferences'
 
 /**
- * Bloco "Preferências de leitura" — apenas visual (placeholder). A edição das
- * preferências é escopo do RF04.
+ * Bloco "Preferências de leitura" do perfil (RF04) — funcional. Carrega as
+ * preferências atuais, permite editá-las (mesmo componente do cadastro) e
+ * salvá-las com o próprio botão.
  */
 export default function ReadingPreferencesSection() {
+	const {
+		methods,
+		onSubmit,
+		isDirty,
+		isLoading,
+		isLoadError,
+		isSaving,
+		success,
+		submitError,
+		dismissSuccess,
+	} = useProfilePreferences()
+
 	return (
-		<Paper variant="outlined" sx={{ p: 3, borderRadius: '6px' }}>
+		<Paper variant="section" sx={{ p: 3 }}>
 			<Stack sx={{ gap: 3 }}>
 				<Stack sx={{ gap: 1 }}>
 					<Typography variant="h6" component="h2">
@@ -71,11 +32,38 @@ export default function ReadingPreferencesSection() {
 						Alimentam suas recomendações. Selecione quantas quiser.
 					</Typography>
 				</Stack>
-				<StaticChips label="Idioma" options={idiomaOptions} />
-				<StaticChips label="Material" options={publicationOptions} />
-				<StaticChips label="Categorias" options={categoriasLivros} />
-				<StaticChips label="Gênero literário" options={generosLiterarios} />
+
+				{isLoading ? (
+					<Stack sx={{ alignItems: 'center', py: 4 }}>
+						<CircularProgress />
+					</Stack>
+				) : isLoadError ? (
+					<Alert severity="error">Não foi possível carregar suas preferências.</Alert>
+				) : (
+					<FormProvider {...methods}>
+						<Stack component="form" onSubmit={onSubmit} noValidate sx={{ gap: 3 }}>
+							<PreferencesFields />
+							{submitError && <Alert severity="error">{submitError}</Alert>}
+							<Box>
+								<Button type="submit" variant="contained" disabled={isSaving || !isDirty}>
+									{isSaving ? 'Salvando…' : 'Salvar preferências'}
+								</Button>
+							</Box>
+						</Stack>
+					</FormProvider>
+				)}
 			</Stack>
+
+			<Snackbar
+				open={success}
+				autoHideDuration={6000}
+				onClose={dismissSuccess}
+				anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+			>
+				<Alert severity="success" variant="filled" onClose={dismissSuccess} sx={{ width: '100%' }}>
+					Preferências atualizadas com sucesso.
+				</Alert>
+			</Snackbar>
 		</Paper>
 	)
 }

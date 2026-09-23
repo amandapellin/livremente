@@ -234,6 +234,84 @@
           }
         }
       }
+    },
+    "/api/users/me/preferences": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna as preferências de leitura do usuário (RF04).",
+        "responses": {
+          "200": {
+            "description": "Preferências do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferences"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Atualiza as preferências de leitura do usuário (RF04).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferences"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferências atualizadas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferences"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -507,6 +585,38 @@
             "minLength": 2,
             "maxLength": 120,
             "description": "Nome completo."
+          }
+        }
+      },
+      "UserPreferences": {
+        "type": "object",
+        "description": "Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).",
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadingLanguage"
+            }
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationType"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Categorias de livros e/ou áreas de artigos (slugs).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "literaryGenres": {
+            "type": "array",
+            "description": "Gêneros literários (slugs).",
+            "items": {
+              "type": "string"
+            }
           }
         }
       }

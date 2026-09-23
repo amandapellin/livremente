@@ -94,14 +94,25 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - **#5 (RF01) Tela de cadastro:** *wizard* de 3 etapas (Dados, Preferências, LGPD)
   com stepper, React Hook Form + Zod, envio via cliente orval, tratamento amigável
   de 409, tela de sucesso.
-- **#6 (RN01, integração):** *toast* no `/login` lendo `?confirmed=1|invalid`.
-- Tela de login (RF02) — base.
+- **#6 (RF02) Tela de login:** e-mail/senha com React Hook Form + Zod; *toast* no
+  `/login` lendo `?confirmed=1|invalid` (RN01, integração).
+- **#7 (RF02) Persistência de sessão:** "manter-se conectado"
+  (local/sessionStorage) e *refresh token* com renovação transparente no 401
+  (centralizado no `fetcher`).
+- **#8 (RF03) Tela de edição de perfil:** formulário pré-preenchido via
+  `GET /api/users/me`, salvar via `PUT` com *toast* de sucesso e validação por
+  campo. Bloco "Identificação" funcional (nome editável; e-mail somente-leitura);
+  Senha, Dados e privacidade e Leitor entram como placeholders visuais (as
+  Preferências passaram a ser funcionais no #9). Contrato `/api/users/me`
+  proposto pelo front — o back-end precisa implementá-lo.
+- **#9 (RF04) Preferências de leitura:** idioma, tipo de conteúdo (livro/artigo),
+  categorias/áreas de conhecimento e gênero literário via *chips* (multi-seleção),
+  num componente compartilhado (`PreferencesFields`) usado **no cadastro e no
+  perfil**. No perfil, prefill via `GET /api/users/me/preferences` e salvar via
+  `PUT` com *toast* próprio. Contrato de preferências proposto pelo front.
 
 **Em andamento / próximas:**
-- **#7 (RF02) Persistência de sessão** ("manter-se conectado" / refresh token) —
-  branch atual `feat/7-persistencia-de-sessao`.
-- Telas de catálogo, detalhes, leitura (reader), estante, recomendações, perfil.
-- Perfil (RF03) consome `/api/users/me/...`; preferências (RF04).
+- Telas de catálogo, detalhes, leitura (reader), estante e recomendações.
 
 ## 9. Documentos relacionados
 

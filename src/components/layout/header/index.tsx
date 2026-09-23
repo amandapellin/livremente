@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router";
+import { styled } from "@mui/material/styles";
 import {
 	AppBar,
 	Box,
@@ -31,6 +32,43 @@ const navItems = [
 	{ label: "Recomendações", to: "/recomendacoes" },
 ];
 
+/**
+ * Item de navegação do menu mobile (Drawer). Usa a mesma classe `.active` do
+ * `NavLink` para destacar a rota atual em azul de ação.
+ */
+const NavDrawerItem = styled(ListItemButton)(({ theme }) => ({
+	"&.active .MuiListItemText-primary": {
+		color: theme.palette.info.main,
+		fontWeight: 700,
+	},
+	// `as typeof ListItemButton` preserva a tipagem polimórfica (prop `component`)
+	// que o `styled()` perde, permitindo `component={NavLink}` com `to`/`end`.
+})) as typeof ListItemButton;
+
+/**
+ * Link de navegação do cabeçalho. O estado ativo usa a classe `.active` que o
+ * `NavLink` do react-router injeta na rota atual (azul de ação + borda inferior).
+ */
+const NavItemLink = styled(NavLink)(({ theme }) => ({
+	display: "flex",
+	alignItems: "center",
+	textDecoration: "none",
+	fontFamily: fontFamilies.heading,
+	fontWeight: 700,
+	fontSize: 14,
+	lineHeight: "20px",
+	letterSpacing: "0.1px",
+	color: theme.palette.text.secondary,
+	borderBottom: "2px solid transparent",
+	paddingBottom: 6,
+	transition: "color .15s",
+	"&:hover": { color: theme.palette.text.primary },
+	"&.active": {
+		color: theme.palette.info.main,
+		borderBottomColor: theme.palette.info.main,
+	},
+}));
+
 function ColorModeToggle() {
 	const { mode, systemMode, setMode } = useColorScheme();
 	const isDark = (mode === "system" ? systemMode : mode) === "dark";
@@ -49,23 +87,6 @@ function ColorModeToggle() {
 
 export default function Header() {
 	const [menuOpen, setMenuOpen] = useState(false);
-
-	const navLinkSx = {
-		display: "flex",
-		alignItems: "center",
-		textDecoration: "none",
-		fontFamily: fontFamilies.heading,
-		fontWeight: 700,
-		fontSize: 14,
-		lineHeight: "20px",
-		letterSpacing: "0.1px",
-		color: "text.secondary",
-		borderBottom: "2px solid transparent",
-		pb: "6px",
-		transition: "color .15s",
-		"&:hover": { color: "text.primary" },
-		"&.active": { color: "info.main", borderBottomColor: "info.main" },
-	} as const;
 
 	return (
 		<>
@@ -139,15 +160,9 @@ export default function Header() {
 							}}
 						>
 							{navItems.map((item) => (
-								<Box
-									key={item.to}
-									component={NavLink}
-									to={item.to}
-									end={item.to === "/"}
-									sx={navLinkSx}
-								>
+								<NavItemLink key={item.to} to={item.to} end={item.to === "/"}>
 									{item.label}
-								</Box>
+								</NavItemLink>
 							))}
 						</Stack>
 					</Stack>
@@ -193,19 +208,13 @@ export default function Header() {
 					<List>
 						{navItems.map((item) => (
 							<ListItem key={item.to} disablePadding>
-								<ListItemButton
+								<NavDrawerItem
 									component={NavLink}
 									to={item.to}
 									end={item.to === "/"}
-									sx={{
-										"&.active .MuiListItemText-primary": {
-											color: "info.main",
-											fontWeight: 700,
-										},
-									}}
 								>
 									<ListItemText primary={item.label} />
-								</ListItemButton>
+								</NavDrawerItem>
 							</ListItem>
 						))}
 					</List>

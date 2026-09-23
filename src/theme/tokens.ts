@@ -73,3 +73,13 @@ export const fontFamilies = {
 	heading: '"Lora", Georgia, serif',
 	body: '"Lexend", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
 } as const
+
+// Raios de canto recorrentes que não seguem a escala base (`shape.borderRadius`).
+export const radii = {
+	section: '6px', // cards de seção "outlined" (perfil)
+	card: '12px', // cards maiores e caixas de destaque (cadastro, landing, LGPD)
+} as const
+
+// Fundo do painel de marca: overlay azul institucional (primary[900] a 78%) sobre
+// a imagem do hero. Reutilizado na landing e no login.
+export const heroBackground = `linear-gradient(rgba(20,38,92,0.78), rgba(20,38,92,0.78)), url('/hero-landing.jpg')`

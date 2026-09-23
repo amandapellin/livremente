@@ -14,13 +14,9 @@ const toggles = [
 	},
 ]
 
-/**
- * Bloco "Leitor e interface" — apenas visual (placeholder). As configurações de
- * leitura serão implementadas em issue futura.
- */
 export default function ReaderSection() {
 	return (
-		<Paper variant="outlined" sx={{ p: 3, borderRadius: '6px' }}>
+		<Paper variant="section" sx={{ p: 3 }}>
 			<Stack sx={{ gap: 3 }}>
 				<Typography variant="h6" component="h2">
 					Leitor e interface
