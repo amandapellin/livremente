@@ -1,7 +1,6 @@
 import { Alert, Box, Button, Checkbox, Divider, FormControlLabel, Link, Stack, TextField, Typography } from "@mui/material";
 import { Controller, type Control, type UseFormHandleSubmit, type FieldErrors } from "react-hook-form";
 import { NavLink } from "react-router";
-import { colors } from '@/theme/tokens'
 import { type LoginForm } from '@/schemas/login-schemas'
 
 interface LoginFormProps {
@@ -98,7 +97,7 @@ export default function LoginFormComponent({ control, handleSubmit, onSubmit, er
                             component="button"
                             type="button"
                             underline="always"
-                            sx={{ color: colors.acao[700], fontSize: 14, whiteSpace: 'nowrap' }}
+                            sx={{ color: 'acao.dark', fontSize: 14, whiteSpace: 'nowrap' }}
                         >
                             Esqueci a senha
                         </Link>

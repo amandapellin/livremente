@@ -1,7 +1,6 @@
 import { Controller, type Control, type FieldErrors } from 'react-hook-form'
 import { Avatar, Button, Stack, TextField, Typography } from '@mui/material'
 import type { ProfileForm } from '@/schemas/profile-schemas'
-import { colors } from '@/theme/tokens'
 
 export interface IdentitySectionProps {
 	control: Control<ProfileForm>
@@ -32,16 +31,7 @@ export default function IdentitySection({ control, errors, email, displayName }:
 			</Typography>
 
 			<Stack direction="row" sx={{ gap: 2.25, alignItems: 'center', flexWrap: 'wrap' }}>
-				<Avatar
-					sx={{
-						width: 72,
-						height: 72,
-						bgcolor: colors.gold[500],
-						color: colors.papel[900],
-						fontFamily: 'Lora, Georgia, serif',
-						fontSize: 26,
-					}}
-				>
+				<Avatar>
 					{initialsFromName(displayName)}
 				</Avatar>
 				<Stack sx={{ gap: 1 }}>

@@ -1,12 +1,15 @@
 import { createTheme } from '@mui/material/styles'
-import { colors as c, fontFamilies } from './tokens'
+import { colors as c, fontFamilies, radii } from './tokens'
 
 declare module '@mui/material/styles' {
-	interface Palette { contrast: Palette['primary']; brand: Palette['primary'] }
-	interface PaletteOptions { contrast?: PaletteOptions['primary']; brand?: PaletteOptions['primary'] }
+	interface Palette { contrast: Palette['primary']; brand: Palette['primary']; acao: Palette['primary'] }
+	interface PaletteOptions { contrast?: PaletteOptions['primary']; brand?: PaletteOptions['primary']; acao?: PaletteOptions['primary'] }
 }
 declare module '@mui/material/IconButton' {
 	interface IconButtonPropsColorOverrides { contrast: true; brand: true }
+}
+declare module '@mui/material/Paper' {
+	interface PaperPropsVariantOverrides { section: true }
 }
 
 export const theme = createTheme({
@@ -41,14 +44,20 @@ export const theme = createTheme({
 					paper: c.white 
 				},
 				divider: c.divider,
-				contrast: { 
-					main: c.papel[100], 
-					contrastText: c.papel[700] 
+				contrast: {
+					main: c.papel[100],
+					contrastText: c.papel[700]
 				}, // busca/notif/toggle
-				brand: { 
-					main: c.primary[800], 
-					contrastText: c.white 
-				}, 
+				brand: {
+					main: c.primary[800],
+					contrastText: c.white
+				},
+				acao: {
+					main: c.acao[600],
+					light: c.acao[200],
+					dark: c.acao[700],
+					contrastText: c.white
+				}, // azul de ação (links/chips selecionados)
 			},
 		},
 		dark: {
@@ -84,9 +93,15 @@ export const theme = createTheme({
 					main: 'rgba(255, 255, 255, 0.08)', 
 					contrastText: c.papel[300] 
 				},
-				brand: { 
-					main: c.primary[200], 
-					contrastText: c.primary[900] 
+				brand: {
+					main: c.primary[200],
+					contrastText: c.primary[900]
+				},
+				acao: {
+					main: c.acao[300],
+					light: c.acao[200],
+					dark: c.acao[500],
+					contrastText: c.papel[900]
 				},
 			},
 		},
@@ -180,6 +195,18 @@ export const theme = createTheme({
 		},
 	},
 	components: {
+		MuiPaper: {
+			variants: [
+				{
+					// Card de seção "outlined" reutilizado nas telas (ex.: perfil).
+					props: { variant: 'section' },
+					style: ({ theme }) => ({
+						border: `1px solid ${theme.palette.divider}`,
+						borderRadius: radii.section,
+					}),
+				},
+			],
+		},
 		MuiIconButton: {
 			variants: [
 				{
@@ -214,6 +241,7 @@ export const theme = createTheme({
 					textTransform: 'none',
 					paddingInline: '24px',
 					paddingBlock: '10px',
+					
 				},
 			},
 		},
@@ -240,6 +268,18 @@ export const theme = createTheme({
 						fontWeight: 500,
 					},
 				}),
+			},
+		},
+		MuiAvatar: {
+			styleOverrides: {
+				root: {
+					width: 72,
+					height: 72,
+					fontFamily: fontFamilies.heading,
+					fontSize: 26,
+					backgroundColor: c.gold[500],
+					color: c.papel[900],
+				},
 			},
 		},
 	},

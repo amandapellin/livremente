@@ -67,7 +67,7 @@ export default function PerfilPage() {
 						alignItems: 'start',
 					}}
 				>
-					<Paper variant="outlined" sx={{ p: 3, borderRadius: '6px' }}>
+					<Paper variant="section" sx={{ p: 3 }}>
 						<Stack component="form" onSubmit={onSubmit} noValidate sx={{ gap: 2 }}>
 							<IdentitySection
 								control={control}

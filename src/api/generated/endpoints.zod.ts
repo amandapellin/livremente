@@ -111,3 +111,32 @@ export const PutApiUsersMeResponse = zod.object({
   "name": zod.string(),
   "email": zod.email()
 })
+
+
+/**
+ * @summary Retorna as preferências de leitura do usuário (RF04).
+ */
+export const GetApiUsersMePreferencesResponse = zod.object({
+  "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
+  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
+  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
+  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
+}).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')
+
+
+/**
+ * @summary Atualiza as preferências de leitura do usuário (RF04).
+ */
+export const PutApiUsersMePreferencesBody = zod.object({
+  "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
+  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
+  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
+  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
+}).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')
+
+export const PutApiUsersMePreferencesResponse = zod.object({
+  "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
+  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
+  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
+  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
+}).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')

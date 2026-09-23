@@ -99,5 +99,8 @@ tecnologias empregadas.*
 | Setup | — | React 19, TypeScript, Vite, MUI, React Router, ESLint |
 | Landing page | — | Componentização, tema/tokens, MUI |
 | #5 | RF01 — Tela de cadastro | Cadastro em etapas (*stepper*), React Hook Form + Zod, cliente orval (`usePostApiAuthRegister`), tratamento de 409 |
+| #6 | RF02 — Login | React Hook Form + Zod; *fetcher* com injeção do token de acesso |
 | #6 (integração) | RN01 — Confirmação | Leitura de `?confirmed=` no `/login` e exibição de *toast* (MUI Snackbar) |
-| #8 | RF02 — Login | React Hook Form; *fetcher* com token e *refresh*; persistência de sessão |
+| #7 | RF02 — Persistência de sessão | *Refresh token* (armazenamento em local/sessionStorage) e renovação transparente no 401, centralizados no *fetcher* |
+| #8 | RF03 — Edição de perfil | `GET`/`PUT /api/users/me` (contrato proposto pelo front); pré-preenchimento via `values` do React Hook Form; TanStack Query; *toast* de sucesso e validação por campo |
+| #9 | RF04 — Preferências de leitura | Componente compartilhado (`PreferencesFields`) reusado no cadastro e no perfil; *chips* de multi-seleção; `GET`/`PUT /api/users/me/preferences` (contrato proposto pelo front) com conversão do array `categories` ⇄ livros/áreas |

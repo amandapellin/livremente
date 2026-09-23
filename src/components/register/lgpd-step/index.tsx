@@ -10,7 +10,7 @@ import {
 } from '@mui/material'
 import MailOutlineIcon from '@mui/icons-material/MailOutlined'
 import type { CadastroForm } from '@/schemas/register-schemas'
-import { colors } from '@/theme/tokens'
+import { colors, radii } from '@/theme/tokens'
 
 const consentParagraphs = [
 	'Coletamos nome, e-mail e preferências de leitura para autenticar seu acesso, manter sua estante e gerar recomendações. O progresso de leitura, grifos e anotações ficam vinculados à sua conta.',
@@ -46,7 +46,7 @@ export default function LgpdStep() {
 					bgcolor: colors.papel[50],
 					border: 1,
 					borderColor: 'divider',
-					borderRadius: '12px',
+					borderRadius: radii.card,
 					p: 3,
 				}}
 			>
@@ -95,7 +95,7 @@ export default function LgpdStep() {
 					bgcolor: colors.primary[50],
 					border: 1,
 					borderColor: colors.primary[300],
-					borderRadius: '12px',
+					borderRadius: radii.card,
 					p: 2,
 				}}
 			>

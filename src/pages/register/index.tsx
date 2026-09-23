@@ -7,6 +7,7 @@ import DadosStep from '@/components/register/personal-data-step'
 import PreferenciasStep from '@/components/register/preferences-step'
 import LgpdStep from '@/components/register/lgpd-step'
 import { useRegisterForm } from '@/hooks/useRegisterForm'
+import { radii } from '@/theme/tokens'
 
 export default function CadastroPage() {
 	const {
@@ -23,7 +24,7 @@ export default function CadastroPage() {
 	if (createdEmail) {
 		return (
 			<Box sx={{ px: 2, py: { xs: 4, md: 8 }, display: 'flex', justifyContent: 'center' }}>
-				<Paper elevation={3} sx={{ maxWidth: 560, width: '100%', p: { xs: 3, sm: 5 }, borderRadius: '12px' }}>
+				<Paper elevation={3} sx={{ maxWidth: 560, width: '100%', p: { xs: 3, sm: 5 }, borderRadius: radii.card }}>
 					<Stack sx={{ gap: 2, alignItems: 'center', textAlign: 'center' }}>
 						<CheckCircleOutlineIcon sx={{ fontSize: 56, color: 'info.main' }} />
 						<Typography variant="h4" component="h1">
@@ -50,7 +51,7 @@ export default function CadastroPage() {
 				{submitError && <Alert severity="error">{submitError}</Alert>}
 
 				<FormProvider {...methods}>
-					<Paper elevation={3} sx={{ p: { xs: 3, sm: 5 }, borderRadius: '12px' }}>
+					<Paper elevation={3} sx={{ p: { xs: 3, sm: 5 }, borderRadius: radii.card }}>
 						{activeStep === 0 && <DadosStep />}
 						{activeStep === 1 && <PreferenciasStep />}
 						{activeStep === 2 && <LgpdStep />}

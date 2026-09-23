@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from '@mui/material'
-import { colors } from '@/theme/tokens'
+import { colors, heroBackground } from '@/theme/tokens'
 
 interface Stat {
 	value: string
@@ -24,7 +24,7 @@ export default function LoginHero() {
 				flex: 1,
 				alignItems: 'center',
 				px: { md: 6, lg: 9 },
-				backgroundImage: `linear-gradient(rgba(20,38,92,0.78), rgba(20,38,92,0.78)), url('/hero-landing.jpg')`,
+				backgroundImage: heroBackground,
 				backgroundSize: 'cover',
 				backgroundPosition: 'center',
 			}}

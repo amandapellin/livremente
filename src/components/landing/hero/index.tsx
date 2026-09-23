@@ -1,12 +1,12 @@
 import { NavLink } from 'react-router'
 import { Box, Button, Stack, Typography } from '@mui/material'
-import { colors } from '@/theme/tokens'
+import { colors, heroBackground } from '@/theme/tokens'
 export default function Hero(){
     return (
         <Box
             sx={{
                 bgcolor: 'primary.dark',
-                backgroundImage: `linear-gradient(rgba(20,38,92,0.78), rgba(20,38,92,0.78)), url('/hero-landing.jpg')`,
+                backgroundImage: heroBackground,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 px: 2,
