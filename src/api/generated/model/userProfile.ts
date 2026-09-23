@@ -9,4 +9,9 @@ export interface UserProfile {
   id: string;
   name: string;
   email: string;
+  /**
+     * Caminho para buscar a imagem (/api/users/{id}/avatar); null quando não há avatar (o front exibe as iniciais).
+     * @nullable
+     */
+  avatarUrl?: string | null;
 }

@@ -56,7 +56,9 @@ async function performTokenRefresh(): Promise<boolean> {
 export const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
   const headers = new Headers(options.headers)
   // Content-Type só quando há corpo — evita preflight CORS desnecessário em GETs.
-  if (options.body != null && !headers.has('Content-Type')) {
+  // Em FormData (upload de avatar), o navegador define o multipart boundary: não
+  // sobrescrever com application/json.
+  if (options.body != null && !headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
   // Injeta o token JWT (quando há sessão) — ponto único de autenticação.

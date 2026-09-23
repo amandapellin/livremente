@@ -24,9 +24,11 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  ChangePasswordRequest,
   ErrorResponse,
   LoginRequest,
   LoginResponse,
+  PutApiUsersMeAvatarBody,
   RefreshRequest,
   RefreshResponse,
   RegisterRequest,
@@ -724,6 +726,316 @@ export const usePutApiUsersMe = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPutApiUsersMeMutationOptions(options), queryClient);
+    }
+
+export type patchApiUsersMePasswordResponse204 = {
+  data: void
+  status: 204
+}
+
+export type patchApiUsersMePasswordResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type patchApiUsersMePasswordResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type patchApiUsersMePasswordResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type patchApiUsersMePasswordResponseSuccess = (patchApiUsersMePasswordResponse204) & {
+  headers: Headers;
+};
+export type patchApiUsersMePasswordResponseError = (patchApiUsersMePasswordResponse400 | patchApiUsersMePasswordResponse401 | patchApiUsersMePasswordResponse422) & {
+  headers: Headers;
+};
+
+export type patchApiUsersMePasswordResponse = (patchApiUsersMePasswordResponseSuccess | patchApiUsersMePasswordResponseError)
+
+export const getPatchApiUsersMePasswordUrl = () => {
+
+
+
+
+  return `/api/users/me/password`
+}
+
+/**
+ * @summary Altera a senha do usuário autenticado (RF03).
+ */
+export const patchApiUsersMePassword = async (changePasswordRequest: ChangePasswordRequest, options?: Parameters<typeof customFetch>[1]): Promise<patchApiUsersMePasswordResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<patchApiUsersMePasswordResponse>(getPatchApiUsersMePasswordUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(changePasswordRequest)
+  }
+);}
+
+
+
+
+
+export const getPatchApiUsersMePasswordMutationKey = () => ['patchApiUsersMePassword'] as const;
+
+export const getPatchApiUsersMePasswordMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiUsersMePassword>>, TError,PatchApiUsersMePasswordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof patchApiUsersMePassword>>, TError,PatchApiUsersMePasswordMutationVariables, TContext> => {
+
+const mutationKey = getPatchApiUsersMePasswordMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof patchApiUsersMePassword>>, PatchApiUsersMePasswordMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  patchApiUsersMePassword(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PatchApiUsersMePasswordMutationResult = NonNullable<Awaited<ReturnType<typeof patchApiUsersMePassword>>>
+    export type PatchApiUsersMePasswordMutationBody = ChangePasswordRequest
+    export type PatchApiUsersMePasswordMutationError = ErrorResponse
+    export type PatchApiUsersMePasswordMutationVariables = {data: ChangePasswordRequest}
+
+    /**
+ * @summary Altera a senha do usuário autenticado (RF03).
+ */
+export const usePatchApiUsersMePassword = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof patchApiUsersMePassword>>, TError,PatchApiUsersMePasswordMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof patchApiUsersMePassword>>,
+        TError,
+        PatchApiUsersMePasswordMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPatchApiUsersMePasswordMutationOptions(options), queryClient);
+    }
+
+export type putApiUsersMeAvatarResponse204 = {
+  data: void
+  status: 204
+}
+
+export type putApiUsersMeAvatarResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putApiUsersMeAvatarResponse422 = {
+  data: ErrorResponse
+  status: 422
+}
+
+export type putApiUsersMeAvatarResponseSuccess = (putApiUsersMeAvatarResponse204) & {
+  headers: Headers;
+};
+export type putApiUsersMeAvatarResponseError = (putApiUsersMeAvatarResponse401 | putApiUsersMeAvatarResponse422) & {
+  headers: Headers;
+};
+
+export type putApiUsersMeAvatarResponse = (putApiUsersMeAvatarResponseSuccess | putApiUsersMeAvatarResponseError)
+
+export const getPutApiUsersMeAvatarUrl = () => {
+
+
+
+
+  return `/api/users/me/avatar`
+}
+
+/**
+ * @summary Envia ou atualiza o avatar do usuário (PNG ou JPG, até 2 MB).
+ */
+export const putApiUsersMeAvatar = async (putApiUsersMeAvatarBody: PutApiUsersMeAvatarBody, options?: Parameters<typeof customFetch>[1]): Promise<putApiUsersMeAvatarResponse> => {
+    const formData = new FormData();
+formData.append(`file`, putApiUsersMeAvatarBody.file);
+
+  return customFetch<putApiUsersMeAvatarResponse>(getPutApiUsersMeAvatarUrl(),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getPutApiUsersMeAvatarMutationKey = () => ['putApiUsersMeAvatar'] as const;
+
+export const getPutApiUsersMeAvatarMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeAvatar>>, TError,PutApiUsersMeAvatarMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeAvatar>>, TError,PutApiUsersMeAvatarMutationVariables, TContext> => {
+
+const mutationKey = getPutApiUsersMeAvatarMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApiUsersMeAvatar>>, PutApiUsersMeAvatarMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  putApiUsersMeAvatar(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutApiUsersMeAvatarMutationResult = NonNullable<Awaited<ReturnType<typeof putApiUsersMeAvatar>>>
+    export type PutApiUsersMeAvatarMutationBody = PutApiUsersMeAvatarBody
+    export type PutApiUsersMeAvatarMutationError = ErrorResponse
+    export type PutApiUsersMeAvatarMutationVariables = {data: PutApiUsersMeAvatarBody}
+
+    /**
+ * @summary Envia ou atualiza o avatar do usuário (PNG ou JPG, até 2 MB).
+ */
+export const usePutApiUsersMeAvatar = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeAvatar>>, TError,PutApiUsersMeAvatarMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putApiUsersMeAvatar>>,
+        TError,
+        PutApiUsersMeAvatarMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutApiUsersMeAvatarMutationOptions(options), queryClient);
+    }
+
+export type deleteApiUsersMeAvatarResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteApiUsersMeAvatarResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteApiUsersMeAvatarResponseSuccess = (deleteApiUsersMeAvatarResponse204) & {
+  headers: Headers;
+};
+export type deleteApiUsersMeAvatarResponseError = (deleteApiUsersMeAvatarResponse401) & {
+  headers: Headers;
+};
+
+export type deleteApiUsersMeAvatarResponse = (deleteApiUsersMeAvatarResponseSuccess | deleteApiUsersMeAvatarResponseError)
+
+export const getDeleteApiUsersMeAvatarUrl = () => {
+
+
+
+
+  return `/api/users/me/avatar`
+}
+
+/**
+ * @summary Remove o avatar do usuário (volta às iniciais). Idempotente: 204 mesmo sem avatar.
+ */
+export const deleteApiUsersMeAvatar = async ( options?: Parameters<typeof customFetch>[1]): Promise<deleteApiUsersMeAvatarResponse> => {
+
+  return customFetch<deleteApiUsersMeAvatarResponse>(getDeleteApiUsersMeAvatarUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteApiUsersMeAvatarMutationKey = () => ['deleteApiUsersMeAvatar'] as const;
+
+export const getDeleteApiUsersMeAvatarMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMeAvatar>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMeAvatar>>, TError,void, TContext> => {
+
+const mutationKey = getDeleteApiUsersMeAvatarMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiUsersMeAvatar>>, void> = () => {
+
+
+          return  deleteApiUsersMeAvatar(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiUsersMeAvatarMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiUsersMeAvatar>>>
+
+    export type DeleteApiUsersMeAvatarMutationError = ErrorResponse
+
+
+    /**
+ * @summary Remove o avatar do usuário (volta às iniciais). Idempotente: 204 mesmo sem avatar.
+ */
+export const useDeleteApiUsersMeAvatar = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMeAvatar>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiUsersMeAvatar>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDeleteApiUsersMeAvatarMutationOptions(options), queryClient);
     }
 
 export type getApiUsersMePreferencesResponse200 = {
