@@ -28,6 +28,7 @@ import type {
   ErrorResponse,
   LoginRequest,
   LoginResponse,
+  LogoutRequest,
   PutApiUsersMeAvatarBody,
   RefreshRequest,
   RefreshResponse,
@@ -494,6 +495,113 @@ export const usePostApiAuthRefresh = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPostApiAuthRefreshMutationOptions(options), queryClient);
+    }
+
+export type postApiAuthLogoutResponse204 = {
+  data: void
+  status: 204
+}
+
+export type postApiAuthLogoutResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type postApiAuthLogoutResponseSuccess = (postApiAuthLogoutResponse204) & {
+  headers: Headers;
+};
+export type postApiAuthLogoutResponseError = (postApiAuthLogoutResponse401) & {
+  headers: Headers;
+};
+
+export type postApiAuthLogoutResponse = (postApiAuthLogoutResponseSuccess | postApiAuthLogoutResponseError)
+
+export const getPostApiAuthLogoutUrl = () => {
+
+
+
+
+  return `/api/auth/logout`
+}
+
+/**
+ * @summary Encerra a sessão do usuário e revoga o refresh token (RF29).
+ */
+export const postApiAuthLogout = async (logoutRequest: LogoutRequest, options?: Parameters<typeof customFetch>[1]): Promise<postApiAuthLogoutResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<postApiAuthLogoutResponse>(getPostApiAuthLogoutUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(logoutRequest)
+  }
+);}
+
+
+
+
+
+export const getPostApiAuthLogoutMutationKey = () => ['postApiAuthLogout'] as const;
+
+export const getPostApiAuthLogoutMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthLogout>>, TError,PostApiAuthLogoutMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof postApiAuthLogout>>, TError,PostApiAuthLogoutMutationVariables, TContext> => {
+
+const mutationKey = getPostApiAuthLogoutMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof postApiAuthLogout>>, PostApiAuthLogoutMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  postApiAuthLogout(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PostApiAuthLogoutMutationResult = NonNullable<Awaited<ReturnType<typeof postApiAuthLogout>>>
+    export type PostApiAuthLogoutMutationBody = LogoutRequest
+    export type PostApiAuthLogoutMutationError = ErrorResponse
+    export type PostApiAuthLogoutMutationVariables = {data: LogoutRequest}
+
+    /**
+ * @summary Encerra a sessão do usuário e revoga o refresh token (RF29).
+ */
+export const usePostApiAuthLogout = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof postApiAuthLogout>>, TError,PostApiAuthLogoutMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof postApiAuthLogout>>,
+        TError,
+        PostApiAuthLogoutMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPostApiAuthLogoutMutationOptions(options), queryClient);
     }
 
 export type getApiUsersMeResponse200 = {

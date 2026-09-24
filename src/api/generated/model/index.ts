@@ -11,6 +11,7 @@ export * from './errorResponse';
 export * from './gender';
 export * from './loginRequest';
 export * from './loginResponse';
+export * from './logoutRequest';
 export * from './publicationType';
 export * from './putApiUsersMeAvatarBody';
 export * from './readingLanguage';

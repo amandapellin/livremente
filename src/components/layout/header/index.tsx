@@ -4,6 +4,8 @@ import { styled } from "@mui/material/styles";
 import {
 	AppBar,
 	Box,
+	Button,
+	Divider,
 	Drawer,
 	IconButton,
 	List,
@@ -20,10 +22,12 @@ import MenuIcon from "@mui/icons-material/Menu";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
 import SearchIcon from "@mui/icons-material/Search";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { colors, fontFamilies } from "@/theme/tokens";
+import { useIsAuthenticated } from "@/hooks/useAuth";
+import { useLogout } from "@/hooks/useLogout";
+import AccountMenu from "@/components/layout/account-menu";
 
 const navItems = [
 	{ label: "Início", to: "/" },
@@ -38,7 +42,7 @@ const navItems = [
  */
 const NavDrawerItem = styled(ListItemButton)(({ theme }) => ({
 	"&.active .MuiListItemText-primary": {
-		color: theme.palette.info.main,
+		color: (theme.vars ?? theme).palette.info.main,
 		fontWeight: 700,
 	},
 	// `as typeof ListItemButton` preserva a tipagem polimórfica (prop `component`)
@@ -58,14 +62,14 @@ const NavItemLink = styled(NavLink)(({ theme }) => ({
 	fontSize: 14,
 	lineHeight: "20px",
 	letterSpacing: "0.1px",
-	color: theme.palette.text.secondary,
+	color: (theme.vars ?? theme).palette.text.secondary,
 	borderBottom: "2px solid transparent",
 	paddingBottom: 6,
 	transition: "color .15s",
-	"&:hover": { color: theme.palette.text.primary },
+	"&:hover": { color: (theme.vars ?? theme).palette.text.primary },
 	"&.active": {
-		color: theme.palette.info.main,
-		borderBottomColor: theme.palette.info.main,
+		color: (theme.vars ?? theme).palette.info.main,
+		borderBottomColor: (theme.vars ?? theme).palette.info.main,
 	},
 }));
 
@@ -87,6 +91,8 @@ function ColorModeToggle() {
 
 export default function Header() {
 	const [menuOpen, setMenuOpen] = useState(false);
+	const isAuthenticated = useIsAuthenticated();
+	const { logout } = useLogout();
 
 	return (
 		<>
@@ -188,12 +194,13 @@ export default function Header() {
 							<NotificationsNoneIcon />
 						</IconButton>
 						<ColorModeToggle />
-						<IconButton
-							aria-label="Conta"
-							color="brand"
-						>
-							<AccountCircleIcon />
-						</IconButton>
+						{isAuthenticated ? (
+							<AccountMenu />
+						) : (
+							<Button component={NavLink} to="/login" variant="contained" size="small">
+								Entrar
+							</Button>
+						)}
 					</Stack>
 				</Toolbar>
 			</AppBar>
@@ -217,6 +224,29 @@ export default function Header() {
 								</NavDrawerItem>
 							</ListItem>
 						))}
+					</List>
+					<Divider />
+					<List>
+						{isAuthenticated ? (
+							<>
+								<ListItem disablePadding>
+									<NavDrawerItem component={NavLink} to="/perfil">
+										<ListItemText primary="Editar perfil" />
+									</NavDrawerItem>
+								</ListItem>
+								<ListItem disablePadding>
+									<ListItemButton onClick={logout}>
+										<ListItemText primary="Sair" />
+									</ListItemButton>
+								</ListItem>
+							</>
+						) : (
+							<ListItem disablePadding>
+								<NavDrawerItem component={NavLink} to="/login">
+									<ListItemText primary="Entrar" />
+								</NavDrawerItem>
+							</ListItem>
+						)}
 					</List>
 				</Box>
 			</Drawer>
