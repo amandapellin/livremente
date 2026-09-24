@@ -90,7 +90,8 @@ export const PostApiAuthRefreshResponse = zod.object({
 export const GetApiUsersMeResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "email": zod.email()
+  "email": zod.email(),
+  "avatarUrl": zod.string().nullish().describe('Caminho para buscar a imagem (/api/users/{id}/avatar); null quando não há avatar (o front exibe as iniciais).')
 })
 
 
@@ -109,8 +110,41 @@ export const PutApiUsersMeBody = zod.object({
 export const PutApiUsersMeResponse = zod.object({
   "id": zod.string(),
   "name": zod.string(),
-  "email": zod.email()
+  "email": zod.email(),
+  "avatarUrl": zod.string().nullish().describe('Caminho para buscar a imagem (/api/users/{id}/avatar); null quando não há avatar (o front exibe as iniciais).')
 })
+
+
+/**
+ * @summary Altera a senha do usuário autenticado (RF03).
+ */
+export const patchApiUsersMePasswordBodyNewPasswordMin = 8;
+export const patchApiUsersMePasswordBodyNewPasswordMax = 128;
+
+
+
+export const PatchApiUsersMePasswordBody = zod.object({
+  "currentPassword": zod.string().describe('Senha atual.'),
+  "newPassword": zod.string().min(patchApiUsersMePasswordBodyNewPasswordMin).max(patchApiUsersMePasswordBodyNewPasswordMax).describe('Nova senha.')
+})
+
+export const PatchApiUsersMePasswordResponse = zod.void()
+
+
+/**
+ * @summary Envia ou atualiza o avatar do usuário (PNG ou JPG, até 2 MB).
+ */
+export const PutApiUsersMeAvatarBody = zod.object({
+  "file": zod.instanceof(Blob)
+})
+
+export const PutApiUsersMeAvatarResponse = zod.void()
+
+
+/**
+ * @summary Remove o avatar do usuário (volta às iniciais). Idempotente: 204 mesmo sem avatar.
+ */
+export const DeleteApiUsersMeAvatarResponse = zod.void()
 
 
 /**

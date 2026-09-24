@@ -12,8 +12,9 @@ export default function PerfilPage() {
 	const {
 		control,
 		errors,
-		isDirty,
+		canSave,
 		profile,
+		avatar,
 		isLoading,
 		isLoadError,
 		isSaving,
@@ -73,14 +74,15 @@ export default function PerfilPage() {
 								control={control}
 								errors={errors}
 								email={profile?.email ?? ''}
-								displayName={profile?.name ?? ''}
+								avatar={avatar}
+								disabled={isSaving}
 							/>
-							<PasswordSection />
-							{/* Botão de salvar logo abaixo do bloco de senha. */}
+							<PasswordSection control={control} errors={errors} disabled={isSaving} />
+							{/* Botão único abaixo do bloco de senha: salva nome, senha e avatar. */}
 							<Stack sx={{ gap: 1.5 }}>
 								{submitError && <Alert severity="error">{submitError}</Alert>}
 								<Box>
-									<Button type="submit" variant="contained" disabled={isSaving || !isDirty}>
+									<Button type="submit" variant="contained" disabled={isSaving || !canSave}>
 										{isSaving ? 'Salvando…' : 'Salvar alterações'}
 									</Button>
 								</Box>

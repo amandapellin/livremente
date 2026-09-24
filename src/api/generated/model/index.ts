@@ -6,11 +6,13 @@
  */
 
 export * from './authUser';
+export * from './changePasswordRequest';
 export * from './errorResponse';
 export * from './gender';
 export * from './loginRequest';
 export * from './loginResponse';
 export * from './publicationType';
+export * from './putApiUsersMeAvatarBody';
 export * from './readingLanguage';
 export * from './refreshRequest';
 export * from './refreshResponse';

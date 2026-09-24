@@ -102,5 +102,5 @@ tecnologias empregadas.*
 | #6 | RF02 — Login | React Hook Form + Zod; *fetcher* com injeção do token de acesso |
 | #6 (integração) | RN01 — Confirmação | Leitura de `?confirmed=` no `/login` e exibição de *toast* (MUI Snackbar) |
 | #7 | RF02 — Persistência de sessão | *Refresh token* (armazenamento em local/sessionStorage) e renovação transparente no 401, centralizados no *fetcher* |
-| #8 | RF03 — Edição de perfil | `GET`/`PUT /api/users/me` (contrato proposto pelo front); pré-preenchimento via `values` do React Hook Form; TanStack Query; *toast* de sucesso e validação por campo |
+| #8 | RF03 — Edição de perfil | `GET`/`PUT /api/users/me`; pré-preenchimento via `values` do React Hook Form; TanStack Query; *toast* de sucesso e validação por campo. Estende-se à troca de senha (`PATCH /api/users/me/password`, com tratamento de 422) e ao avatar (`PUT`/`DELETE /api/users/me/avatar`, upload *multipart* com *preview*), num único salvar |
 | #9 | RF04 — Preferências de leitura | Componente compartilhado (`PreferencesFields`) reusado no cadastro e no perfil; *chips* de multi-seleção; `GET`/`PUT /api/users/me/preferences` (contrato proposto pelo front) com conversão do array `categories` ⇄ livros/áreas |

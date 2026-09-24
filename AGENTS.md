@@ -100,11 +100,14 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   (local/sessionStorage) e *refresh token* com renovação transparente no 401
   (centralizado no `fetcher`).
 - **#8 (RF03) Tela de edição de perfil:** formulário pré-preenchido via
-  `GET /api/users/me`, salvar via `PUT` com *toast* de sucesso e validação por
-  campo. Bloco "Identificação" funcional (nome editável; e-mail somente-leitura);
-  Senha, Dados e privacidade e Leitor entram como placeholders visuais (as
-  Preferências passaram a ser funcionais no #9). Contrato `/api/users/me`
-  proposto pelo front — o back-end precisa implementá-lo.
+  `GET /api/users/me`, com **um único "Salvar alterações"** que orquestra três
+  recursos (só chama o que mudou): **nome** (`PUT /api/users/me`), **senha**
+  (`PATCH /api/users/me/password`, trata 422 "senha atual incorreta" por campo)
+  e **avatar** (`PUT`/`DELETE /api/users/me/avatar`, upload *multipart* PNG/JPG
+  ≤2 MB com *preview* e volta às iniciais). E-mail somente-leitura. Dados e
+  privacidade e Leitor seguem como placeholders visuais. Endpoints já
+  implementados no back-end (o `DELETE` do avatar é o último pendente). O
+  `customFetch` não força `Content-Type` em `FormData`.
 - **#9 (RF04) Preferências de leitura:** idioma, tipo de conteúdo (livro/artigo),
   categorias/áreas de conhecimento e gênero literário via *chips* (multi-seleção),
   num componente compartilhado (`PreferencesFields`) usado **no cadastro e no
