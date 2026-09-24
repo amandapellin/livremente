@@ -113,6 +113,13 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   num componente compartilhado (`PreferencesFields`) usado **no cadastro e no
   perfil**. No perfil, prefill via `GET /api/users/me/preferences` e salvar via
   `PUT` com *toast* próprio. Contrato de preferências proposto pelo front.
+- **#10 (RF29) Logout:** estado de sessão reativo (`useIsAuthenticated` via
+  `useSyncExternalStore`, com eventos emitidos por `auth-storage`). O header
+  alterna **conta ⇄ "Entrar"**; autenticado, o botão de conta abre um *popover*
+  (`AccountMenu`) com identidade (avatar/nome/e-mail), "Editar perfil" e "Sair".
+  O logout (`useLogout`) chama `POST /api/auth/logout` (contrato proposto pelo
+  front) de forma *best-effort* — em erro ou sucesso limpa a sessão, descarta o
+  cache e redireciona para a landing (RF28). Também no Drawer (mobile).
 
 **Em andamento / próximas:**
 - Telas de catálogo, detalhes, leitura (reader), estante e recomendações.

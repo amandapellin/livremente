@@ -85,6 +85,16 @@ export const PostApiAuthRefreshResponse = zod.object({
 
 
 /**
+ * @summary Encerra a sessão do usuário e revoga o refresh token (RF29).
+ */
+export const PostApiAuthLogoutBody = zod.object({
+  "refreshToken": zod.string().describe('Refresh token a ser revogado no servidor.')
+})
+
+export const PostApiAuthLogoutResponse = zod.void()
+
+
+/**
  * @summary Retorna o perfil do usuário autenticado (RF03).
  */
 export const GetApiUsersMeResponse = zod.object({

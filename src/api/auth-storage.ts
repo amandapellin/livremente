@@ -1,6 +1,36 @@
 const TOKEN_KEY = 'livremente.auth.token'
 const REFRESH_TOKEN_KEY = 'livremente.auth.refresh_token'
 
+/** Evento disparado na mesma aba quando a sessão muda (login/logout). */
+const AUTH_EVENT = 'livremente:auth-changed'
+
+function emitAuthChanged(): void {
+	try {
+		window.dispatchEvent(new Event(AUTH_EVENT))
+	} catch {
+		// Ambiente sem window (testes/SSR) — ignora.
+	}
+}
+
+/** Indica se há sessão ativa (token de acesso presente). */
+export function isAuthenticated(): boolean {
+	return getAuthToken() !== null
+}
+
+/**
+ * Assina mudanças de sessão para atualizar a UI de forma reativa. Cobre a mesma
+ * aba (evento próprio, disparado por save/clear) e outras abas (evento nativo
+ * `storage`). Retorna a função de cancelamento.
+ */
+export function subscribeAuthChange(callback: () => void): () => void {
+	window.addEventListener(AUTH_EVENT, callback)
+	window.addEventListener('storage', callback)
+	return () => {
+		window.removeEventListener(AUTH_EVENT, callback)
+		window.removeEventListener('storage', callback)
+	}
+}
+
 /**
  * Persistência do token de autenticação (RF02).
  *
@@ -21,6 +51,7 @@ export function saveAuthTokens(token: string, refreshToken: string, remember: bo
 	} catch {
 		// Storage indisponível — segue sem persistir.
 	}
+	emitAuthChanged()
 }
 
 /** Lê os tokens atuais (local ou de sessão), junto com o tipo de storage usado. */
@@ -61,4 +92,5 @@ export function clearAuthTokens(): void {
 	} catch {
 		// Ignorado.
 	}
+	emitAuthChanged()
 }

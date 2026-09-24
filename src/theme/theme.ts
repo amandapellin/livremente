@@ -201,7 +201,7 @@ export const theme = createTheme({
 					// Card de seção "outlined" reutilizado nas telas (ex.: perfil).
 					props: { variant: 'section' },
 					style: ({ theme }) => ({
-						border: `1px solid ${theme.palette.divider}`,
+						border: `1px solid ${theme.vars.palette.divider}`,
 						borderRadius: radii.section,
 					}),
 				},
@@ -212,22 +212,22 @@ export const theme = createTheme({
 				{
 					props: { color: 'contrast' },
 					style: ({ theme }) => ({
-						backgroundColor: theme.palette.contrast.main,
-						color: theme.palette.contrast.contrastText,
-						'&:hover': { 
-							backgroundColor: theme.palette.contrast.main, 
-							filter: 'brightness(0.97)' 
+						backgroundColor: theme.vars.palette.contrast.main,
+						color: theme.vars.palette.contrast.contrastText,
+						'&:hover': {
+							backgroundColor: theme.vars.palette.contrast.main,
+							filter: 'brightness(0.97)'
 						},
 					}),
 				},
 				{
 					props: { color: 'brand' },
 					style: ({ theme }) => ({
-						backgroundColor: theme.palette.brand.main,
-						color: theme.palette.brand.contrastText,
-						'&:hover': { 
-							backgroundColor: theme.palette.brand.main, 
-							filter: 'brightness(0.92)' 
+						backgroundColor: theme.vars.palette.brand.main,
+						color: theme.vars.palette.brand.contrastText,
+						'&:hover': {
+							backgroundColor: theme.vars.palette.brand.main,
+							filter: 'brightness(0.92)'
 						},
 					}),
 				},
@@ -251,7 +251,7 @@ export const theme = createTheme({
 				root: ({ theme }) => ({
 					color: c.papel[500],
 					'&.Mui-active, &.Mui-completed': {
-						color: theme.palette.info.main,
+						color: theme.vars.palette.info.main,
 					},
 				}),
 			},
@@ -263,7 +263,7 @@ export const theme = createTheme({
 					fontWeight: 500,
 					fontSize: 14,
 					letterSpacing: '0.1px',
-					color: theme.palette.text.primary,
+					color: theme.vars.palette.text.primary,
 					'&.Mui-active, &.Mui-completed': {
 						fontWeight: 500,
 					},
@@ -279,6 +279,18 @@ export const theme = createTheme({
 					fontSize: 26,
 					backgroundColor: c.gold[500],
 					color: c.papel[900],
+				},
+			},
+		},
+		MuiMenuItem: {
+			styleOverrides: {
+				root: {
+					padding: '16px',
+					fontSize: 14,
+					fontFamily: fontFamilies.body,
+					fontWeight: 700,
+					letterSpacing: '0.8px',
+					lineHeight: '24px',
 				},
 			},
 		},
