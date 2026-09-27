@@ -24,8 +24,10 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  CatalogPage,
   ChangePasswordRequest,
   ErrorResponse,
+  GetApiCatalogParams,
   LoginRequest,
   LoginResponse,
   LogoutRequest,
@@ -1377,3 +1379,125 @@ export const usePutApiUsersMePreferences = <TError = ErrorResponse,
       > => {
       return useMutation(getPutApiUsersMePreferencesMutationOptions(options), queryClient);
     }
+
+export type getApiCatalogResponse200 = {
+  data: CatalogPage
+  status: 200
+}
+
+export type getApiCatalogResponseSuccess = (getApiCatalogResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getApiCatalogResponse = (getApiCatalogResponseSuccess)
+
+export const getGetApiCatalogUrl = (params?: GetApiCatalogParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    const explodeParameters = ["language","genres"];
+
+    if (Array.isArray(value) && explodeParameters.includes(key)) {
+      value.forEach((v) => {
+        normalizedParams.append(key, v === null ? 'null' : String(v));
+      });
+      return;
+    }
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/catalog?${stringifiedParams}` : `/api/catalog`
+}
+
+/**
+ * @summary Retorna o catálogo de livros e artigos com filtros e paginação (RF10).
+ */
+export const getApiCatalog = async (params?: GetApiCatalogParams, options?: Parameters<typeof customFetch>[1]): Promise<getApiCatalogResponse> => {
+
+  return customFetch<getApiCatalogResponse>(getGetApiCatalogUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApiCatalogQueryKey = (params?: GetApiCatalogParams,) => {
+    return [
+    `/api/catalog`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetApiCatalogQueryOptions = <TData = Awaited<ReturnType<typeof getApiCatalog>>, TError = unknown>(params?: GetApiCatalogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiCatalogQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiCatalog>>> = ({ signal }) => getApiCatalog(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiCatalog>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiCatalogQueryResult = NonNullable<Awaited<ReturnType<typeof getApiCatalog>>>
+export type GetApiCatalogQueryError = unknown
+
+
+export function useGetApiCatalog<TData = Awaited<ReturnType<typeof getApiCatalog>>, TError = unknown>(
+ params: undefined |  GetApiCatalogParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalog>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiCatalog>>,
+          TError,
+          Awaited<ReturnType<typeof getApiCatalog>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiCatalog<TData = Awaited<ReturnType<typeof getApiCatalog>>, TError = unknown>(
+ params?: GetApiCatalogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalog>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiCatalog>>,
+          TError,
+          Awaited<ReturnType<typeof getApiCatalog>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiCatalog<TData = Awaited<ReturnType<typeof getApiCatalog>>, TError = unknown>(
+ params?: GetApiCatalogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Retorna o catálogo de livros e artigos com filtros e paginação (RF10).
+ */
+
+export function useGetApiCatalog<TData = Awaited<ReturnType<typeof getApiCatalog>>, TError = unknown>(
+ params?: GetApiCatalogParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalog>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiCatalogQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}

@@ -184,3 +184,50 @@ export const PutApiUsersMePreferencesResponse = zod.object({
   "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
   "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
 }).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')
+
+
+/**
+ * @summary Retorna o catálogo de livros e artigos com filtros e paginação (RF10).
+ */
+export const getApiCatalogQuerySortDefault = `relevance`;
+export const getApiCatalogQueryPageDefault = 1;
+
+export const getApiCatalogQueryPageSizeDefault = 10;
+export const getApiCatalogQueryPageSizeMax = 50;
+
+
+
+export const GetApiCatalogQueryParams = zod.object({
+  "q": zod.string().optional().describe('Busca por título ou autor.'),
+  "type": zod.enum(['book', 'scientific_article']).optional(),
+  "language": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
+  "genres": zod.array(zod.string()).optional().describe('Gênero literário (livros) ou área de conhecimento (artigos).'),
+  "sort": zod.enum(['relevance', 'recent', 'title', 'popularity']).default(getApiCatalogQuerySortDefault),
+  "page": zod.int().min(1).default(getApiCatalogQueryPageDefault),
+  "pageSize": zod.int().min(1).max(getApiCatalogQueryPageSizeMax).default(getApiCatalogQueryPageSizeDefault)
+})
+
+export const GetApiCatalogResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "author": zod.string(),
+  "type": zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).'),
+  "language": zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.'),
+  "genre": zod.string().nullish().describe('Slug de gênero (livro) ou área de conhecimento (artigo).'),
+  "year": zod.int().nullish(),
+  "format": zod.string().nullish().describe('EPUB, PDF...'),
+  "source": zod.string().nullish().describe('Project Gutemberg | arXiv.'),
+  "description": zod.string().nullish(),
+  "coverUrl": zod.string().nullish()
+})),
+  "page": zod.int(),
+  "pageSize": zod.int(),
+  "total": zod.int(),
+  "totalPages": zod.int(),
+  "counts": zod.object({
+  "all": zod.int(),
+  "book": zod.int(),
+  "scientific_article": zod.int()
+})
+})

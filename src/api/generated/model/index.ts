@@ -6,12 +6,18 @@
  */
 
 export * from './authUser';
+export * from './catalogCounts';
+export * from './catalogItem';
+export * from './catalogPage';
 export * from './changePasswordRequest';
 export * from './errorResponse';
 export * from './gender';
+export * from './getApiCatalogParams';
+export * from './getApiCatalogSort';
 export * from './loginRequest';
 export * from './loginResponse';
 export * from './logoutRequest';
+export * from './publication';
 export * from './publicationType';
 export * from './putApiUsersMeAvatarBody';
 export * from './readingLanguage';
