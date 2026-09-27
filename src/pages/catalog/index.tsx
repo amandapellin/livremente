@@ -1,66 +1,58 @@
+import { useMemo, useState } from "react";
+import { Search, SearchOff } from "@mui/icons-material";
+import { Alert, Box, Button, Container, InputAdornment, MenuItem, Pagination, Paper, Select, Skeleton, Stack, TextField, Typography } from "@mui/material";
 import CatalogFilters from "@/components/catalog/catalog-filters";
 import PublicationCard from "@/components/catalog/publication-card";
 import { useCatalogSearch } from "@/hooks/useCatalogSearch";
+import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { emptyCatalogQuery, sortOptions, type CatalogQuery, type CatalogSort } from "@/schemas/catalog-schemas";
-import { Search, SearchOff } from "@mui/icons-material";
-import { Alert, Box, Button, Container, InputAdornment, MenuItem, Pagination, Paper, Select, Skeleton, Stack, TextField, Typography } from "@mui/material";
-import { useState } from "react";
 
 export default function CatalogoPage() {
 	const [filters, setFilters] = useState<CatalogQuery>(emptyCatalogQuery)
-	const [qInput, setQInput] = useState('')
-	const { data, isLoading, isError, isPlaceholderData } = useCatalogSearch(filters)
+	// Texto com debounce alimenta a busca; o campo mostra filters.q na hora.
+	const debouncedQ = useDebouncedValue(filters.q, 350)
+	const query = useMemo<CatalogQuery>(() => ({ ...filters, q: debouncedQ }), [filters, debouncedQ])
+	const { data, isLoading, isError, isPlaceholderData } = useCatalogSearch(query)
 
 	const patch = (p: Partial<CatalogQuery>) =>
 		setFilters((f) => ({ ...f, ...p, page: 'page' in p ? (p.page as number) : 1 }))
-	const clearFilters = () => { setQInput(''); setFilters(emptyCatalogQuery) }
+	const clearFilters = () => setFilters(emptyCatalogQuery)
 
 	const items = data?.items ?? []
 	const totalPages = data?.totalPages ?? 1
 
 	return (
-		<Container maxWidth="lg" sx={{ sx: 3, md: 5 }}>
+		<Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
 			<Stack sx={{ gap: 1, mb: 3 }}>
 				<Typography variant="h4" component="h1" sx={{ color: 'primary.main' }}>Descoberta e Busca</Typography>
 				<Typography sx={{ color: 'text.secondary', fontSize: 18, lineHeight: '28px' }}>Explore vastos conhecimentos, desde clássicos literários até artigos científicos contemporâneos.</Typography>
 			</Stack>
-			<Stack component="form" onSubmit={(e) => { e.preventDefault(); patch({ q: qInput }) }} sx={{ gap: 0.5, mb: 3 }}>
+
+			<Stack component="form" onSubmit={(e) => e.preventDefault()} sx={{ gap: 0.5, mb: 3 }}>
 				<Stack direction="row" sx={{ gap: 2 }}>
-					<TextField 
+					<TextField
 						fullWidth
-						label="Buscar por título ou autor" 
-						variant="outlined" 
-						value={qInput} 
-						onChange={(e) => setQInput(e.target.value)}
+						label="Buscar por título ou autor"
+						variant="outlined"
+						value={filters.q}
+						onChange={(e) => patch({ q: e.target.value })}
 						slotProps={{ input: { startAdornment: <InputAdornment position="start"><Search /></InputAdornment> } }}
 					/>
 					<Button type="submit" variant="contained">Buscar</Button>
 				</Stack>
-				<Typography variant="caption" sx={{ color: 'text.secondary' }}> Catálogo unificado: Project Gutenbeg (livros) e arXiv (artigos científicos).</Typography>
+				<Typography variant="caption" sx={{ color: 'text.secondary' }}>Catálogo unificado: Project Gutenberg (livros) e arXiv (artigos científicos).</Typography>
 			</Stack>
-			<Box
-				sx={{
-					display: 'grid',
-					gap: 3, 
-					gridTemplateColumns: {
-						xs: '1fr',
-						md: '305px 1fr',
-					},
-					alignItems: 'start'
-				}}
-			>
+
+			<Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', md: '305px 1fr' }, alignItems: 'start' }}>
 				<CatalogFilters query={filters} counts={data?.counts} onChange={patch} onClear={clearFilters} />
 				<Stack sx={{ gap: 2 }}>
-					<Stack direction="row" sx={{ gap: 1, alignItems: 'center', justifyContent: 'flex-end'}}>
-						<Typography variant="caption" sx={{ color: 'text.secondary' }}> Ordenar </Typography>
-						<Select size="small"
-							value={filters.sort ?? 'relevance'}
-							onChange={(e) => patch({ sort: e.target.value as CatalogSort})}
-							sx={{ minWidth: 160 }}
-						>
+					<Stack direction="row" sx={{ gap: 1, alignItems: 'center', justifyContent: 'flex-end' }}>
+						<Typography variant="caption" sx={{ color: 'text.secondary' }}>Ordenar</Typography>
+						<Select size="small" value={filters.sort} onChange={(e) => patch({ sort: e.target.value as CatalogSort })} sx={{ minWidth: 160 }}>
 							{sortOptions.map((o) => <MenuItem key={o.value} value={o.value}>{o.label}</MenuItem>)}
 						</Select>
 					</Stack>
+
 					{isError ? (
 						<Alert severity="error">Não foi possível carregar o catálogo. Tente novamente.</Alert>
 					) : isLoading ? (

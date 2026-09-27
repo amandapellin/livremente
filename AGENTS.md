@@ -68,6 +68,10 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - *Slugs* de categorias/gêneros/idiomas em `src/schemas/category-schemas.ts` são o
   contrato de vocabulário: **devem casar com as chaves do `PreferenceCatalog`** do
   back-end.
+- Catálogo: **`GET /api/catalog`** (retorna `CatalogPage` com `Publication[]`) é
+  **proposto pelo front** e ainda não existe no back-end — a UI usa um mock
+  trocável (`USE_CATALOG_MOCK` em `useCatalogSearch`). Ao implementar no back-end,
+  alinhar o *shape* e desligar o flag.
 
 ## 6. Execução e verificação
 
@@ -120,9 +124,22 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   O logout (`useLogout`) chama `POST /api/auth/logout` (contrato proposto pelo
   front) de forma *best-effort* — em erro ou sucesso limpa a sessão, descarta o
   cache e redireciona para a landing (RF28). Também no Drawer (mobile).
+- **#11 (RF10) Tela de busca/catálogo** (com filhas **#12 RF11** e **#13 RF12**):
+  lista de publicações (`PublicationCard`), busca por palavra-chave com
+  **debounce ao digitar + submit** (`useDebouncedValue`), **filtros em sidebar**
+  quebrados em componentes (`TypeFilter` com contagem, `LanguageFilter`,
+  `GenreFilter`) com **visibilidade condicional por tipo** (idioma e gênero só
+  para livro; área só para artigo), ordenação, **paginação numerada** e estados
+  de carregando/vazio/erro. Contrato `GET /api/catalog` proposto pelo front
+  (params `q/type/languages/genres/sort/page` → `CatalogPage` com `Publication[]`
+  e `counts`), regenerado com orval. Enquanto o back-end não expõe o endpoint,
+  os dados vêm de um **mock trocável** (`src/api/catalog-mock.ts` +
+  `useCatalogSearch`, flag `USE_CATALOG_MOCK`). O filtro de **ano** foi removido
+  do critério do #13. Entidade nomeada `Publication` (casa com `PublicationType`);
+  `obra` fica só como rótulo de UI/rota (`/obra/:id`).
 
 **Em andamento / próximas:**
-- Telas de catálogo, detalhes, leitura (reader), estante e recomendações.
+- Telas de detalhes (obra), leitura (reader), estante e recomendações.
 
 ## 9. Documentos relacionados
 

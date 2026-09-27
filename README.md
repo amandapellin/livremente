@@ -75,7 +75,7 @@ O roteamento usa o **Data Mode** do React Router: as rotas são declaradas num m
 | `/recomendacoes` | `RecomendacoesPage` | Recomendações personalizadas |
 | `*` | `NotFoundPage` | 404 — rota não encontrada |
 
-> Já implementadas: landing (`/`), login (`/login`), cadastro (`/cadastro`) e edição de perfil (`/perfil`). As demais telas (catálogo, detalhes, leitor, estante e recomendações) seguem como placeholders e serão implementadas nas issues correspondentes. O header/navegação e a alternância de tema já estão no layout base.
+> Já implementadas: landing (`/`), login (`/login`), cadastro (`/cadastro`), edição de perfil (`/perfil`) e busca/catálogo (`/catalogo`). As demais telas (detalhes, leitor, estante e recomendações) seguem como placeholders e serão implementadas nas issues correspondentes. O header/navegação e a alternância de tema já estão no layout base.
 
 ## Design system
 

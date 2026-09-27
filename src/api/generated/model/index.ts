@@ -7,7 +7,6 @@
 
 export * from './authUser';
 export * from './catalogCounts';
-export * from './catalogItem';
 export * from './catalogPage';
 export * from './changePasswordRequest';
 export * from './errorResponse';
