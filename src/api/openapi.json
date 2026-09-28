@@ -471,6 +471,94 @@
           }
         }
       }
+    }, 
+    "/api/catalog": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "Retorna o catálogo de livros e artigos com filtros e paginação (RF10).",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca por título ou autor." 
+          },
+          {
+            "name": "type", 
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PublicationType"
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ReadingLanguage"
+              }
+            }
+          },
+          {
+            "name": "genres",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Gênero literário (livros) ou área de conhecimento (artigos)."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["relevance", "recent", "title", "popularity"],
+              "default": "relevance"
+            }  
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página de resultados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CatalogPage"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -812,6 +900,102 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "Publication": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "author",
+          "type",
+          "language"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PublicationType"
+          },
+          "language": {
+            "$ref": "#/components/schemas/ReadingLanguage"
+          },
+          "genre": {
+            "type": "string",
+            "nullable": true,
+            "description": "Slug de gênero (livro) ou área de conhecimento (artigo)."
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "format": {
+            "type": "string",
+            "nullable": true,
+            "description": "EPUB, PDF..."
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "Project Gutemberg | arXiv."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CatalogCounts": {
+        "type": "object",
+        "required": ["all", "book", "scientific_article"],
+        "properties": {
+          "all": {
+            "type": "integer"
+          },
+          "book": {
+            "type": "integer"
+          },
+          "scientific_article": {
+            "type": "integer"
+          }
+        }
+      },
+      "CatalogPage": {
+        "type": "object",
+        "required": ["items", "page", "pageSize", "total", "totalPages", "counts"],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Publication"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CatalogCounts" 
           }
         }
       }
