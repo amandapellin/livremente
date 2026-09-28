@@ -559,6 +559,45 @@
           }
         }
       }
+    },
+    "/api/catalog/{id}": {
+      "get": {
+        "tags": ["Catalog"],
+        "summary": "Detalhes de uma publicação (RF13).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "ID da publicação."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Detalhes da publicação.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Publicação não encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -998,6 +1037,98 @@
             "$ref": "#/components/schemas/CatalogCounts" 
           }
         }
+      },
+      "Contributor": {
+        "type": "object",
+        "required": ["name", "role"],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "description": "author | translator | editor | illustrator"
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true,
+            "description": "ex.: 1864–1927"
+          }
+        }
+      },
+      "ReadingStatus": {
+        "type": "string",
+        "enum": ["read", "reading", "want_to_read", "abandoned"],
+        "description": "Estado de leitura na estante (espelha o enum ReadingStatus do back-end)."
+      },
+      "ReadingProgress": {
+        "type": "object",
+        "required": ["percent"],
+        "description": "Progresso de leitura do usuário (épico Leitura/Estante).",
+        "properties": {
+          "percent": { "type": "integer", "description": "Percentual lido (0–100)." },
+          "currentPage": { "type": "integer", "nullable": true },
+          "totalPages": { "type": "integer", "nullable": true },
+          "lastSession": { "type": "string", "nullable": true, "description": "Rótulo/descrição da última sessão (ex.: \"ontem\")." },
+          "readingTimeMinutes": { "type": "integer", "nullable": true, "description": "Tempo total de leitura em minutos." },
+          "highlights": { "type": "integer", "nullable": true },
+          "notes": { "type": "integer", "nullable": true },
+          "bookmarks": { "type": "integer", "nullable": true }
+        }
+      },
+      "PublicationDetails": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Publication" },
+          { "type": "object",
+            "properties": {
+              "synopsis": {
+                "type": "string",
+                "nullable": true,
+                "description": "Parágrafos separados por linha em branco."
+              },
+              "contributors": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Contributor"
+                }
+              },
+              "subjects": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "  Gêneros/assuntos (rótulos)."
+              },
+              "pages": {
+                "type": "integer",
+                "nullable": true
+              },
+              "rights": {
+                "type": "string",
+                "nullable": true,
+                "description": "ex.: Domínio público"
+              },
+              "publicDomain": {
+                "type": "boolean",
+                "nullable": true
+              },
+              "downloadUrl": {
+                "type": "string",
+                "nullable": true
+              },
+              "readingStatus": {
+                "nullable": true,
+                "allOf": [{ "$ref": "#/components/schemas/ReadingStatus" }],
+                "description": "Estado na estante do usuário (épico Estante); null quando não está na estante."
+              },
+              "readingProgress": {
+                "nullable": true,
+                "allOf": [{ "$ref": "#/components/schemas/ReadingProgress" }],
+                "description": "Progresso de leitura; presente quando na estante em leitura/lido/abandonado."
+              }
+            }
+          }
+        ]
       }
     }
   }

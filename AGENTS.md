@@ -68,10 +68,14 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - *Slugs* de categorias/gêneros/idiomas em `src/schemas/category-schemas.ts` são o
   contrato de vocabulário: **devem casar com as chaves do `PreferenceCatalog`** do
   back-end.
-- Catálogo: **`GET /api/catalog`** (retorna `CatalogPage` com `Publication[]`) é
-  **proposto pelo front** e ainda não existe no back-end — a UI usa um mock
-  trocável (`USE_CATALOG_MOCK` em `useCatalogSearch`). Ao implementar no back-end,
-  alinhar o *shape* e desligar o flag.
+- Catálogo: **`GET /api/catalog`** (lista → `CatalogPage` com `Publication[]`) e
+  **`GET /api/catalog/{id}`** (detalhes → `PublicationDetails`) são **propostos
+  pelo front** e ainda não existem no back-end — a UI usa mocks trocáveis
+  (`USE_CATALOG_MOCK` em `useCatalogSearch`/`usePublicationDetails`). Ao
+  implementar, alinhar o *shape* e desligar o flag.
+- **`ReadingStatus`** (estado na estante) espelha o enum do back-end
+  (`read | reading | want_to_read | abandoned`) — deve ser serializado como
+  **string** no JSON (`JsonStringEnumConverter`), não número.
 
 ## 6. Execução e verificação
 
@@ -136,10 +140,29 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   os dados vêm de um **mock trocável** (`src/api/catalog-mock.ts` +
   `useCatalogSearch`, flag `USE_CATALOG_MOCK`). O filtro de **ano** foi removido
   do critério do #13. Entidade nomeada `Publication` (casa com `PublicationType`);
-  `obra` fica só como rótulo de UI/rota (`/obra/:id`).
+  `obra` fica só como rótulo de UI/rota (`/obra/:id`). Há alternância de
+  visualização **lista ⇄ grade** (`PublicationGridCard`; preferência em
+  `localStorage`).
+- **#14 (RF13) Tela de detalhes da obra/artigo:** metadados completos da
+  publicação em `/obra/:id` — `usePublicationDetails` via `GET /api/catalog/{id}`
+  (contrato proposto pelo front + mock trocável `catalog-details-mock`).
+  Componentes decompostos: `PublicationHeader` (capa, título, meta, ações),
+  `SynopsisSection` e `MetadataAside` (responsáveis, gêneros/assuntos, publicação,
+  estado na estante). Ações: **"Ler agora"** (→ `/leitura/:id`, épico Leitura),
+  **"Baixar epub"** (`downloadUrl`) e **"Adicionar à estante"** como *dropdown* de
+  estado usando o enum **`ReadingStatus`** do back-end
+  (`read | reading | want_to_read | abandoned`; rótulos/cores em
+  `reading-status-schemas`) — gancho para o épico Estante. Estados
+  carregando/não-encontrada (404)/erro. Quando na estante em **lido/lendo/
+  abandonado**, exibe um **card de progresso** (`ReadingProgressCard` + schema
+  `ReadingProgress`): % lido, posição/última sessão, barra e métricas (tempo de
+  leitura, grifos, anotações, páginas marcadas). **Atenção:** o back-end deve
+  serializar `ReadingStatus` como *string* (`JsonStringEnumConverter`), não
+  número; `readingStatus`/`readingProgress` são dados do usuário (épico
+  Estante/Leitura), hoje no contrato de detalhes por praticidade do mock.
 
 **Em andamento / próximas:**
-- Telas de detalhes (obra), leitura (reader), estante e recomendações.
+- Telas de leitura (reader), estante e recomendações.
 
 ## 9. Documentos relacionados
 
