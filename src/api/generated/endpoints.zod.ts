@@ -162,10 +162,9 @@ export const DeleteApiUsersMeAvatarResponse = zod.void()
  */
 export const GetApiUsersMePreferencesResponse = zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
-  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
-  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
-  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
-}).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')
+  "contentTypes": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
+  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).')
+}).describe('Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.')
 
 
 /**
@@ -173,17 +172,15 @@ export const GetApiUsersMePreferencesResponse = zod.object({
  */
 export const PutApiUsersMePreferencesBody = zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
-  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
-  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
-  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
-}).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')
+  "contentTypes": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
+  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).')
+}).describe('Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.')
 
 export const PutApiUsersMePreferencesResponse = zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
-  "publications": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
-  "categories": zod.array(zod.string()).optional().describe('Categorias de livros e/ou áreas de artigos (slugs).'),
-  "literaryGenres": zod.array(zod.string()).optional().describe('Gêneros literários (slugs).')
-}).describe('Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).')
+  "contentTypes": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
+  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).')
+}).describe('Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.')
 
 
 /**
@@ -276,3 +273,33 @@ export const GetApiCatalogIdResponse = zod.object({
   "bookmarks": zod.int().nullish()
 }).describe('Progresso de leitura do usuário (épico Leitura/Estante).'),zod.null()]).optional().describe('Progresso de leitura; presente quando na estante em leitura/lido/abandonado.')
 }))
+
+
+/**
+ * @summary Retorna os gêneros preferidos do usuário como slugs (RF04).
+ */
+export const GetApiUsersMeGenresResponse = zod.object({
+  "genres": zod.array(zod.string()).optional().describe('Slugs de categorias de livro e gêneros literários.')
+}).describe('Gêneros preferidos do usuário como slugs do front (categorias de livro e gêneros literários), mapeados no back-end para a M:N user_genre.')
+
+
+/**
+ * @summary Substitui os gêneros preferidos do usuário (RF04).
+ */
+export const PutApiUsersMeGenresBody = zod.object({
+  "genres": zod.array(zod.string()).optional().describe('Slugs de categorias de livro e gêneros literários.')
+}).describe('Gêneros preferidos do usuário como slugs do front (categorias de livro e gêneros literários), mapeados no back-end para a M:N user_genre.')
+
+export const PutApiUsersMeGenresResponse = zod.object({
+  "genres": zod.array(zod.string()).optional().describe('Slugs de categorias de livro e gêneros literários.')
+}).describe('Gêneros preferidos do usuário como slugs do front (categorias de livro e gêneros literários), mapeados no back-end para a M:N user_genre.')
+
+
+/**
+ * @summary Remove um gênero da preferência do usuário pelo id (RF04).
+ */
+export const DeleteApiUsersMeGenresGenreIdParams = zod.object({
+  "genreId": zod.int()
+})
+
+export const DeleteApiUsersMeGenresGenreIdResponse = zod.void()

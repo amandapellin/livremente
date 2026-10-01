@@ -8,13 +8,11 @@ import type { PublicationType } from './publicationType';
 import type { ReadingLanguage } from './readingLanguage';
 
 /**
- * Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).
+ * Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.
  */
 export interface UserPreferences {
   languages?: ReadingLanguage[];
-  publications?: PublicationType[];
-  /** Categorias de livros e/ou áreas de artigos (slugs). */
-  categories?: string[];
-  /** Gêneros literários (slugs). */
-  literaryGenres?: string[];
+  contentTypes?: PublicationType[];
+  /** Áreas de conhecimento (slugs de áreas de artigo). */
+  knowledgeAreas?: string[];
 }

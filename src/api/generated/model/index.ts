@@ -30,5 +30,6 @@ export * from './registerPreferences';
 export * from './registerRequest';
 export * from './registerResponse';
 export * from './updateProfileRequest';
+export * from './userGenres';
 export * from './userPreferences';
 export * from './userProfile';
