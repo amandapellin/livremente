@@ -38,6 +38,7 @@ import type {
   RegisterRequest,
   RegisterResponse,
   UpdateProfileRequest,
+  UserGenres,
   UserPreferences,
   UserProfile
 } from './model';
@@ -1622,3 +1623,339 @@ export function useGetApiCatalogId<TData = Awaited<ReturnType<typeof getApiCatal
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+
+
+
+
+
+
+export type getApiUsersMeGenresResponse200 = {
+  data: UserGenres
+  status: 200
+}
+
+export type getApiUsersMeGenresResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getApiUsersMeGenresResponseSuccess = (getApiUsersMeGenresResponse200) & {
+  headers: Headers;
+};
+export type getApiUsersMeGenresResponseError = (getApiUsersMeGenresResponse401) & {
+  headers: Headers;
+};
+
+export type getApiUsersMeGenresResponse = (getApiUsersMeGenresResponseSuccess | getApiUsersMeGenresResponseError)
+
+export const getGetApiUsersMeGenresUrl = () => {
+
+
+
+
+  return `/api/users/me/genres`
+}
+
+/**
+ * @summary Retorna os gêneros preferidos do usuário como slugs (RF04).
+ */
+export const getApiUsersMeGenres = async ( options?: Parameters<typeof customFetch>[1]): Promise<getApiUsersMeGenresResponse> => {
+
+  return customFetch<getApiUsersMeGenresResponse>(getGetApiUsersMeGenresUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApiUsersMeGenresQueryKey = () => {
+    return [
+    `/api/users/me/genres`
+    ] as const;
+    }
+
+
+export const getGetApiUsersMeGenresQueryOptions = <TData = Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiUsersMeGenresQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiUsersMeGenres>>> = ({ signal }) => getApiUsersMeGenres({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiUsersMeGenresQueryResult = NonNullable<Awaited<ReturnType<typeof getApiUsersMeGenres>>>
+export type GetApiUsersMeGenresQueryError = ErrorResponse
+
+
+export function useGetApiUsersMeGenres<TData = Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMeGenres>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMeGenres>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMeGenres<TData = Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMeGenres>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMeGenres>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMeGenres<TData = Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Retorna os gêneros preferidos do usuário como slugs (RF04).
+ */
+
+export function useGetApiUsersMeGenres<TData = Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeGenres>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiUsersMeGenresQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putApiUsersMeGenresResponse200 = {
+  data: UserGenres
+  status: 200
+}
+
+export type putApiUsersMeGenresResponse400 = {
+  data: ErrorResponse
+  status: 400
+}
+
+export type putApiUsersMeGenresResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putApiUsersMeGenresResponseSuccess = (putApiUsersMeGenresResponse200) & {
+  headers: Headers;
+};
+export type putApiUsersMeGenresResponseError = (putApiUsersMeGenresResponse400 | putApiUsersMeGenresResponse401) & {
+  headers: Headers;
+};
+
+export type putApiUsersMeGenresResponse = (putApiUsersMeGenresResponseSuccess | putApiUsersMeGenresResponseError)
+
+export const getPutApiUsersMeGenresUrl = () => {
+
+
+
+
+  return `/api/users/me/genres`
+}
+
+/**
+ * @summary Substitui os gêneros preferidos do usuário (RF04).
+ */
+export const putApiUsersMeGenres = async (userGenres: UserGenres, options?: Parameters<typeof customFetch>[1]): Promise<putApiUsersMeGenresResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putApiUsersMeGenresResponse>(getPutApiUsersMeGenresUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(userGenres)
+  }
+);}
+
+
+
+
+
+export const getPutApiUsersMeGenresMutationKey = () => ['putApiUsersMeGenres'] as const;
+
+export const getPutApiUsersMeGenresMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeGenres>>, TError,PutApiUsersMeGenresMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeGenres>>, TError,PutApiUsersMeGenresMutationVariables, TContext> => {
+
+const mutationKey = getPutApiUsersMeGenresMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApiUsersMeGenres>>, PutApiUsersMeGenresMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  putApiUsersMeGenres(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutApiUsersMeGenresMutationResult = NonNullable<Awaited<ReturnType<typeof putApiUsersMeGenres>>>
+    export type PutApiUsersMeGenresMutationBody = UserGenres
+    export type PutApiUsersMeGenresMutationError = ErrorResponse
+    export type PutApiUsersMeGenresMutationVariables = {data: UserGenres}
+
+    /**
+ * @summary Substitui os gêneros preferidos do usuário (RF04).
+ */
+export const usePutApiUsersMeGenres = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeGenres>>, TError,PutApiUsersMeGenresMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putApiUsersMeGenres>>,
+        TError,
+        PutApiUsersMeGenresMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutApiUsersMeGenresMutationOptions(options), queryClient);
+    }
+
+export type deleteApiUsersMeGenresGenreIdResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteApiUsersMeGenresGenreIdResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteApiUsersMeGenresGenreIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type deleteApiUsersMeGenresGenreIdResponseSuccess = (deleteApiUsersMeGenresGenreIdResponse204) & {
+  headers: Headers;
+};
+export type deleteApiUsersMeGenresGenreIdResponseError = (deleteApiUsersMeGenresGenreIdResponse401 | deleteApiUsersMeGenresGenreIdResponse404) & {
+  headers: Headers;
+};
+
+export type deleteApiUsersMeGenresGenreIdResponse = (deleteApiUsersMeGenresGenreIdResponseSuccess | deleteApiUsersMeGenresGenreIdResponseError)
+
+export const getDeleteApiUsersMeGenresGenreIdUrl = (genreId: number,) => {
+
+
+
+
+  return `/api/users/me/genres/${genreId}`
+}
+
+/**
+ * @summary Remove um gênero da preferência do usuário pelo id (RF04).
+ */
+export const deleteApiUsersMeGenresGenreId = async (genreId: number, options?: Parameters<typeof customFetch>[1]): Promise<deleteApiUsersMeGenresGenreIdResponse> => {
+
+  return customFetch<deleteApiUsersMeGenresGenreIdResponse>(getDeleteApiUsersMeGenresGenreIdUrl(genreId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteApiUsersMeGenresGenreIdMutationKey = () => ['deleteApiUsersMeGenresGenreId'] as const;
+
+export const getDeleteApiUsersMeGenresGenreIdMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMeGenresGenreId>>, TError,DeleteApiUsersMeGenresGenreIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMeGenresGenreId>>, TError,DeleteApiUsersMeGenresGenreIdMutationVariables, TContext> => {
+
+const mutationKey = getDeleteApiUsersMeGenresGenreIdMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiUsersMeGenresGenreId>>, DeleteApiUsersMeGenresGenreIdMutationVariables> = (props) => {
+          const {genreId} = props ?? {};
+
+          return  deleteApiUsersMeGenresGenreId(genreId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiUsersMeGenresGenreIdMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiUsersMeGenresGenreId>>>
+
+    export type DeleteApiUsersMeGenresGenreIdMutationError = ErrorResponse
+    export type DeleteApiUsersMeGenresGenreIdMutationVariables = {genreId: number}
+
+    /**
+ * @summary Remove um gênero da preferência do usuário pelo id (RF04).
+ */
+export const useDeleteApiUsersMeGenresGenreId = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMeGenresGenreId>>, TError,DeleteApiUsersMeGenresGenreIdMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiUsersMeGenresGenreId>>,
+        TError,
+        DeleteApiUsersMeGenresGenreIdMutationVariables,
+        TContext
+      > => {
+      return useMutation(getDeleteApiUsersMeGenresGenreIdMutationOptions(options), queryClient);
+    }

@@ -1,9 +1,11 @@
-import { areasArtigos, categoriasLivros } from './category-schemas'
+import { categoriasLivros, generosLiterarios } from './category-schemas'
 
 /**
  * Preferências no formato da UI (RF04). As categorias ficam separadas em livros
- * e áreas de artigos porque são exibidas em seções distintas; a API usa um único
- * array `categories` (ver `preferencesToApi`/`apiToPreferences`).
+ * e áreas de artigos porque são exibidas em seções distintas. No back-end elas
+ * viajam em DOIS recursos: as EAV (idioma, tipo, área) em `/me/preferences` e os
+ * gêneros/categorias de livro em `/me/genres` (ver `preferencesToEav`,
+ * `preferencesToGenres` e `apiToPreferences`).
  */
 export interface PreferencesValue {
 	languages: string[]
@@ -21,35 +23,52 @@ export const emptyPreferences: PreferencesValue = {
 	literaryGenres: [],
 }
 
-/** Formato do contrato da API (categorias e áreas mescladas em `categories`). */
-export interface PreferencesPayload {
+/** Corpo do recurso EAV (`GET`/`PUT /api/users/me/preferences`). */
+export interface EavPreferencesPayload {
 	languages: string[]
-	publications: string[]
-	categories: string[]
-	literaryGenres: string[]
+	contentTypes: string[]
+	knowledgeAreas: string[]
+}
+
+/** Corpo do recurso de gêneros (`GET`/`PUT /api/users/me/genres`). */
+export interface GenresPayload {
+	genres: string[]
 }
 
 const bookCategorySlugs = new Set(categoriasLivros.map((o) => o.value))
-const articleAreaSlugs = new Set(areasArtigos.map((o) => o.value))
+const literaryGenreSlugs = new Set(generosLiterarios.map((o) => o.value))
 
-/** Converte as preferências vindas da API (categorias mescladas) para a UI. */
-export function apiToPreferences(p: Partial<PreferencesPayload> | undefined): PreferencesValue {
-	const categories = p?.categories ?? []
+/**
+ * Mescla as duas respostas da API (EAV + gêneros) no formato da UI. Os slugs de
+ * `genres` são separados de volta em categorias de livro e gêneros literários
+ * pelos conjuntos de vocabulário do front.
+ */
+export function apiToPreferences(
+	eav: Partial<EavPreferencesPayload> | undefined,
+	genres: readonly string[] | undefined,
+): PreferencesValue {
+	const genreSlugs = genres ?? []
 	return {
-		languages: p?.languages ?? [],
-		publications: p?.publications ?? [],
-		bookCategories: categories.filter((c) => bookCategorySlugs.has(c)),
-		articleAreas: categories.filter((c) => articleAreaSlugs.has(c)),
-		literaryGenres: p?.literaryGenres ?? [],
+		languages: eav?.languages ?? [],
+		publications: eav?.contentTypes ?? [],
+		bookCategories: genreSlugs.filter((g) => bookCategorySlugs.has(g)),
+		articleAreas: eav?.knowledgeAreas ?? [],
+		literaryGenres: genreSlugs.filter((g) => literaryGenreSlugs.has(g)),
 	}
 }
 
-/** Converte as preferências da UI para o corpo da API (mescla categorias + áreas). */
-export function preferencesToApi(v: PreferencesValue): PreferencesPayload {
+/** Extrai o corpo EAV (`/me/preferences`) do formato da UI. */
+export function preferencesToEav(v: PreferencesValue): EavPreferencesPayload {
 	return {
 		languages: v.languages,
-		publications: v.publications,
-		categories: [...v.bookCategories, ...v.articleAreas],
-		literaryGenres: v.literaryGenres,
+		contentTypes: v.publications,
+		knowledgeAreas: v.articleAreas,
+	}
+}
+
+/** Extrai o corpo de gêneros (`/me/genres`) do formato da UI (categorias de livro + gêneros). */
+export function preferencesToGenres(v: PreferencesValue): GenresPayload {
+	return {
+		genres: [...v.bookCategories, ...v.literaryGenres],
 	}
 }

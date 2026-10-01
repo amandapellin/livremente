@@ -471,10 +471,12 @@
           }
         }
       }
-    }, 
+    },
     "/api/catalog": {
       "get": {
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "summary": "Retorna o catálogo de livros e artigos com filtros e paginação (RF10).",
         "parameters": [
           {
@@ -483,10 +485,10 @@
             "schema": {
               "type": "string"
             },
-            "description": "Busca por título ou autor." 
+            "description": "Busca por título ou autor."
           },
           {
-            "name": "type", 
+            "name": "type",
             "in": "query",
             "schema": {
               "$ref": "#/components/schemas/PublicationType"
@@ -522,9 +524,14 @@
             "in": "query",
             "schema": {
               "type": "string",
-              "enum": ["relevance", "recent", "title", "popularity"],
+              "enum": [
+                "relevance",
+                "recent",
+                "title",
+                "popularity"
+              ],
               "default": "relevance"
-            }  
+            }
           },
           {
             "name": "page",
@@ -562,7 +569,9 @@
     },
     "/api/catalog/{id}": {
       "get": {
-        "tags": ["Catalog"],
+        "tags": [
+          "Catalog"
+        ],
         "summary": "Detalhes de uma publicação (RF13).",
         "parameters": [
           {
@@ -588,6 +597,128 @@
           },
           "404": {
             "description": "Publicação não encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/genres": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna os gêneros preferidos do usuário como slugs (RF04).",
+        "responses": {
+          "200": {
+            "description": "Gêneros do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGenres"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Substitui os gêneros preferidos do usuário (RF04).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserGenres"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gêneros atualizados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGenres"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/genres/{genreId}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Remove um gênero da preferência do usuário pelo id (RF04).",
+        "parameters": [
+          {
+            "name": "genreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removido."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Gênero não associado ao usuário.",
             "content": {
               "application/json": {
                 "schema": {
@@ -912,7 +1043,7 @@
       },
       "UserPreferences": {
         "type": "object",
-        "description": "Preferências de leitura do usuário (idioma, tipo de conteúdo, categorias/áreas e gêneros).",
+        "description": "Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.",
         "properties": {
           "languages": {
             "type": "array",
@@ -920,22 +1051,15 @@
               "$ref": "#/components/schemas/ReadingLanguage"
             }
           },
-          "publications": {
+          "contentTypes": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/PublicationType"
             }
           },
-          "categories": {
+          "knowledgeAreas": {
             "type": "array",
-            "description": "Categorias de livros e/ou áreas de artigos (slugs).",
-            "items": {
-              "type": "string"
-            }
-          },
-          "literaryGenres": {
-            "type": "array",
-            "description": "Gêneros literários (slugs).",
+            "description": "Áreas de conhecimento (slugs de áreas de artigo).",
             "items": {
               "type": "string"
             }
@@ -998,7 +1122,11 @@
       },
       "CatalogCounts": {
         "type": "object",
-        "required": ["all", "book", "scientific_article"],
+        "required": [
+          "all",
+          "book",
+          "scientific_article"
+        ],
         "properties": {
           "all": {
             "type": "integer"
@@ -1013,7 +1141,14 @@
       },
       "CatalogPage": {
         "type": "object",
-        "required": ["items", "page", "pageSize", "total", "totalPages", "counts"],
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total",
+          "totalPages",
+          "counts"
+        ],
         "properties": {
           "items": {
             "type": "array",
@@ -1034,13 +1169,16 @@
             "type": "integer"
           },
           "counts": {
-            "$ref": "#/components/schemas/CatalogCounts" 
+            "$ref": "#/components/schemas/CatalogCounts"
           }
         }
       },
       "Contributor": {
         "type": "object",
-        "required": ["name", "role"],
+        "required": [
+          "name",
+          "role"
+        ],
         "properties": {
           "name": {
             "type": "string"
@@ -1058,28 +1196,64 @@
       },
       "ReadingStatus": {
         "type": "string",
-        "enum": ["read", "reading", "want_to_read", "abandoned"],
+        "enum": [
+          "read",
+          "reading",
+          "want_to_read",
+          "abandoned"
+        ],
         "description": "Estado de leitura na estante (espelha o enum ReadingStatus do back-end)."
       },
       "ReadingProgress": {
         "type": "object",
-        "required": ["percent"],
+        "required": [
+          "percent"
+        ],
         "description": "Progresso de leitura do usuário (épico Leitura/Estante).",
         "properties": {
-          "percent": { "type": "integer", "description": "Percentual lido (0–100)." },
-          "currentPage": { "type": "integer", "nullable": true },
-          "totalPages": { "type": "integer", "nullable": true },
-          "lastSession": { "type": "string", "nullable": true, "description": "Rótulo/descrição da última sessão (ex.: \"ontem\")." },
-          "readingTimeMinutes": { "type": "integer", "nullable": true, "description": "Tempo total de leitura em minutos." },
-          "highlights": { "type": "integer", "nullable": true },
-          "notes": { "type": "integer", "nullable": true },
-          "bookmarks": { "type": "integer", "nullable": true }
+          "percent": {
+            "type": "integer",
+            "description": "Percentual lido (0–100)."
+          },
+          "currentPage": {
+            "type": "integer",
+            "nullable": true
+          },
+          "totalPages": {
+            "type": "integer",
+            "nullable": true
+          },
+          "lastSession": {
+            "type": "string",
+            "nullable": true,
+            "description": "Rótulo/descrição da última sessão (ex.: \"ontem\")."
+          },
+          "readingTimeMinutes": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Tempo total de leitura em minutos."
+          },
+          "highlights": {
+            "type": "integer",
+            "nullable": true
+          },
+          "notes": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bookmarks": {
+            "type": "integer",
+            "nullable": true
+          }
         }
       },
       "PublicationDetails": {
         "allOf": [
-          { "$ref": "#/components/schemas/Publication" },
-          { "type": "object",
+          {
+            "$ref": "#/components/schemas/Publication"
+          },
+          {
+            "type": "object",
             "properties": {
               "synopsis": {
                 "type": "string",
@@ -1118,17 +1292,38 @@
               },
               "readingStatus": {
                 "nullable": true,
-                "allOf": [{ "$ref": "#/components/schemas/ReadingStatus" }],
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReadingStatus"
+                  }
+                ],
                 "description": "Estado na estante do usuário (épico Estante); null quando não está na estante."
               },
               "readingProgress": {
                 "nullable": true,
-                "allOf": [{ "$ref": "#/components/schemas/ReadingProgress" }],
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReadingProgress"
+                  }
+                ],
                 "description": "Progresso de leitura; presente quando na estante em leitura/lido/abandonado."
               }
             }
           }
         ]
+      },
+      "UserGenres": {
+        "type": "object",
+        "description": "Gêneros preferidos do usuário como slugs do front (categorias de livro e gêneros literários), mapeados no back-end para a M:N user_genre.",
+        "properties": {
+          "genres": {
+            "type": "array",
+            "description": "Slugs de categorias de livro e gêneros literários.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   }

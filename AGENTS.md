@@ -74,8 +74,10 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   (`USE_CATALOG_MOCK` em `useCatalogSearch`/`usePublicationDetails`). Ao
   implementar, alinhar o *shape* e desligar o flag.
 - **`ReadingStatus`** (estado na estante) espelha o enum do back-end
-  (`read | reading | want_to_read | abandoned`) — deve ser serializado como
-  **string** no JSON (`JsonStringEnumConverter`), não número.
+  (`read | reading | want_to_read | abandoned`) e trafega como **string** no JSON.
+  O back-end já garante isso globalmente (`JsonStringEnumConverter` em
+  `ConfigureHttpJsonOptions`); o cliente gerado já é *string union* — **nada a
+  ajustar no front** (o mesmo vale para `Gender`, `PublicationType`, `ReadingLanguage`).
 
 ## 6. Execução e verificação
 
@@ -119,8 +121,18 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - **#9 (RF04) Preferências de leitura:** idioma, tipo de conteúdo (livro/artigo),
   categorias/áreas de conhecimento e gênero literário via *chips* (multi-seleção),
   num componente compartilhado (`PreferencesFields`) usado **no cadastro e no
-  perfil**. No perfil, prefill via `GET /api/users/me/preferences` e salvar via
-  `PUT` com *toast* próprio. Contrato de preferências proposto pelo front.
+  perfil**. **Contrato alinhado ao back-end (#11 EAV + #12 gêneros):** no perfil,
+  o `useProfilePreferences` orquestra **dois recursos** — EAV em
+  `GET`/`PUT /api/users/me/preferences` (`{ languages, contentTypes, knowledgeAreas }`)
+  e gêneros/categorias de livro em `GET`/`PUT /api/users/me/genres` (`{ genres }`,
+  slugs). Carrega e salva os dois em paralelo (`Promise.all`), com *toast* próprio.
+  A UI mantém o formato único `PreferencesValue`; o mapeamento de/para os dois
+  contratos fica em `preferences-schemas` (`preferencesToEav`,
+  `preferencesToGenres`, `apiToPreferences`). **O cadastro (`register`) NÃO mudou** —
+  segue enviando o payload combinado (`{ languages, publications, categories,
+  literaryGenres }`) que o back-end roteia pelo `PreferenceCatalog`. Há também
+  `DELETE /api/users/me/genres/{genreId}` no contrato (remoção granular), não usado
+  pela UI de chips (que usa o `PUT` de substituição).
 - **#10 (RF29) Logout:** estado de sessão reativo (`useIsAuthenticated` via
   `useSyncExternalStore`, com eventos emitidos por `auth-storage`). O header
   alterna **conta ⇄ "Entrar"**; autenticado, o botão de conta abre um *popover*
