@@ -173,8 +173,20 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   número; `readingStatus`/`readingProgress` são dados do usuário (épico
   Estante/Leitura), hoje no contrato de detalhes por praticidade do mock.
 
+- **#16 (RF15) Leitor de EPUB (epub.js):** leitor em `/leitura/:id` que renderiza
+  o `epubFileUrl` do material via **epub.js** (`useEpubReader`): render paginado,
+  **navegação** página/capítulo (botões Anterior/Próxima + setas do teclado),
+  **reflow** responsivo (RNF15, via `ResizeObserver` + rendition 100%), capítulo
+  atual (TOC), progresso (%) e **temas** claro/sépia/escuro. Componentes em
+  `components/reader/` (`reader-topbar`, `reader-view`, `reader-nav`). A rota
+  **esconde o header global** (o `App` oculta o `Header` em `/leitura/:id`,
+  mantendo o `Footer`). Contrato: `epubFileUrl` em `PublicationDetails`; em dev,
+  um `public/sample.epub` (domínio público) evita CORS — em produção usa-se o
+  `epub_file_url` real. **Fora de escopo (issues próprias):** grifos/anotações,
+  dicionário, marcar página e cronômetro de sessão.
+
 **Em andamento / próximas:**
-- Telas de leitura (reader), estante e recomendações.
+- Telas de estante e recomendações.
 
 ## 9. Documentos relacionados
 

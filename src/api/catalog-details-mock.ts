@@ -11,6 +11,7 @@ const extras: Record<string, Partial<PublicationDetails>> = {
 		subjects: ['Romance', 'Literatura inglesa', 'Costumes', 'Famílias', 'Casamento', 'Sátira social'],
 		pages: 279, rights: 'Domínio público', publicDomain: true,
 		downloadUrl: 'https://www.gutenberg.org/ebooks/1342.epub.noimages',
+		epubFileUrl: '/sample.epub',
 		readingStatus: 'reading',
 		readingProgress: {
 			percent: 34,
