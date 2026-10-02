@@ -24,6 +24,15 @@ const extras: Record<string, Partial<PublicationDetails>> = {
 			bookmarks: 3,
 		},
 	},
+	'arxiv-1706.03762': {
+		synopsis:
+			'Introduz a arquitetura Transformer, baseada inteiramente em mecanismos de atenção, dispensando recorrência e convoluções.',
+		contributors: [{ role: 'author', name: 'Vaswani et al.', lifespan: null }],
+		subjects: ['Aprendizado de máquina', 'Processamento de linguagem natural'],
+		pages: 15, rights: 'arXiv (acesso aberto)', publicDomain: false,
+		downloadUrl: 'https://arxiv.org/abs/1706.03762', // botão "Abrir no arXiv"
+		pdfFileUrl: '/sample.pdf', // dev; em prod, o pdf_file_url real do material
+	},
 	// … adicione mais conforme necessário
 }
 

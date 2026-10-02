@@ -272,7 +272,8 @@ export const GetApiCatalogIdResponse = zod.object({
   "notes": zod.int().nullish(),
   "bookmarks": zod.int().nullish()
 }).describe('Progresso de leitura do usuário (épico Leitura/Estante).'),zod.null()]).optional().describe('Progresso de leitura; presente quando na estante em leitura/lido/abandonado.'),
-  "epubFileUrl": zod.string().nullish().describe('URL do arquivo EPUB para leitura (RF15).')
+  "epubFileUrl": zod.string().nullish().describe('URL do arquivo EPUB para leitura (RF15).'),
+  "pdfFileUrl": zod.string().nullish().describe('URL do arquivo PDF para leitura (RF16).')
 }))
 
 
