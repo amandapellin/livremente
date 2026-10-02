@@ -70,7 +70,7 @@ O roteamento usa o **Data Mode** do React Router: as rotas são declaradas num m
 | `/perfil` | `PerfilPage` | Edição de perfil |
 | `/catalogo` | `CatalogoPage` | Busca/catálogo de obras |
 | `/obra/:id` | `DetalhesObraPage` | Detalhes de uma obra/artigo |
-| `/leitura/:id` | `LeitorPage` | Leitor (EPUB/PDF) |
+| `/leitura/:id` | `LeitorPage` | Leitor de EPUB |
 | `/estante` | `EstantePage` | Minha Estante |
 | `/recomendacoes` | `RecomendacoesPage` | Recomendações personalizadas |
 | `*` | `NotFoundPage` | 404 — rota não encontrada |

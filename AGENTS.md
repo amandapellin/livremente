@@ -177,13 +177,23 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   o `epubFileUrl` do material via **epub.js** (`useEpubReader`): render paginado,
   **navegação** página/capítulo (botões Anterior/Próxima + setas do teclado),
   **reflow** responsivo (RNF15, via `ResizeObserver` + rendition 100%), capítulo
-  atual (TOC), progresso (%) e **temas** claro/sépia/escuro. Componentes em
-  `components/reader/` (`reader-topbar`, `reader-view`, `reader-nav`). A rota
-  **esconde o header global** (o `App` oculta o `Header` em `/leitura/:id`,
-  mantendo o `Footer`). Contrato: `epubFileUrl` em `PublicationDetails`; em dev,
-  um `public/sample.epub` (domínio público) evita CORS — em produção usa-se o
-  `epub_file_url` real. **Fora de escopo (issues próprias):** grifos/anotações,
-  dicionário, marcar página e cronômetro de sessão.
+  atual (TOC) e progresso (%). **Modal de Configurações** (inspirado na biblioteca
+  Biblion): família de fonte (editor / sem serifa / **OpenDyslexic**, injetada no
+  iframe via `rendition.hooks.content`), **tamanho do texto**, **entrelinha**,
+  **alinhamento**, **cor de página** (claro/sépia/escuro — migrada para o modal;
+  as pills da topbar foram removidas) e **tipo de página** (dupla/única/rolagem,
+  via `rendition.flow`/`spread`). A rota **esconde o header e o footer globais**
+  (o `App` oculta ambos em `/leitura/:id`); topbar e barra de navegação acompanham
+  a cor do tema selecionado. Componentes em `components/reader/`: `reader-topbar`,
+  `reader-view`, `reader-nav`, `buttons` (`ReaderButton` compartilhado) e
+  `reader-settings` decomposto em primitivos (`settings-section`,
+  `settings-option-card`, `settings-slider`) + campos (`font-field`, `align-field`,
+  `page-color-field`, `page-type-field`). **Tipos e constantes do leitor** ficam em
+  `src/types/reader-types.ts` e `src/constants/reader-const.ts`. Contrato:
+  `epubFileUrl` em `PublicationDetails`; em dev, um `public/sample.epub` (domínio
+  público) evita CORS — em produção usa-se o `epub_file_url` real. **Fora de escopo
+  (issues próprias):** grifos/anotações, dicionário, marcar página e cronômetro de
+  sessão.
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
