@@ -1307,6 +1307,11 @@
                   }
                 ],
                 "description": "Progresso de leitura; presente quando na estante em leitura/lido/abandonado."
+              },
+              "epubFileUrl": { 
+                "type": "string", 
+                "nullable": true, 
+                "description": "URL do arquivo EPUB para leitura (RF15)." 
               }
             }
           }

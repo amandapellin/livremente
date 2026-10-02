@@ -33,4 +33,9 @@ export type PublicationDetails = Publication & ({
   readingStatus?: ReadingStatus | null;
   /** Progresso de leitura; presente quando na estante em leitura/lido/abandonado. */
   readingProgress?: ReadingProgress | null;
+  /**
+     * URL do arquivo EPUB para leitura (RF15).
+     * @nullable
+     */
+  epubFileUrl?: string | null;
 });

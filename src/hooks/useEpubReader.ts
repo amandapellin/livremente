@@ -1,0 +1,173 @@
+import { useEffect, useRef, useState } from 'react'
+import ePub, { type Book, type NavItem, type Rendition } from 'epubjs'
+import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderSurface, ReaderTheme } from '@/types/reader-types'
+import { FONT_FAMILIES, FONT_SIZE, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
+
+// Temas aplicados ao conteúdo do EPUB (derivados das cores acima).
+const bodyTheme = (c: ReaderSurface) => ({ body: { color: c.text, background: c.background } })
+const THEMES: Record<ReaderTheme, Record<string, Record<string, string>>> = {
+	light: bodyTheme(readerThemeColors.light),
+	sepia: bodyTheme(readerThemeColors.sepia),
+	dark: bodyTheme(readerThemeColors.dark),
+}
+
+type RelocatedLocation = { start: { cfi: string; href: string } }
+
+function findTocItem(toc: NavItem[], href: string): NavItem | undefined {
+	for (const item of toc) {
+		if (item.href && href.includes(item.href.split('#')[0])) return item
+		const sub = item.subitems?.length ? findTocItem(item.subitems, href) : undefined
+		if (sub) return sub
+	}
+	return undefined
+}
+
+function applyTypography(r: Rendition, fontScale: number, lineHeight: number, font: ReaderFont, align: ReaderAlign) {
+	r.themes.fontSize(`${fontScale}%`)
+	r.themes.override('line-height', String(lineHeight), true)
+	r.themes.override('font-family', FONT_FAMILIES[font], true)
+	r.themes.override('text-align', align, true)
+}
+
+function applyPageType(r: Rendition, type: ReaderPageType) {
+	if (type === 'scroll') {
+		r.flow('scrolled-doc')
+		return
+	}
+	r.flow('paginated')
+	r.spread(type === 'double' ? 'auto' : 'none')
+}
+
+export function useEpubReader(url: string | undefined | null) {
+	const containerRef = useRef<HTMLDivElement | null>(null)
+	const renditionRef = useRef<Rendition | null>(null)
+	const [chapter, setChapter] = useState('')
+	const [progress, setProgress] = useState(0)
+	const [isLoading, setIsLoading] = useState(true)
+	const [isError, setIsError] = useState(false)
+	const [theme, setTheme] = useState<ReaderTheme>('light')
+	const [fontScale, setFontScale] = useState(FONT_SIZE.default)
+	const [lineHeight, setLineHeight] = useState(LINE_SPACING.default)
+	const [fontFamily, setFontFamily] = useState<ReaderFont>('editor')
+	const [textAlign, setTextAlign] = useState<ReaderAlign>('justify')
+	const [pageType, setPageType] = useState<ReaderPageType>('single')
+
+	useEffect(() => {
+		const el = containerRef.current
+		if (!url || !el) return
+
+		setIsLoading(true)
+		setIsError(false)
+
+		const book: Book = ePub(url)
+		const rendition: Rendition = book.renderTo(el, { width: '100%', height: '100%' })
+		renditionRef.current = rendition
+
+		// Disponibiliza a OpenDyslexic dentro do iframe de cada seção.
+		rendition.hooks.content.register((contents: { document: Document }) => {
+			const style = contents.document.createElement('style')
+			style.textContent = `@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-regular.woff2') format('woff2');font-weight:400;font-display:swap}@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-bold.woff2') format('woff2');font-weight:700;font-display:swap}`
+			contents.document.head.appendChild(style)
+		})
+
+		Object.entries(THEMES).forEach(([name, rules]) => rendition.themes.register(name, rules))
+		rendition.themes.select(theme)
+		applyTypography(rendition, fontScale, lineHeight, fontFamily, textAlign)
+		applyPageType(rendition, pageType)
+
+		const fail = () => {
+			setIsError(true)
+			setIsLoading(false)
+		}
+
+		// Reflow (RNF15): só observa depois do display (o manager precisa existir).
+		const resizeObserver = new ResizeObserver(() => {
+			try {
+				rendition.resize(el.clientWidth, el.clientHeight)
+			} catch {
+				/* manager ainda não pronto ou já destruído */
+			}
+		})
+
+		rendition.display().then(() => {
+			setIsLoading(false)
+			resizeObserver.observe(el)
+		}, fail)
+		book.ready.then(() => book.locations.generate(1600)).catch(() => undefined)
+		book.opened.catch(fail)
+
+		rendition.on('relocated', (location: RelocatedLocation) => {
+			try {
+				const pct = book.locations.percentageFromCfi(location.start.cfi)
+				if (typeof pct === 'number') setProgress(Math.round(pct * 100))
+			} catch {
+				/* locations ainda não geradas */
+			}
+			const item = findTocItem(book.navigation?.toc ?? [], location.start.href)
+			if (item?.label) setChapter(item.label.trim())
+		})
+
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'ArrowRight') rendition.next()
+			if (e.key === 'ArrowLeft') rendition.prev()
+		}
+		document.addEventListener('keydown', onKey)
+		rendition.on('keyup', onKey)
+
+		return () => {
+			document.removeEventListener('keydown', onKey)
+			resizeObserver.disconnect()
+			rendition.destroy()
+			book.destroy()
+			renditionRef.current = null
+		}
+		// Valores iniciais aqui; mudanças nos efeitos abaixo.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [url])
+
+	useEffect(() => {
+		renditionRef.current?.themes.select(theme)
+	}, [theme])
+
+	useEffect(() => {
+		renditionRef.current?.themes.fontSize(`${fontScale}%`)
+	}, [fontScale])
+
+	useEffect(() => {
+		renditionRef.current?.themes.override('line-height', String(lineHeight), true)
+	}, [lineHeight])
+
+	useEffect(() => {
+		renditionRef.current?.themes.override('font-family', FONT_FAMILIES[fontFamily], true)
+	}, [fontFamily])
+
+	useEffect(() => {
+		renditionRef.current?.themes.override('text-align', textAlign, true)
+	}, [textAlign])
+
+	useEffect(() => {
+		if (renditionRef.current) applyPageType(renditionRef.current, pageType)
+	}, [pageType])
+
+	return {
+		containerRef,
+		chapter,
+		progress,
+		isLoading,
+		isError,
+		theme,
+		setTheme,
+		next: () => renditionRef.current?.next(),
+		prev: () => renditionRef.current?.prev(),
+		fontScale,
+		setFontScale,
+		lineHeight,
+		setLineHeight,
+		fontFamily,
+		setFontFamily,
+		textAlign,
+		setTextAlign,
+		pageType,
+		setPageType,
+	}
+}
