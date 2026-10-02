@@ -1312,6 +1312,11 @@
                 "type": "string", 
                 "nullable": true, 
                 "description": "URL do arquivo EPUB para leitura (RF15)." 
+              },
+              "pdfFileUrl": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL do arquivo PDF para leitura (RF16)."
               }
             }
           }

@@ -38,4 +38,9 @@ export type PublicationDetails = Publication & ({
      * @nullable
      */
   epubFileUrl?: string | null;
+  /**
+     * URL do arquivo PDF para leitura (RF16).
+     * @nullable
+     */
+  pdfFileUrl?: string | null;
 });

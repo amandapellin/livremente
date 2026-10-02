@@ -1,18 +1,18 @@
 import { useParams } from 'react-router'
 import { Alert, Box, CircularProgress, Container } from '@mui/material'
 import { usePublicationDetails } from '@/hooks/usePublicationDetails'
-import { useEpubReader } from '@/hooks/useEpubReader'
-import { readerThemeColors } from '@/constants/reader-const'
-import ReaderTopbar from '@/components/reader/reader-topbar'
-import ReaderView from '@/components/reader/reader-view'
-import ReaderNav from '@/components/reader/reader-nav'
+import PdfReader from '@/components/reader/pdf-reader'
+import EpubReader from '@/components/reader/epub-reader'
 
+/**
+ * Resolve os detalhes da publicação e escolhe o leitor conforme o arquivo
+ * disponível: PDF (RF16) ou EPUB (RF15). Cada leitor tem seu próprio hook.
+ */
 export default function LeitorPage() {
 	const { id } = useParams()
-	const { data, isLoading: loadingMeta, isError: metaError } = usePublicationDetails(id)
-	const reader = useEpubReader(data?.epubFileUrl)
+	const { data, isLoading, isError } = usePublicationDetails(id)
 
-	if (loadingMeta) {
+	if (isLoading) {
 		return (
 			<Box sx={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}>
 				<CircularProgress />
@@ -20,7 +20,7 @@ export default function LeitorPage() {
 		)
 	}
 
-	if (metaError || !data) {
+	if (isError || !data) {
 		return (
 			<Container maxWidth="sm" sx={{ py: 5 }}>
 				<Alert severity="error">Não foi possível abrir a obra.</Alert>
@@ -28,41 +28,13 @@ export default function LeitorPage() {
 		)
 	}
 
-	if (!data.epubFileUrl) {
-		return (
-			<Container maxWidth="sm" sx={{ py: 5 }}>
-				<Alert severity="info">Esta obra não tem arquivo EPUB disponível.</Alert>
-			</Container>
-		)
-	}
-
-	const surface = readerThemeColors[reader.theme]
+	// key por obra: remonta o leitor ao trocar de publicação (estado limpo).
+	if (data.pdfFileUrl) return <PdfReader key={data.id} data={data} />
+	if (data.epubFileUrl) return <EpubReader key={data.id} data={data} />
 
 	return (
-		// Preenche a área principal (header global escondido; footer fica abaixo).
-		// O fundo acompanha o tema do leitor (cobre as margens da renderização).
-		<Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, bgcolor: surface.background, transition: 'background-color .15s' }}>
-			<ReaderTopbar
-				backTo={`/obra/${data.id}`}
-				title={data.title}
-				chapter={reader.chapter}
-				progress={reader.progress}
-				surface={surface}
-				theme={reader.theme}
-				fontScale={reader.fontScale}
-				lineHeight={reader.lineHeight}
-				fontFamily={reader.fontFamily}
-				textAlign={reader.textAlign}
-				pageType={reader.pageType}
-				onThemeChange={reader.setTheme}
-				onFontScaleChange={reader.setFontScale}
-				onLineHeightChange={reader.setLineHeight}
-				onFontFamilyChange={reader.setFontFamily}
-				onTextAlignChange={reader.setTextAlign}
-				onPageTypeChange={reader.setPageType}
-			/>
-			<ReaderView containerRef={reader.containerRef} isLoading={reader.isLoading} isError={reader.isError} />
-			<ReaderNav surface={surface} onPrev={reader.prev} onNext={reader.next} />
-		</Box>
+		<Container maxWidth="sm" sx={{ py: 5 }}>
+			<Alert severity="info">Esta obra não tem arquivo para leitura disponível.</Alert>
+		</Container>
 	)
 }

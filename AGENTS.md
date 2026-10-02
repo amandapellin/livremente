@@ -195,6 +195,25 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   (issues próprias):** grifos/anotações, dicionário, marcar página e cronômetro de
   sessão.
 
+- **#17 (RF16) Leitor de PDF (visualizador nativo):** leitor de artigos (PDF) no
+  mesmo `/leitura/:id`, agora um **dispatcher** (`LeitorPage`) que escolhe o leitor
+  pelo arquivo disponível — **`pdfFileUrl` → `PdfReader`**, senão **`epubFileUrl` →
+  `EpubReader`** (o corpo EPUB da #16 foi extraído para `components/reader/
+  epub-reader/`); cada leitor é **keyado por obra** (`key={data.id}`). O `PdfReader`
+  **delega a renderização ao visualizador nativo do navegador** via `<iframe
+  src={pdfFileUrl}>` — scroll, **zoom**, **navegação de página**, miniaturas, busca
+  e impressão vêm prontos do browser (critérios do RF16). Decisão de produto: a
+  tentativa inicial com `pdfjs-dist` (render em canvas) foi descartada por ficar
+  aquém do visualizador nativo; **o `pdfjs-dist` foi removido** junto de
+  `usePdfReader`/`pdf-view`/`pdf-aside`/`pdf-thumb`. Resta uma **topbar enxuta**
+  (`pdf-topbar`): voltar, título/subtítulo e “Abrir no {source}” (`downloadUrl`).
+  Moldura escura fixa (tokens `papel`). **Embed:** o PDF precisa ser servido inline e
+  sem `X-Frame-Options`/CSP `frame-ancestors` restritivos — o arXiv atende
+  (`content-disposition: inline`, `ACAO: *`, sem XFO) e o backend servirá os próprios
+  arquivos. Em dev, `public/sample.pdf` (mesma origem). **Fora de escopo:**
+  grifos/anotações, progresso de leitura (o visualizador nativo é caixa-preta para
+  esses épicos — reavaliar PDF.js quando entrarem).
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 
