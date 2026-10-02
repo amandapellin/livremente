@@ -266,6 +266,95 @@
             }
           }
         }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Exclui a conta e todos os dados do usuário autenticado (LGPD, direito à eliminação).",
+        "responses": {
+          "204": {
+            "description": "Conta excluída."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/consent": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna o consentimento LGPD do usuário autenticado.",
+        "responses": {
+          "200": {
+            "description": "Consentimento atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConsent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Atualiza o consentimento opcional (avisos) do usuário autenticado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConsentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consentimento atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConsent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/users/me/password": {
@@ -1005,6 +1094,41 @@
             "type": "string",
             "nullable": true,
             "description": "Caminho para buscar a imagem (/api/users/{id}/avatar); null quando não há avatar (o front exibe as iniciais)."
+          }
+        }
+      },
+      "UserConsent": {
+        "type": "object",
+        "required": [
+          "lgpdConsent",
+          "marketingConsent",
+          "consentedAt"
+        ],
+        "properties": {
+          "lgpdConsent": {
+            "type": "boolean",
+            "description": "Consentimento obrigatório do tratamento de dados (RN03); verdadeiro enquanto a conta existe."
+          },
+          "marketingConsent": {
+            "type": "boolean",
+            "description": "Consentimento opcional para avisos de novas obras."
+          },
+          "consentedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora do registro do consentimento."
+          }
+        }
+      },
+      "UpdateConsentRequest": {
+        "type": "object",
+        "required": [
+          "marketingConsent"
+        ],
+        "properties": {
+          "marketingConsent": {
+            "type": "boolean",
+            "description": "Novo valor do consentimento opcional (avisos)."
           }
         }
       },

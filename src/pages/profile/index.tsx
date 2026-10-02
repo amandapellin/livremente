@@ -87,7 +87,7 @@ export default function PerfilPage() {
 									</Button>
 								</Box>
 							</Stack>
-							<PrivacySection />
+							<PrivacySection email={profile?.email ?? ''} />
 						</Stack>
 					</Paper>
 

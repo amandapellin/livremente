@@ -37,7 +37,9 @@ import type {
   RefreshResponse,
   RegisterRequest,
   RegisterResponse,
+  UpdateConsentRequest,
   UpdateProfileRequest,
+  UserConsent,
   UserGenres,
   UserPreferences,
   UserProfile
@@ -838,6 +840,326 @@ export const usePutApiUsersMe = <TError = ErrorResponse,
         TContext
       > => {
       return useMutation(getPutApiUsersMeMutationOptions(options), queryClient);
+    }
+
+export type deleteApiUsersMeResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteApiUsersMeResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type deleteApiUsersMeResponseSuccess = (deleteApiUsersMeResponse204) & {
+  headers: Headers;
+};
+export type deleteApiUsersMeResponseError = (deleteApiUsersMeResponse401) & {
+  headers: Headers;
+};
+
+export type deleteApiUsersMeResponse = (deleteApiUsersMeResponseSuccess | deleteApiUsersMeResponseError)
+
+export const getDeleteApiUsersMeUrl = () => {
+
+
+
+
+  return `/api/users/me`
+}
+
+/**
+ * @summary Exclui a conta e todos os dados do usuário autenticado (LGPD, direito à eliminação).
+ */
+export const deleteApiUsersMe = async ( options?: Parameters<typeof customFetch>[1]): Promise<deleteApiUsersMeResponse> => {
+
+  return customFetch<deleteApiUsersMeResponse>(getDeleteApiUsersMeUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+
+export const getDeleteApiUsersMeMutationKey = () => ['deleteApiUsersMe'] as const;
+
+export const getDeleteApiUsersMeMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMe>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMe>>, TError,void, TContext> => {
+
+const mutationKey = getDeleteApiUsersMeMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteApiUsersMe>>, void> = () => {
+
+
+          return  deleteApiUsersMe(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteApiUsersMeMutationResult = NonNullable<Awaited<ReturnType<typeof deleteApiUsersMe>>>
+
+    export type DeleteApiUsersMeMutationError = ErrorResponse
+
+
+    /**
+ * @summary Exclui a conta e todos os dados do usuário autenticado (LGPD, direito à eliminação).
+ */
+export const useDeleteApiUsersMe = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteApiUsersMe>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteApiUsersMe>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getDeleteApiUsersMeMutationOptions(options), queryClient);
+    }
+
+export type getApiUsersMeConsentResponse200 = {
+  data: UserConsent
+  status: 200
+}
+
+export type getApiUsersMeConsentResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type getApiUsersMeConsentResponseSuccess = (getApiUsersMeConsentResponse200) & {
+  headers: Headers;
+};
+export type getApiUsersMeConsentResponseError = (getApiUsersMeConsentResponse401) & {
+  headers: Headers;
+};
+
+export type getApiUsersMeConsentResponse = (getApiUsersMeConsentResponseSuccess | getApiUsersMeConsentResponseError)
+
+export const getGetApiUsersMeConsentUrl = () => {
+
+
+
+
+  return `/api/users/me/consent`
+}
+
+/**
+ * @summary Retorna o consentimento LGPD do usuário autenticado.
+ */
+export const getApiUsersMeConsent = async ( options?: Parameters<typeof customFetch>[1]): Promise<getApiUsersMeConsentResponse> => {
+
+  return customFetch<getApiUsersMeConsentResponse>(getGetApiUsersMeConsentUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApiUsersMeConsentQueryKey = () => {
+    return [
+    `/api/users/me/consent`
+    ] as const;
+    }
+
+
+export const getGetApiUsersMeConsentQueryOptions = <TData = Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError = ErrorResponse>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiUsersMeConsentQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiUsersMeConsent>>> = ({ signal }) => getApiUsersMeConsent({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiUsersMeConsentQueryResult = NonNullable<Awaited<ReturnType<typeof getApiUsersMeConsent>>>
+export type GetApiUsersMeConsentQueryError = ErrorResponse
+
+
+export function useGetApiUsersMeConsent<TData = Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError = ErrorResponse>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMeConsent>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMeConsent>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMeConsent<TData = Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiUsersMeConsent>>,
+          TError,
+          Awaited<ReturnType<typeof getApiUsersMeConsent>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiUsersMeConsent<TData = Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Retorna o consentimento LGPD do usuário autenticado.
+ */
+
+export function useGetApiUsersMeConsent<TData = Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError = ErrorResponse>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiUsersMeConsent>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiUsersMeConsentQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type putApiUsersMeConsentResponse200 = {
+  data: UserConsent
+  status: 200
+}
+
+export type putApiUsersMeConsentResponse401 = {
+  data: ErrorResponse
+  status: 401
+}
+
+export type putApiUsersMeConsentResponseSuccess = (putApiUsersMeConsentResponse200) & {
+  headers: Headers;
+};
+export type putApiUsersMeConsentResponseError = (putApiUsersMeConsentResponse401) & {
+  headers: Headers;
+};
+
+export type putApiUsersMeConsentResponse = (putApiUsersMeConsentResponseSuccess | putApiUsersMeConsentResponseError)
+
+export const getPutApiUsersMeConsentUrl = () => {
+
+
+
+
+  return `/api/users/me/consent`
+}
+
+/**
+ * @summary Atualiza o consentimento opcional (avisos) do usuário autenticado.
+ */
+export const putApiUsersMeConsent = async (updateConsentRequest: UpdateConsentRequest, options?: Parameters<typeof customFetch>[1]): Promise<putApiUsersMeConsentResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<putApiUsersMeConsentResponse>(getPutApiUsersMeConsentUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(updateConsentRequest)
+  }
+);}
+
+
+
+
+
+export const getPutApiUsersMeConsentMutationKey = () => ['putApiUsersMeConsent'] as const;
+
+export const getPutApiUsersMeConsentMutationOptions = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeConsent>>, TError,PutApiUsersMeConsentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeConsent>>, TError,PutApiUsersMeConsentMutationVariables, TContext> => {
+
+const mutationKey = getPutApiUsersMeConsentMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof putApiUsersMeConsent>>, PutApiUsersMeConsentMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  putApiUsersMeConsent(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type PutApiUsersMeConsentMutationResult = NonNullable<Awaited<ReturnType<typeof putApiUsersMeConsent>>>
+    export type PutApiUsersMeConsentMutationBody = UpdateConsentRequest
+    export type PutApiUsersMeConsentMutationError = ErrorResponse
+    export type PutApiUsersMeConsentMutationVariables = {data: UpdateConsentRequest}
+
+    /**
+ * @summary Atualiza o consentimento opcional (avisos) do usuário autenticado.
+ */
+export const usePutApiUsersMeConsent = <TError = ErrorResponse,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMeConsent>>, TError,PutApiUsersMeConsentMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof putApiUsersMeConsent>>,
+        TError,
+        PutApiUsersMeConsentMutationVariables,
+        TContext
+      > => {
+      return useMutation(getPutApiUsersMeConsentMutationOptions(options), queryClient);
     }
 
 export type patchApiUsersMePasswordResponse204 = {

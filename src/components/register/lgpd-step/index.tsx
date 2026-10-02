@@ -11,12 +11,7 @@ import {
 import MailOutlineIcon from '@mui/icons-material/MailOutlined'
 import type { CadastroForm } from '@/schemas/register-schemas'
 import { colors, radii } from '@/theme/tokens'
-
-const consentParagraphs = [
-	'Coletamos nome, e-mail e preferências de leitura para autenticar seu acesso, manter sua estante e gerar recomendações. O progresso de leitura, grifos e anotações ficam vinculados à sua conta.',
-	'Sua senha é armazenada de forma criptografada. Não compartilhamos dados com terceiros e não usamos seus dados para publicidade.',
-	'Você pode solicitar a exportação ou a exclusão dos seus dados a qualquer momento pelo perfil.',
-]
+import { LGPD_CONSENT_PARAGRAPHS } from '@/constants/lgpd'
 
 /**
  * Etapa 3 do cadastro — texto de consentimento (LGPD), aceite obrigatório do
@@ -51,7 +46,7 @@ export default function LgpdStep() {
 				}}
 			>
 				<Stack sx={{ gap: 1 }}>
-					{consentParagraphs.map((text) => (
+					{LGPD_CONSENT_PARAGRAPHS.map((text) => (
 						<Typography key={text} variant="body2" sx={{ color: 'text.secondary', lineHeight: '22px' }}>
 							{text}
 						</Typography>
