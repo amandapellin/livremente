@@ -114,10 +114,11 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   recursos (só chama o que mudou): **nome** (`PUT /api/users/me`), **senha**
   (`PATCH /api/users/me/password`, trata 422 "senha atual incorreta" por campo)
   e **avatar** (`PUT`/`DELETE /api/users/me/avatar`, upload *multipart* PNG/JPG
-  ≤2 MB com *preview* e volta às iniciais). E-mail somente-leitura. Dados e
-  privacidade e Leitor seguem como placeholders visuais. Endpoints já
-  implementados no back-end (o `DELETE` do avatar é o último pendente). O
-  `customFetch` não força `Content-Type` em `FormData`.
+  ≤2 MB com *preview* e volta às iniciais). E-mail somente-leitura. O bloco
+  **Leitor** segue como placeholder visual (**Dados e privacidade** foi
+  implementado — ver abaixo). Endpoints já implementados no back-end (o `DELETE`
+  do avatar é o último pendente). O `customFetch` não força `Content-Type` em
+  `FormData`.
 - **#9 (RF04) Preferências de leitura:** idioma, tipo de conteúdo (livro/artigo),
   categorias/áreas de conhecimento e gênero literário via *chips* (multi-seleção),
   num componente compartilhado (`PreferencesFields`) usado **no cadastro e no
@@ -213,6 +214,24 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   arquivos. Em dev, `public/sample.pdf` (mesma origem). **Fora de escopo:**
   grifos/anotações, progresso de leitura (o visualizador nativo é caixa-preta para
   esses épicos — reavaliar PDF.js quando entrarem).
+
+- **Dados e privacidade (LGPD) — perfil** (sem issue; definido com a usuária): o
+  bloco "Dados e privacidade" do perfil deixou de ser placeholder.
+  **Exportar meus dados** (`useDataExport`): compõe um JSON (perfil + preferências
+  + gêneros, dos endpoints **reais já existentes**) e baixa no navegador
+  (`livremente-meus-dados.json`) — portabilidade LGPD. **Rever consentimento**
+  (`useConsent` + `ConsentDialog`): mostra os termos (texto compartilhado em
+  `constants/lgpd.ts`, reusado no cadastro) e a data, o consentimento obrigatório
+  como concedido (somente leitura) e permite alternar o **opcional** (avisos) via
+  `PUT /api/users/me/consent`. **Excluir conta e dados** (`useDeleteAccount` +
+  `DeleteAccountDialog`): ação destrutiva via `DELETE /api/users/me`, confirmada
+  **digitando o e-mail** da conta; em sucesso limpa a sessão e volta à landing.
+  **Contrato proposto pelo front** (`DELETE /api/users/me`,
+  `GET`/`PUT /api/users/me/consent` + `UserConsent`/`UpdateConsentRequest`),
+  regenerado com orval. Enquanto o back-end não expõe consent/delete, há **mock
+  trocável** (`USE_PRIVACY_MOCK` em `src/api/privacy-mock.ts`); o **export usa
+  endpoints reais** (depende do back-end). Componentes em
+  `components/profile/privacy-section/` (`consent-dialog`, `delete-account-dialog`).
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.

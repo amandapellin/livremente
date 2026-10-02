@@ -126,6 +126,36 @@ export const PutApiUsersMeResponse = zod.object({
 
 
 /**
+ * @summary Exclui a conta e todos os dados do usuário autenticado (LGPD, direito à eliminação).
+ */
+export const DeleteApiUsersMeResponse = zod.void()
+
+
+/**
+ * @summary Retorna o consentimento LGPD do usuário autenticado.
+ */
+export const GetApiUsersMeConsentResponse = zod.object({
+  "lgpdConsent": zod.boolean().describe('Consentimento obrigatório do tratamento de dados (RN03); verdadeiro enquanto a conta existe.'),
+  "marketingConsent": zod.boolean().describe('Consentimento opcional para avisos de novas obras.'),
+  "consentedAt": zod.iso.datetime({"offset":true}).describe('Data/hora do registro do consentimento.')
+})
+
+
+/**
+ * @summary Atualiza o consentimento opcional (avisos) do usuário autenticado.
+ */
+export const PutApiUsersMeConsentBody = zod.object({
+  "marketingConsent": zod.boolean().describe('Novo valor do consentimento opcional (avisos).')
+})
+
+export const PutApiUsersMeConsentResponse = zod.object({
+  "lgpdConsent": zod.boolean().describe('Consentimento obrigatório do tratamento de dados (RN03); verdadeiro enquanto a conta existe.'),
+  "marketingConsent": zod.boolean().describe('Consentimento opcional para avisos de novas obras.'),
+  "consentedAt": zod.iso.datetime({"offset":true}).describe('Data/hora do registro do consentimento.')
+})
+
+
+/**
  * @summary Altera a senha do usuário autenticado (RF03).
  */
 export const patchApiUsersMePasswordBodyNewPasswordMin = 8;
