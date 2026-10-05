@@ -228,10 +228,20 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   **digitando o e-mail** da conta; em sucesso limpa a sessão e volta à landing.
   **Contrato proposto pelo front** (`DELETE /api/users/me`,
   `GET`/`PUT /api/users/me/consent` + `UserConsent`/`UpdateConsentRequest`),
-  regenerado com orval. Enquanto o back-end não expõe consent/delete, há **mock
-  trocável** (`USE_PRIVACY_MOCK` em `src/api/privacy-mock.ts`); o **export usa
-  endpoints reais** (depende do back-end). Componentes em
-  `components/profile/privacy-section/` (`consent-dialog`, `delete-account-dialog`).
+  regenerado com orval. O **back-end já expõe** consent/delete, então os três
+  fluxos usam os **endpoints reais** (o mock `privacy-mock.ts` foi removido).
+  Componentes em `components/profile/privacy-section/` (`consent-dialog`,
+  `delete-account-dialog`).
+
+- **#18 (RF26) Seletor de tema do leitor (claro/sépia/escuro):** o seletor e a
+  aplicação imediata já vinham do #16 (campo **"Cor de página"** no modal de
+  Configurações → `setTheme` → `themes.select` + `surface` na hora). Esta issue
+  adiciona a **persistência** (critério 3): no `useEpubReader`, o tema é lido de
+  `localStorage` (chave **`reader:theme`**, validado) via lazy initializer e o
+  `setTheme` grava a cada troca — ao reabrir a leitura, o tema volta já no primeiro
+  render (sem flash). Decisão: o seletor **fica no modal** (não voltam pills para a
+  topbar; no design atual as pills de tema vivem só no editar perfil — seção
+  "Leitor"). A chave é global, então um seletor no perfil pode compartilhá-la.
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.

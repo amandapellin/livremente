@@ -2,12 +2,10 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getApiUsersMeConsent, putApiUsersMeConsent } from '@/api/generated/endpoints'
 import type { UserConsent } from '@/api/generated/model'
 import { HttpError } from '@/api/fetcher'
-import { USE_PRIVACY_MOCK, getConsentMock, updateConsentMock } from '@/api/privacy-mock'
 
 const CONSENT_KEY = ['users', 'me', 'consent']
 
 async function fetchConsent(): Promise<UserConsent> {
-	if (USE_PRIVACY_MOCK) return getConsentMock()
 	const res = await getApiUsersMeConsent()
 	if (res.status !== 200) throw new HttpError(res.status, res.data, '/api/users/me/consent')
 	return res.data
@@ -24,7 +22,6 @@ export function useConsent() {
 
 	const update = useMutation({
 		mutationFn: async (marketingConsent: boolean): Promise<UserConsent> => {
-			if (USE_PRIVACY_MOCK) return updateConsentMock(marketingConsent)
 			const res = await putApiUsersMeConsent({ marketingConsent })
 			if (res.status !== 200) throw new HttpError(res.status, res.data, '/api/users/me/consent')
 			return res.data

@@ -11,6 +11,20 @@ const THEMES: Record<ReaderTheme, Record<string, Record<string, string>>> = {
 	dark: bodyTheme(readerThemeColors.dark),
 }
 
+// Tema do leitor persistido globalmente (RF26): mantido ao reabrir a leitura.
+const THEME_STORAGE_KEY = 'reader:theme'
+
+/** Lê o tema salvo, validando o valor; cai em 'light' se ausente/ inválido. */
+function readStoredTheme(): ReaderTheme {
+	try {
+		const v = localStorage.getItem(THEME_STORAGE_KEY)
+		if (v === 'light' || v === 'sepia' || v === 'dark') return v
+	} catch {
+		/* storage indisponível (aba anônima etc.) */
+	}
+	return 'light'
+}
+
 type RelocatedLocation = { start: { cfi: string; href: string } }
 
 function findTocItem(toc: NavItem[], href: string): NavItem | undefined {
@@ -45,7 +59,7 @@ export function useEpubReader(url: string | undefined | null) {
 	const [progress, setProgress] = useState(0)
 	const [isLoading, setIsLoading] = useState(true)
 	const [isError, setIsError] = useState(false)
-	const [theme, setTheme] = useState<ReaderTheme>('light')
+	const [theme, setThemeState] = useState<ReaderTheme>(readStoredTheme)
 	const [fontScale, setFontScale] = useState(FONT_SIZE.default)
 	const [lineHeight, setLineHeight] = useState(LINE_SPACING.default)
 	const [fontFamily, setFontFamily] = useState<ReaderFont>('editor')
@@ -148,6 +162,16 @@ export function useEpubReader(url: string | undefined | null) {
 	useEffect(() => {
 		if (renditionRef.current) applyPageType(renditionRef.current, pageType)
 	}, [pageType])
+
+	// Aplica (efeito abaixo) e persiste o tema escolhido (RF26).
+	const setTheme = (next: ReaderTheme) => {
+		setThemeState(next)
+		try {
+			localStorage.setItem(THEME_STORAGE_KEY, next)
+		} catch {
+			/* ignora falha de storage */
+		}
+	}
 
 	return {
 		containerRef,
