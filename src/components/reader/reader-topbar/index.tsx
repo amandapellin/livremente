@@ -51,9 +51,9 @@ export default function ReaderTopbar({
 		<Stack
 			direction="row"
 			sx={{
-				gap: 2,
+				gap: { xs: 1, md: 2 },
 				alignItems: 'center',
-				px: 3,
+				px: { xs: 1.5, md: 3 },
 				minHeight: 64,
 				flexShrink: 0,
 				bgcolor: surface.background,
@@ -76,13 +76,14 @@ export default function ReaderTopbar({
 
 			<Stack
 				direction="row"
-				sx={{ gap: 1, alignItems: 'center', px: 2, borderLeft: `1px solid ${surface.border}`, borderRight: `1px solid ${surface.border}`, display: { xs: 'none', lg: 'flex' } }}
+				aria-label={`${progress}% lido`}
+				sx={{ gap: 1, alignItems: 'center', px: { xs: 1, lg: 2 }, borderLeft: `1px solid ${surface.border}`, borderRight: `1px solid ${surface.border}` }}
 			>
-				<Typography variant="caption" sx={{ opacity: 0.7 }}>{progress}%</Typography>
+				<Typography variant="caption" sx={{ opacity: 0.7, whiteSpace: 'nowrap' }}>{progress}%</Typography>
 				<LinearProgress
 					variant="determinate"
 					value={progress}
-					sx={{ width: 120, height: 4, borderRadius: 999, backgroundColor: surface.border, '& .MuiLinearProgress-bar': { backgroundColor: colors.gold[500] } }}
+					sx={{ width: 120, height: 4, borderRadius: 999, backgroundColor: surface.border, display: { xs: 'none', md: 'block' }, '& .MuiLinearProgress-bar': { backgroundColor: colors.gold[500] } }}
 				/>
 			</Stack>
 
@@ -102,7 +103,12 @@ export default function ReaderTopbar({
 				onPageTypeChange={onPageTypeChange}
 			/>
 
-			<ReaderButton borderColor={surface.border} startIcon={<EditNoteIcon />} title="Em breve">
+			<ReaderButton
+				borderColor={surface.border}
+				startIcon={<EditNoteIcon />}
+				title="Em breve"
+				sx={{ display: { xs: 'none', md: 'inline-flex' } }}
+			>
 				Grifos e Anotações
 			</ReaderButton>
 		</Stack>

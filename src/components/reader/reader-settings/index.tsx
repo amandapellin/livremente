@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+	Box,
 	Dialog,
 	DialogContent,
 	DialogTitle,
@@ -55,8 +56,16 @@ export default function ReaderSettings({
 
 	return (
 		<>
-			<ReaderButton borderColor={borderColor} startIcon={<TuneIcon />} onClick={() => setOpen(true)}>
-				Configurações
+			<ReaderButton
+				borderColor={borderColor}
+				startIcon={<TuneIcon />}
+				onClick={() => setOpen(true)}
+				aria-label="Configurações"
+				sx={{ '& .MuiButton-startIcon': { mr: { xs: 0, sm: 1 }, ml: { xs: 0, sm: -0.5 } } }}
+			>
+				<Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+					Configurações
+				</Box>
 			</ReaderButton>
 
 			<Dialog

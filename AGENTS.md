@@ -267,6 +267,21 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   quando existir, troca-se o `localStorage` pelo endpoint, mantendo o cache como
   *fallback*.
 
+- **#20 (RF19) Indicador de percentual lido (EPUB):** o `useEpubReader` calcula o
+  percentual com `book.locations.percentageFromCfi(cfi)` **tanto no `relocated`
+  quanto logo após `book.locations.generate()`** (helper `updateProgress`) — isso
+  evita o 0% travado no load (as *locations* são geradas de forma assíncrona depois
+  do `book.ready`). O percentual é **persistido por obra** em `localStorage`
+  (`reader:percent:<id>`, helpers `get/setStoredPercentage`) e o estado inicial é
+  hidratado dele (sem flash). A topbar exibe o percentual em **todas as larguras**
+  (número sempre; barra de `md` pra cima) com `aria-label`. **Restrito a EPUB** — o
+  `PdfReader`/`PdfTopbar` não mostram percentual (dicionário de dados: `read_percentage`
+  só para EPUB). **Cross-device** via o mesmo endpoint de progresso do back-end
+  (`reading-progress/{id}`, CFI + percent), com o cache como *fallback*.
+  **Junto (responsividade da topbar do leitor):** `gap`/`px` reduzidos no mobile,
+  **"Grifos e Anotações"** (placeholder "Em breve") **oculto abaixo de `md`** e
+  **"Configurações" só-ícone** no mobile (rótulo responsivo + `aria-label`).
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 
