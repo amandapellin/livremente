@@ -4,6 +4,7 @@ import type { PublicationDetails } from '@/api/generated/model'
 import type { ReaderTheme } from '@/types/reader-types'
 import { useEpubReader } from '@/hooks/useEpubReader'
 import { useReaderPreferences } from '@/hooks/useReaderPreferences'
+import { useReadingSession } from '@/hooks/useReadingSession'
 import { readerThemeColors } from '@/constants/reader-const'
 import ReaderTopbar from '@/components/reader/reader-topbar'
 import ReaderView from '@/components/reader/reader-view'
@@ -16,6 +17,7 @@ interface Props {
 export default function EpubReader({ data }: Props) {
 	const reader = useEpubReader(data.epubFileUrl, data.id)
 	const prefs = useReaderPreferences()
+	const session = useReadingSession(data.id)
 	const surface = readerThemeColors[reader.theme]
 
 	useEffect(() => {
@@ -35,6 +37,7 @@ export default function EpubReader({ data }: Props) {
 				title={data.title}
 				chapter={reader.chapter}
 				progress={reader.progress}
+				sessionTime={session.label}
 				surface={surface}
 				theme={reader.theme}
 				fontScale={reader.fontScale}

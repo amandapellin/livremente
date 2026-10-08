@@ -3,11 +3,13 @@ import { Box, IconButton, Stack, Typography } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
 import { colors } from '@/theme/tokens'
+import SessionTimer from '@/components/reader/session-timer'
 
 interface Props {
 	backTo: string
 	title: string
 	subtitle: string
+	sessionTime: string
 	externalUrl?: string | null
 	externalLabel: string
 }
@@ -21,7 +23,7 @@ const squareSx = {
 	'&:hover': { borderColor: colors.papel[400] },
 }
 
-export default function PdfTopbar({ backTo, title, subtitle, externalUrl, externalLabel }: Props) {
+export default function PdfTopbar({ backTo, title, subtitle, sessionTime, externalUrl, externalLabel }: Props) {
 	return (
 		<Stack
 			direction="row"
@@ -44,6 +46,8 @@ export default function PdfTopbar({ backTo, title, subtitle, externalUrl, extern
 				<Typography sx={{ fontSize: 16, lineHeight: '24px' }} noWrap>{title}</Typography>
 				<Typography sx={{ fontSize: 12, lineHeight: '16px', color: colors.papel[400] }} noWrap>{subtitle}</Typography>
 			</Box>
+
+			<SessionTimer label={sessionTime} color={colors.papel[400]} sx={{ display: { xs: 'none', md: 'flex' } }} />
 
 			{externalUrl && (
 				<Stack
