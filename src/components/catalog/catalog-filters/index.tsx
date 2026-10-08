@@ -30,7 +30,6 @@ export default function CatalogFilters({ query, counts, onChange, onClear }: Pro
                         <LanguageFilter value={query.languages} onChange={(languages) => onChange({ languages })} />
                     )
                 }
-                {/* Gênero (livro) ou área (artigo): aparece só quando há um tipo escolhido. */}
                 {
                     query.type !== '' && (
                         <GenreFilter type={query.type} value={query.genres} onChange={(genres) => onChange({ genres })} />

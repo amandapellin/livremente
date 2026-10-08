@@ -23,7 +23,6 @@ function readStoredView(): ViewMode {
 export default function CatalogoPage() {
 	const [filters, setFilters] = useState<CatalogQuery>(emptyCatalogQuery)
 	const [view, setView] = useState<ViewMode>(readStoredView)
-	// Texto com debounce alimenta a busca; o campo mostra filters.q na hora.
 	const debouncedQ = useDebouncedValue(filters.q, 350)
 	const query = useMemo<CatalogQuery>(() => ({ ...filters, q: debouncedQ }), [filters, debouncedQ])
 	const { data, isLoading, isError, isPlaceholderData } = useCatalogSearch(query)

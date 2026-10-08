@@ -15,21 +15,18 @@ import type {
 	ReaderTheme,
 } from "@/types/reader-types"
 
-/** Cores de cada tema do leitor (fonte única: conteúdo + chrome da tela). */
 export const readerThemeColors: Record<ReaderTheme, ReaderSurface> = {
     light: { background: '#fafafb', text: '#171a22', border: 'rgba(23, 26, 34, 0.12)' },
     sepia: { background: '#f4ecd8', text: '#5b4636', border: 'rgba(91, 70, 54, 0.18)' },
     dark: { background: '#14161c', text: '#e4e6ec', border: 'rgba(228, 230, 236, 0.16)' },
 }
 
-/** Famílias de fonte oferecidas no ajuste (Fonte do editor / sem serifa / dislexia). */
 export const FONT_FAMILIES: Record<ReaderFont, string> = {
     editor: 'Georgia, "Times New Roman", serif',
     sans: '"Lexend", system-ui, -apple-system, sans-serif',
     dyslexic: '"OpenDyslexic", "Comic Sans MS", sans-serif',
 }
 
-/** Limites dos sliders (fonte em % e espaçamento entre linhas como multiplicador). */
 export const FONT_SIZE = { min: 80, max: 180, step: 10, default: 100 }
 export const LINE_SPACING = { min: 1.2, max: 2.4, step: 0.1, default: 1.6 }
 

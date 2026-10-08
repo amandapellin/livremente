@@ -27,10 +27,6 @@ const REMOVED_ITEMS = [
 	'Estante, progresso, grifos e anotações',
 ]
 
-/**
- * Exclusão de conta (LGPD) — ação destrutiva e irreversível. Exige que o usuário
- * digite o próprio e-mail para habilitar a confirmação.
- */
 export default function DeleteAccountDialog({ open, onClose, email }: Props) {
 	const { deleteAccount, isDeleting, error } = useDeleteAccount()
 	const [typed, setTyped] = useState('')

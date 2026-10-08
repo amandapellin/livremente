@@ -7,11 +7,6 @@ interface Props {
 	data: PublicationDetails
 }
 
-/**
- * Leitor de PDF (RF16): delega a renderização ao **visualizador nativo do
- * navegador** via `<iframe>` (scroll, zoom, miniaturas, busca e impressão vêm
- * prontos). Mantém uma topbar enxuta da marca com voltar, título e link externo.
- */
 export default function PdfReader({ data }: Props) {
 	const subtitle = [data.source, data.type === 'scientific_article' ? 'artigo científico' : 'livro', data.format]
 		.filter(Boolean)

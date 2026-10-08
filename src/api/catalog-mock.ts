@@ -9,10 +9,9 @@ export const publicationMocks: Publication[] = [
 	{ id: '55752', title: 'Dom Casmurro', author: 'Machado de Assis', type: 'book', language: 'pt', genre: 'classics', year: 1899, format: 'EPUB', source: 'Project Gutenberg', description: 'Bento Santiago narra o ciúme e a dúvida sobre Capitu.', coverUrl: cover(55752) },
 	{ id: 'arxiv-1706.03762', title: 'Attention Is All You Need', author: 'Vaswani et al.', type: 'scientific_article', language: 'en', genre: 'computer_science', year: 2017, format: 'PDF', source: 'arXiv', description: 'Introduz a arquitetura Transformer baseada em mecanismos de atenção.', coverUrl: null },
 	{ id: 'arxiv-2010.11929', title: 'An Image is Worth 16x16 Words', author: 'Dosovitskiy et al.', type: 'scientific_article', language: 'en', genre: 'computer_science', year: 2020, format: 'PDF', source: 'arXiv', description: 'Aplica Transformers diretamente a patches de imagem (Vision Transformer).', coverUrl: null },
-	// … acrescente mais itens para exercitar paginação/contagens
 ]
 
-function matches(query: CatalogQuery, it: Publication, ignoreType = false) {
+const matches = (query: CatalogQuery, it: Publication, ignoreType = false) => {
 	if (!ignoreType && query.type && it.type !== query.type) return false
 	if (query.languages.length && !query.languages.includes(it.language)) return false
 	if (query.genres.length && !(it.genre && query.genres.includes(it.genre))) return false
@@ -21,7 +20,7 @@ function matches(query: CatalogQuery, it: Publication, ignoreType = false) {
 	return true
 }
 
-export function searchCatalogMock(query: CatalogQuery): CatalogPage {
+export const searchCatalogMock = (query: CatalogQuery): CatalogPage => {
 	const base = publicationMocks.filter((it) => matches(query, it, true))
 	const counts = {
 		all: base.length,

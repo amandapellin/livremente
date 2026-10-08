@@ -2,12 +2,6 @@ import { getAuthToken, getAuthTokens, saveAuthTokens, clearAuthTokens } from './
 
 const baseURL = import.meta.env.VITE_API_URL ?? ''
 
-/**
- * Erro lançado quando o backend responde com status não-ok.
- * Carrega o `status` e o `data` (corpo já desserializado, quando houver) para
- * que a camada de UI possa reagir a casos específicos — por exemplo, tratar um
- * 409 no cadastro como "e-mail já cadastrado" e exibir a mensagem amigável.
- */
 export class HttpError extends Error {
   readonly status: number
   readonly data: unknown
@@ -48,20 +42,11 @@ async function performTokenRefresh(): Promise<boolean> {
   }
 }
 
-/**
- * Custom fetch usado pelo cliente gerado (orval, httpClient: 'fetch').
- * Prefixa a baseURL vinda do ambiente e centraliza o tratamento de resposta.
- * Injeta o token JWT e intercepta respostas 401 para renovação automática (RF02).
- */
 export const customFetch = async <T>(url: string, options: RequestInit = {}): Promise<T> => {
   const headers = new Headers(options.headers)
-  // Content-Type só quando há corpo — evita preflight CORS desnecessário em GETs.
-  // Em FormData (upload de avatar), o navegador define o multipart boundary: não
-  // sobrescrever com application/json.
   if (options.body != null && !headers.has('Content-Type') && !(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json')
   }
-  // Injeta o token JWT (quando há sessão) — ponto único de autenticação.
   let token = getAuthToken()
   if (token && !headers.has('Authorization')) {
     headers.set('Authorization', `Bearer ${token}`)
@@ -69,7 +54,6 @@ export const customFetch = async <T>(url: string, options: RequestInit = {}): Pr
 
   let response = await fetch(`${baseURL}${url}`, { ...options, headers })
 
-  // Intercepta 401 para tentar renovar o token (se não for nas rotas de login/refresh)
   if (response.status === 401 && !url.includes('/api/auth/login') && !url.includes('/api/auth/refresh')) {
     if (!refreshPromise) {
       refreshPromise = performTokenRefresh()
@@ -90,7 +74,6 @@ export const customFetch = async <T>(url: string, options: RequestInit = {}): Pr
   const data = text ? JSON.parse(text) : undefined
 
   if (!response.ok) {
-    // Se o erro continua sendo 401 (refresh falhou ou url era auth), desloga e redireciona
     if (response.status === 401 && !url.includes('/api/auth/login')) {
       clearAuthTokens()
       window.location.href = '/login'

@@ -13,11 +13,6 @@ function formatMinutes(min?: number | null): string | null {
 	return h > 0 ? `${h}h ${m}min` : `${m}min`
 }
 
-/**
- * Card de progresso de leitura, exibido no cabeçalho da obra quando ela está na
- * estante em leitura/lido/abandonado. Mostra "% lido", posição, barra e as
- * métricas (tempo de leitura, grifos, anotações, páginas marcadas).
- */
 export default function ReadingProgressCard({ progress }: Props) {
 	const pageInfo = [
 		progress.currentPage != null && progress.totalPages != null

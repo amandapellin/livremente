@@ -4,11 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { deleteApiUsersMe } from '@/api/generated/endpoints'
 import { clearAuthTokens } from '@/api/auth-storage'
 
-/**
- * Exclusão de conta (LGPD, direito à eliminação). **Irreversível**: em sucesso,
- * limpa a sessão local, descarta o cache e redireciona para a landing.
- */
-export function useDeleteAccount() {
+export const useDeleteAccount = () => {
 	const navigate = useNavigate()
 	const queryClient = useQueryClient()
 	const [isDeleting, setIsDeleting] = useState(false)
@@ -18,7 +14,6 @@ export function useDeleteAccount() {
 		setIsDeleting(true)
 		setError(false)
 		try {
-			// `customFetch` lança em respostas não-ok, então resolver = sucesso (204).
 			await deleteApiUsersMe()
 			clearAuthTokens()
 			queryClient.clear()

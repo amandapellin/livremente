@@ -3,11 +3,6 @@ import { Alert, Box, Button, CircularProgress, Paper, Snackbar, Stack, Typograph
 import PreferencesFields from '@/components/preferences/preferences-fields'
 import { useProfilePreferences } from '@/hooks/useProfilePreferences'
 
-/**
- * Bloco "Preferências de leitura" do perfil (RF04) — funcional. Carrega as
- * preferências atuais, permite editá-las (mesmo componente do cadastro) e
- * salvá-las com o próprio botão.
- */
 export default function ReadingPreferencesSection() {
 	const {
 		methods,

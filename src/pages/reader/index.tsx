@@ -4,10 +4,6 @@ import { usePublicationDetails } from '@/hooks/usePublicationDetails'
 import PdfReader from '@/components/reader/pdf-reader'
 import EpubReader from '@/components/reader/epub-reader'
 
-/**
- * Resolve os detalhes da publicação e escolhe o leitor conforme o arquivo
- * disponível: PDF (RF16) ou EPUB (RF15). Cada leitor tem seu próprio hook.
- */
 export default function LeitorPage() {
 	const { id } = useParams()
 	const { data, isLoading, isError } = usePublicationDetails(id)
@@ -28,7 +24,6 @@ export default function LeitorPage() {
 		)
 	}
 
-	// key por obra: remonta o leitor ao trocar de publicação (estado limpo).
 	if (data.pdfFileUrl) return <PdfReader key={data.id} data={data} />
 	if (data.epubFileUrl) return <EpubReader key={data.id} data={data} />
 

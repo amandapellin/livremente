@@ -22,13 +22,8 @@ interface Props {
 	onSaved: () => void
 }
 
-/**
- * Revisão de consentimento (LGPD): mostra os termos, o obrigatório como
- * concedido (somente leitura) e permite ligar/desligar o **opcional** (avisos).
- */
 export default function ConsentDialog({ open, onClose, onSaved }: Props) {
 	const { consent, isLoading, isError, update } = useConsent()
-	// `null` = segue o valor carregado; ao mexer, assume o valor local.
 	const [marketing, setMarketing] = useState<boolean | null>(null)
 	const checked = marketing ?? consent?.marketingConsent ?? false
 

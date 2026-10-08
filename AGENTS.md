@@ -255,6 +255,18 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   Os toggles guardam a preferência para os épicos correspondentes (progresso,
   dicionário) a implementar.
 
+- **#19 (RF18) Retomada automática de leitura (EPUB):** o `useEpubReader(url,
+  bookId)` salva a posição a cada `relocated` como **CFI** do epub.js (posição
+  robusta; nº de página é instável em *reflowable*) e, ao abrir, retoma com
+  `rendition.display(cfi)` — com **fallback para o início** se o CFI for inválido.
+  Respeita o toggle **"retomar na última página"** (`resumeAuto`): desligado,
+  abre sempre do início. Persistência por obra em `localStorage`
+  (`reader:position:<id>`, helpers em `utils/reader-preferences.ts`). **Cross-device
+  fica para o back-end:** issue de progresso proposta no `livremente_backend`
+  (`GET`/`PUT /api/users/me/reading-progress/{id}` guardando o CFI + percent);
+  quando existir, troca-se o `localStorage` pelo endpoint, mantendo o cache como
+  *fallback*.
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 

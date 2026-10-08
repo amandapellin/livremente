@@ -5,7 +5,6 @@ import type { ProfileForm } from '@/schemas/profile-schemas'
 export interface PasswordSectionProps {
 	control: Control<ProfileForm>
 	errors: FieldErrors<ProfileForm>
-	/** Desabilita os campos durante o salvamento. */
 	disabled?: boolean
 }
 
@@ -15,11 +14,6 @@ const fields = [
 	{ name: 'confirmNewPassword', label: 'Confirmar nova senha', helper: undefined },
 ] as const
 
-/**
- * Bloco "Senha" — troca de senha (RF03). Opcional: se os campos ficarem em
- * branco, a senha é mantida. A submissão é feita pelo botão único da página
- * ("Salvar alterações"), que chama `PATCH /api/users/me/password`.
- */
 export default function PasswordSection({ control, errors, disabled }: PasswordSectionProps) {
 	return (
 		<Stack sx={{ gap: 1, borderTop: 1, borderColor: 'divider', pt: 2 }}>

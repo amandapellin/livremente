@@ -9,7 +9,6 @@ interface Props {
 	id: string
 	downloadUrl?: string | null
 	readingStatus?: ReadingStatus | null
-	/** Gancho do épico Estante: chamado ao escolher um estado. */
 	onSelectStatus?: (status: ReadingStatus) => void
 }
 
@@ -30,7 +29,6 @@ export default function DetailActions({ id, downloadUrl, readingStatus, onSelect
 				direction="row"
 				sx={{ gap: 2, rowGap: 2, flexWrap: "wrap", alignItems: "center", justifyContent: "space-between" }}
 			>
-				{/* Grupo esquerdo: ações principais na mesma linha. */}
 				<Stack direction="row" sx={{ gap: 2, flexWrap: "wrap", alignItems: "center" }}>
 					<Button
 						component={NavLink}
@@ -56,7 +54,6 @@ export default function DetailActions({ id, downloadUrl, readingStatus, onSelect
 					</Button>
 				</Stack>
 
-				{/* Estante: empurrado para a direita (dropdown de estado). */}
 				<Button
 					variant="outlined"
 					color="primary"

@@ -1,13 +1,7 @@
 import { useState } from 'react'
 import { getApiUsersMe, getApiUsersMeGenres, getApiUsersMePreferences } from '@/api/generated/endpoints'
 
-/**
- * Exportação de dados (LGPD, portabilidade). Compõe um JSON com o perfil,
- * preferências e gêneros do usuário — a partir dos endpoints **já existentes** —
- * e baixa o arquivo no navegador. (Pode virar `GET /api/users/me/export` quando
- * o backend consolidar a exportação, incluindo estante/progresso.)
- */
-export function useDataExport() {
+export const useDataExport = () => {
 	const [isExporting, setIsExporting] = useState(false)
 
 	const exportData = async (): Promise<boolean> => {

@@ -13,11 +13,6 @@ import type { CadastroForm } from '@/schemas/register-schemas'
 import { colors, radii } from '@/theme/tokens'
 import { LGPD_CONSENT_PARAGRAPHS } from '@/constants/lgpd'
 
-/**
- * Etapa 3 do cadastro — texto de consentimento (LGPD), aceite obrigatório do
- * tratamento de dados (RN03) e aceite opcional de avisos, além do aviso de
- * confirmação por e-mail.
- */
 export default function LgpdStep() {
 	const {
 		control,

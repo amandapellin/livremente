@@ -10,17 +10,9 @@ export interface ChipGroupProps {
 	label: string
 }
 
-/**
- * Chip de seleção do grupo. O estado "selecionado" não é nativo do MUI Chip,
- * então é um componente estilizado com um prop transiente `selected` (não
- * encaminhado ao DOM via `shouldForwardProp`), usando o azul de ação do DS.
- */
 const SelectionChip = styled(Chip, {
 	shouldForwardProp: (prop) => prop !== 'selected',
 })<{ selected?: boolean }>(({ theme, selected }) => ({
-	// `&&` dobra a especificidade da classe para vencer o `background-color` do
-	// variant `outlined` do Chip (que, por ordem de inserção, sobrescreveria o
-	// nosso fundo do estado selecionado).
 	'&&': {
 		borderRadius: 100,
 		fontSize: 12,
@@ -43,10 +35,6 @@ const SelectionChip = styled(Chip, {
 	},
 }))
 
-/**
- * Grupo de chips de múltipla seleção. Cada chip alterna sua presença na lista
- * `value`; o estado selecionado usa o azul de ação do design system.
- */
 export default function ChipGroup({ options, value, onChange, label }: ChipGroupProps) {
 	const toggle = (v: string) => {
 		onChange(value.includes(v) ? value.filter((x) => x !== v) : [...value, v])

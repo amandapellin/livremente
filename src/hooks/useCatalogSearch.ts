@@ -18,7 +18,7 @@ async function fetchMock(query: CatalogQuery): Promise<CatalogPage> {
     return searchCatalogMock(query)
 }
 
-export function useCatalogSearch(query: CatalogQuery) {
+export const useCatalogSearch = (query: CatalogQuery) => {
     return useQuery({
         queryKey: ['catalog', query],
         queryFn: () => (USE_CATALOG_MOCK ? fetchMock(query) : fetchReal(query)),

@@ -78,7 +78,6 @@ export default function PerfilPage() {
 								disabled={isSaving}
 							/>
 							<PasswordSection control={control} errors={errors} disabled={isSaving} />
-							{/* Botão único abaixo do bloco de senha: salva nome, senha e avatar. */}
 							<Stack sx={{ gap: 1.5 }}>
 								{submitError && <Alert severity="error">{submitError}</Alert>}
 								<Box>

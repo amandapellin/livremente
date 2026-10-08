@@ -4,16 +4,11 @@ import { Avatar, Button, Stack, TextField, Typography } from '@mui/material'
 import type { ProfileForm } from '@/schemas/profile-schemas'
 
 export interface IdentitySectionAvatar {
-	/** URL da imagem a exibir; ausente = exibe as iniciais. */
 	src?: string
-	/** Nome atual, usado para as iniciais quando não há imagem. */
 	displayName: string
 	error: string | null
-	/** Recebe o arquivo escolhido (validação de tipo/tamanho fica no hook). */
 	pick: (file: File) => void
-	/** Volta às iniciais (remove o avatar ao salvar). */
 	useInitials: () => void
-	/** Habilita "Usar iniciais" (há avatar no servidor ou imagem escolhida). */
 	canRemove: boolean
 }
 
@@ -22,7 +17,6 @@ export interface IdentitySectionProps {
 	errors: FieldErrors<ProfileForm>
 	email: string
 	avatar: IdentitySectionAvatar
-	/** Desabilita os controles durante o salvamento. */
 	disabled?: boolean
 }
 
@@ -34,18 +28,12 @@ function initialsFromName(name: string): string {
 	return (first + last).toUpperCase()
 }
 
-/**
- * Bloco "Identificação" — dados cadastrais do perfil (RF03): nome editável,
- * e-mail desativado (não alterável) e avatar (envio de imagem ou volta às
- * iniciais). O botão de salvar fica na página e cobre todos os blocos.
- */
 export default function IdentitySection({ control, errors, email, avatar, disabled }: IdentitySectionProps) {
 	const fileInputRef = useRef<HTMLInputElement>(null)
 
 	const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0]
 		if (file) avatar.pick(file)
-		// Permite reescolher o mesmo arquivo depois.
 		event.target.value = ''
 	}
 
@@ -118,7 +106,6 @@ export default function IdentitySection({ control, errors, email, avatar, disabl
 				<Typography variant="caption" component="label" sx={{ color: 'text.secondary' }}>
 					E-mail
 				</Typography>
-				{/* E-mail não é alterável aqui (troca exige confirmação por e-mail). */}
 				<TextField value={email} fullWidth size="small" disabled />
 			</Stack>
 		</Stack>

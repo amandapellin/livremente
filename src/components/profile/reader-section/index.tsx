@@ -9,12 +9,6 @@ const READING_MODES: { value: ReaderTheme; label: string }[] = [
 	{ value: 'dark', label: 'Escuro' },
 ]
 
-/**
- * "Leitor e interface" do perfil: define o **tema padrão** do leitor e as
- * preferências de leitura. Persistidas no back-end (`/api/users/me/preferences`)
- * com cache local compartilhado com o leitor, via `useReaderPreferences` —
- * aplicadas na hora, fora do "Salvar alterações".
- */
 export default function ReaderSection() {
 	const { theme, resumeAuto, saveDictionary, setTheme, setResumeAuto, setSaveDictionary } = useReaderPreferences()
 

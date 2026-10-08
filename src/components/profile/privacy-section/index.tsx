@@ -19,10 +19,6 @@ function formatDate(iso?: string) {
 
 type Toast = { message: string; severity: 'success' | 'error' }
 
-/**
- * Bloco "Dados e privacidade" (LGPD): exportar dados, rever consentimento e
- * excluir conta. Ver `useDataExport`, `useConsent` e `useDeleteAccount`.
- */
 export default function PrivacySection({ email }: Props) {
 	const { consent } = useConsent()
 	const { exportData, isExporting } = useDataExport()

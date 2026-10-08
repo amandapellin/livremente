@@ -11,11 +11,6 @@ const stats: readonly Stat[] = [
 	{ value: '2,3 mi', label: 'artigos do arXiv' },
 ]
 
-/**
- * Painel de marca exibido ao lado do formulário de login (apenas em telas
- * médias ou maiores). Reusa a imagem de fundo da landing com o overlay azul do
- * design.
- */
 export default function LoginHero() {
 	return (
 		<Box

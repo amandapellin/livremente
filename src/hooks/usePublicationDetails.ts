@@ -4,7 +4,6 @@ import type { PublicationDetails } from '@/api/generated/model'
 import { HttpError } from '@/api/fetcher'
 import { publicationDetailsMock } from '@/api/catalog-details-mock'
 
-// TEMP: mesmo flag do catálogo (idealmente extrair para um módulo compartilhado).
 const USE_CATALOG_MOCK = true
 
 async function fetchReal(id: string): Promise<PublicationDetails> {
@@ -19,7 +18,7 @@ async function fetchMock(id: string): Promise<PublicationDetails> {
 	return details
 }
 
-export function usePublicationDetails(id: string | undefined) {
+export const usePublicationDetails = (id: string | undefined) => {
 	return useQuery({
 		queryKey: ['catalog', 'details', id],
 		queryFn: () => (USE_CATALOG_MOCK ? fetchMock(id!) : fetchReal(id!)),

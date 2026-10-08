@@ -36,11 +36,11 @@ export const typeChips = [
     { value: 'scientific_article' as const, label: 'Artigos científicos' },
 ]
 
-export function genreOptionsFor(type: CatalogQuery['type']): readonly Opcao[] {
+export const genreOptionsFor = (type: CatalogQuery['type']): readonly Opcao[] => {
     return type === 'scientific_article' ? areasArtigos: generosLiterarios
 }
 
-export function genreLabelFor(type: CatalogQuery['type']): string {
+export const genreLabelFor = (type: CatalogQuery['type']): string => {
     return type === 'scientific_article' ? 'Área de conhecimento' : 'Gênero literário'
 }
 
@@ -49,7 +49,7 @@ const genreLabels = new Map([...generosLiterarios, ...areasArtigos].map((o)=> [o
 export const languageLabel = (v: string) => langLabels.get(v) ?? v
 export const genreLabel = (v: string) => genreLabels.get(v) ?? v
 
-export function toApiParams(query: CatalogQuery){
+export const toApiParams = (query: CatalogQuery) => {
     return {
         q: query.q.trim() || undefined,
         type: query.type || undefined,
