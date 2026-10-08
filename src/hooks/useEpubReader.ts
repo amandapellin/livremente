@@ -2,7 +2,13 @@ import { useEffect, useRef, useState } from 'react'
 import ePub, { type Book, type NavItem, type Rendition } from 'epubjs'
 import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/types/reader-types'
 import { FONT_FAMILIES, FONT_SIZE, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
-import { getStoredTheme, setStoredTheme } from '@/utils/reader-preferences'
+import {
+	getResumeAuto,
+	getStoredPosition,
+	getStoredTheme,
+	setStoredPosition,
+	setStoredTheme,
+} from '@/utils/reader-preferences'
 
 type RelocatedLocation = { start: { cfi: string; href: string } }
 
@@ -40,7 +46,7 @@ function applyTheme(r: Rendition, theme: ReaderTheme) {
 	r.themes.override('background', c.background, true)
 }
 
-export function useEpubReader(url: string | undefined | null) {
+export function useEpubReader(url: string | undefined | null, bookId?: string) {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const renditionRef = useRef<Rendition | null>(null)
 	const [chapter, setChapter] = useState('')
@@ -90,14 +96,22 @@ export function useEpubReader(url: string | undefined | null) {
 			}
 		})
 
-		rendition.display().then(() => {
+		// Retomada (RF18): com "retomar" ligado e posição salva, abre no CFI salvo;
+		// senão, do início. CFI inválido (ex.: obra mudou) → cai para o início.
+		const resumeCfi = bookId && getResumeAuto() ? getStoredPosition(bookId) : undefined
+		const onDisplayed = () => {
 			setIsLoading(false)
 			resizeObserver.observe(el)
-		}, fail)
+		}
+		rendition.display(resumeCfi).then(onDisplayed, () => {
+			if (resumeCfi) rendition.display().then(onDisplayed, fail)
+			else fail()
+		})
 		book.ready.then(() => book.locations.generate(1600)).catch(() => undefined)
 		book.opened.catch(fail)
 
 		rendition.on('relocated', (location: RelocatedLocation) => {
+			if (bookId) setStoredPosition(bookId, location.start.cfi)
 			try {
 				const pct = book.locations.percentageFromCfi(location.start.cfi)
 				if (typeof pct === 'number') setProgress(Math.round(pct * 100))

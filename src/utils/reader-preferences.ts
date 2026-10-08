@@ -5,6 +5,7 @@ import type { ReaderTheme } from '@/types/reader-types'
 const THEME_KEY = 'reader:theme'
 const RESUME_KEY = 'reader:resume-auto'
 const DICTIONARY_KEY = 'reader:save-dictionary'
+const POSITION_PREFIX = 'reader:position:'
 
 /** Tema do leitor salvo (RF26); valida o valor e cai em 'light'. */
 export function getStoredTheme(): ReaderTheme {
@@ -44,9 +45,28 @@ function setStoredBool(key: string, value: boolean) {
 	}
 }
 
+
 // Preferências booleanas (padrão: ligadas). Serão lidas pelos épicos
 // correspondentes quando existirem (retomar progresso; histórico do dicionário).
 export const getResumeAuto = () => getStoredBool(RESUME_KEY, true)
 export const setResumeAuto = (value: boolean) => setStoredBool(RESUME_KEY, value)
 export const getSaveDictionary = () => getStoredBool(DICTIONARY_KEY, true)
 export const setSaveDictionary = (value: boolean) => setStoredBool(DICTIONARY_KEY, value)
+
+// Última posição lida por obra, como CFI do epub.js (RF18). Em obra reflowable o
+// número de página é instável; o CFI é a posição robusta para retomar.
+export function getStoredPosition(bookId: string): string | undefined {
+	try {
+		return localStorage.getItem(POSITION_PREFIX + bookId) ?? undefined
+	} catch {
+		return undefined
+	}
+}
+
+export function setStoredPosition(bookId: string, cfi: string) {
+	try {
+		localStorage.setItem(POSITION_PREFIX + bookId, cfi)
+	} catch {
+		/* storage indisponível — ignora */
+	}
+}

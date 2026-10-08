@@ -20,7 +20,7 @@ interface Props {
  * e grava as trocas feitas no modal.
  */
 export default function EpubReader({ data }: Props) {
-	const reader = useEpubReader(data.epubFileUrl)
+	const reader = useEpubReader(data.epubFileUrl, data.id)
 	const prefs = useReaderPreferences()
 	const surface = readerThemeColors[reader.theme]
 
