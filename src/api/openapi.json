@@ -516,7 +516,8 @@
         "tags": [
           "Users"
         ],
-        "summary": "Atualiza as preferências de leitura do usuário (RF04).",
+        "summary": "Atualiza as preferências de leitura do usuário (RF04/RF26).",
+        "description": "Atualização parcial (merge): apenas os campos presentes no corpo são alterados; os ausentes são preservados. Permite que o perfil (chips EAV) e a seção 'Leitor e interface' (tema/toggles) gravem independentemente.",
         "requestBody": {
           "required": true,
           "content": {
@@ -1187,6 +1188,26 @@
             "items": {
               "type": "string"
             }
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "light",
+              "sepia",
+              "dark"
+            ],
+            "nullable": true,
+            "description": "Tema padrão do leitor (RF26)."
+          },
+          "resumeAuto": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Retomar automaticamente na última página."
+          },
+          "saveDictionary": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Salvar palavras consultadas no dicionário."
           }
         }
       },

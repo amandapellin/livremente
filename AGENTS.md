@@ -114,11 +114,10 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   recursos (só chama o que mudou): **nome** (`PUT /api/users/me`), **senha**
   (`PATCH /api/users/me/password`, trata 422 "senha atual incorreta" por campo)
   e **avatar** (`PUT`/`DELETE /api/users/me/avatar`, upload *multipart* PNG/JPG
-  ≤2 MB com *preview* e volta às iniciais). E-mail somente-leitura. O bloco
-  **Leitor** segue como placeholder visual (**Dados e privacidade** foi
-  implementado — ver abaixo). Endpoints já implementados no back-end (o `DELETE`
-  do avatar é o último pendente). O `customFetch` não força `Content-Type` em
-  `FormData`.
+  ≤2 MB com *preview* e volta às iniciais). E-mail somente-leitura. Os blocos
+  **Leitor e interface** e **Dados e privacidade** foram implementados (ver
+  abaixo). Endpoints já implementados no back-end (o `DELETE` do avatar é o último
+  pendente). O `customFetch` não força `Content-Type` em `FormData`.
 - **#9 (RF04) Preferências de leitura:** idioma, tipo de conteúdo (livro/artigo),
   categorias/áreas de conhecimento e gênero literário via *chips* (multi-seleção),
   num componente compartilhado (`PreferencesFields`) usado **no cadastro e no
@@ -228,10 +227,33 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   **digitando o e-mail** da conta; em sucesso limpa a sessão e volta à landing.
   **Contrato proposto pelo front** (`DELETE /api/users/me`,
   `GET`/`PUT /api/users/me/consent` + `UserConsent`/`UpdateConsentRequest`),
-  regenerado com orval. Enquanto o back-end não expõe consent/delete, há **mock
-  trocável** (`USE_PRIVACY_MOCK` em `src/api/privacy-mock.ts`); o **export usa
-  endpoints reais** (depende do back-end). Componentes em
-  `components/profile/privacy-section/` (`consent-dialog`, `delete-account-dialog`).
+  regenerado com orval. O **back-end já expõe** consent/delete, então os três
+  fluxos usam os **endpoints reais** (o mock `privacy-mock.ts` foi removido).
+  Componentes em `components/profile/privacy-section/` (`consent-dialog`,
+  `delete-account-dialog`).
+
+- **#18 (RF26) Seletor de tema do leitor (claro/sépia/escuro):** o seletor e a
+  aplicação imediata já vinham do #16 (campo **"Cor de página"** no modal de
+  Configurações). Esta issue adiciona a **persistência** (critério 3) e corrige um
+  bug. Decisão: o seletor **fica no modal** (não voltam pills para a topbar).
+  **Correção de bug:** `rendition.themes.select()` não revertia ao voltar a um
+  tema (as regras do tema anterior persistiam) — trocado por
+  `themes.override('color'/'background', …, true)` numa função `applyTheme` no
+  `useEpubReader` (como já era feito para fonte/alinhamento/entrelinha).
+- **"Leitor e interface" — perfil + preferências do leitor (RF26):** a seção do
+  perfil deixou de ser placeholder — **modo de leitura padrão** (pills) e dois
+  toggles (**retomar na última página**, **salvar dicionário**). Persistência
+  **cross-device no back-end**: o contrato `/api/users/me/preferences` foi
+  **estendido** com `theme`/`resumeAuto`/`saveDictionary` (PUT com **merge
+  parcial**, para o perfil-chips e a seção de leitor gravarem independentemente).
+  O hook **`useReaderPreferences`** é a fonte da verdade (back-end) com **cache em
+  `localStorage`** (`src/utils/reader-preferences.ts`, chave `reader:theme` +
+  toggles) para o leitor ler **síncrono, sem flash**. A query **só roda
+  autenticada** (`enabled`), **hidrata ao abrir perfil/leitor** e grava via
+  `setQueryData` otimista + `PUT`. O `useEpubReader` lê o cache no mount; o
+  `EpubReader` aplica o tema do servidor quando chega e grava as trocas do modal.
+  Os toggles guardam a preferência para os épicos correspondentes (progresso,
+  dicionário) a implementar.
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.

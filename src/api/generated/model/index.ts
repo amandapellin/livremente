@@ -34,4 +34,5 @@ export * from './updateProfileRequest';
 export * from './userConsent';
 export * from './userGenres';
 export * from './userPreferences';
+export * from './userPreferencesTheme';
 export * from './userProfile';

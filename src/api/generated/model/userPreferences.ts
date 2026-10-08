@@ -6,6 +6,7 @@
  */
 import type { PublicationType } from './publicationType';
 import type { ReadingLanguage } from './readingLanguage';
+import type { UserPreferencesTheme } from './userPreferencesTheme';
 
 /**
  * Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.
@@ -15,4 +16,19 @@ export interface UserPreferences {
   contentTypes?: PublicationType[];
   /** Áreas de conhecimento (slugs de áreas de artigo). */
   knowledgeAreas?: string[];
+  /**
+     * Tema padrão do leitor (RF26).
+     * @nullable
+     */
+  theme?: UserPreferencesTheme;
+  /**
+     * Retomar automaticamente na última página.
+     * @nullable
+     */
+  resumeAuto?: boolean | null;
+  /**
+     * Salvar palavras consultadas no dicionário.
+     * @nullable
+     */
+  saveDictionary?: boolean | null;
 }

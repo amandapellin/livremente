@@ -1625,7 +1625,8 @@ export const getPutApiUsersMePreferencesUrl = () => {
 }
 
 /**
- * @summary Atualiza as preferências de leitura do usuário (RF04).
+ * Atualização parcial (merge): apenas os campos presentes no corpo são alterados; os ausentes são preservados. Permite que o perfil (chips EAV) e a seção 'Leitor e interface' (tema/toggles) gravem independentemente.
+ * @summary Atualiza as preferências de leitura do usuário (RF04/RF26).
  */
 export const putApiUsersMePreferences = async (userPreferences: UserPreferences, options?: Parameters<typeof customFetch>[1]): Promise<putApiUsersMePreferencesResponse> => {
 
@@ -1691,7 +1692,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type PutApiUsersMePreferencesMutationVariables = {data: UserPreferences}
 
     /**
- * @summary Atualiza as preferências de leitura do usuário (RF04).
+ * @summary Atualiza as preferências de leitura do usuário (RF04/RF26).
  */
 export const usePutApiUsersMePreferences = <TError = ErrorResponse,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof putApiUsersMePreferences>>, TError,PutApiUsersMePreferencesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}

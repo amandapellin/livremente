@@ -193,23 +193,33 @@ export const DeleteApiUsersMeAvatarResponse = zod.void()
 export const GetApiUsersMePreferencesResponse = zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
   "contentTypes": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
-  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).')
+  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).'),
+  "theme": zod.enum(['light', 'sepia', 'dark']).nullish().describe('Tema padrão do leitor (RF26).'),
+  "resumeAuto": zod.boolean().nullish().describe('Retomar automaticamente na última página.'),
+  "saveDictionary": zod.boolean().nullish().describe('Salvar palavras consultadas no dicionário.')
 }).describe('Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.')
 
 
 /**
- * @summary Atualiza as preferências de leitura do usuário (RF04).
+ * Atualização parcial (merge): apenas os campos presentes no corpo são alterados; os ausentes são preservados. Permite que o perfil (chips EAV) e a seção 'Leitor e interface' (tema/toggles) gravem independentemente.
+ * @summary Atualiza as preferências de leitura do usuário (RF04/RF26).
  */
 export const PutApiUsersMePreferencesBody = zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
   "contentTypes": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
-  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).')
+  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).'),
+  "theme": zod.enum(['light', 'sepia', 'dark']).nullish().describe('Tema padrão do leitor (RF26).'),
+  "resumeAuto": zod.boolean().nullish().describe('Retomar automaticamente na última página.'),
+  "saveDictionary": zod.boolean().nullish().describe('Salvar palavras consultadas no dicionário.')
 }).describe('Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.')
 
 export const PutApiUsersMePreferencesResponse = zod.object({
   "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
   "contentTypes": zod.array(zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).')).optional(),
-  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).')
+  "knowledgeAreas": zod.array(zod.string()).optional().describe('Áreas de conhecimento (slugs de áreas de artigo).'),
+  "theme": zod.enum(['light', 'sepia', 'dark']).nullish().describe('Tema padrão do leitor (RF26).'),
+  "resumeAuto": zod.boolean().nullish().describe('Retomar automaticamente na última página.'),
+  "saveDictionary": zod.boolean().nullish().describe('Salvar palavras consultadas no dicionário.')
 }).describe('Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.')
 
 

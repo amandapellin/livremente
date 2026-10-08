@@ -66,7 +66,7 @@ export default function ReaderSettings({
 				slotProps={{ paper: { sx: { maxWidth: 760, py: 1.5 } } }}
 			>
 				<DialogTitle sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', px: 3, pr: 1.5 }}>
-					<Typography variant="h5">Configurações</Typography>
+					<Typography variant="h5" component="span">Configurações</Typography>
 					<IconButton aria-label="Fechar" onClick={() => setOpen(false)} size="small">
 						<CloseIcon />
 					</IconButton>

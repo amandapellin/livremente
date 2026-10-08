@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router'
 import { useQueryClient } from '@tanstack/react-query'
 import { deleteApiUsersMe } from '@/api/generated/endpoints'
 import { clearAuthTokens } from '@/api/auth-storage'
-import { USE_PRIVACY_MOCK, deleteAccountMock } from '@/api/privacy-mock'
 
 /**
  * Exclusão de conta (LGPD, direito à eliminação). **Irreversível**: em sucesso,
@@ -20,11 +19,7 @@ export function useDeleteAccount() {
 		setError(false)
 		try {
 			// `customFetch` lança em respostas não-ok, então resolver = sucesso (204).
-			if (USE_PRIVACY_MOCK) {
-				await deleteAccountMock()
-			} else {
-				await deleteApiUsersMe()
-			}
+			await deleteApiUsersMe()
 			clearAuthTokens()
 			queryClient.clear()
 			navigate('/', { replace: true })
