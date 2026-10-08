@@ -47,7 +47,7 @@ export const theme = createTheme({
 				contrast: {
 					main: c.papel[100],
 					contrastText: c.papel[700]
-				}, // busca/notif/toggle
+				},
 				brand: {
 					main: c.primary[800],
 					contrastText: c.white
@@ -57,7 +57,7 @@ export const theme = createTheme({
 					light: c.acao[200],
 					dark: c.acao[700],
 					contrastText: c.white
-				}, // azul de ação (links/chips selecionados)
+				},
 			},
 		},
 		dark: {
@@ -198,7 +198,6 @@ export const theme = createTheme({
 		MuiPaper: {
 			variants: [
 				{
-					// Card de seção "outlined" reutilizado nas telas (ex.: perfil).
 					props: { variant: 'section' },
 					style: ({ theme }) => ({
 						border: `1px solid ${theme.vars.palette.divider}`,
@@ -247,7 +246,6 @@ export const theme = createTheme({
 		},
 		MuiStepIcon: {
 			styleOverrides: {
-				// Ativo/concluído em azul de ação; etapas futuras em cinza.
 				root: ({ theme }) => ({
 					color: c.papel[500],
 					'&.Mui-active, &.Mui-completed': {

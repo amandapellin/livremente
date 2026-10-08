@@ -1,11 +1,6 @@
 import { Stack, Typography } from '@mui/material'
 import PreferencesFields from '@/components/preferences/preferences-fields'
 
-/**
- * Etapa 2 do cadastro — preferências de leitura (RF04). O conteúdo é o
- * componente compartilhado `PreferencesFields`, também usado na tela de perfil;
- * roda dentro do `FormProvider` do cadastro.
- */
 export default function PreferenciasStep() {
 	return (
 		<Stack sx={{ gap: 4, width: '100%' }}>

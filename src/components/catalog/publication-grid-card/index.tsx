@@ -9,10 +9,6 @@ interface Props {
     publication: Publication
 }
 
-/**
- * Card compacto do catálogo em modo grade: capa (largura total), selo de tipo,
- * título e autor, empilhados. A lista horizontal usa `PublicationCard`.
- */
 export default function PublicationGridCard({ publication }: Props) {
     return (
         <Card variant="outlined" sx={{ borderRadius: radii.card, overflow: 'hidden', height: '100%' }}>

@@ -9,7 +9,7 @@ import { HttpError } from '@/api/fetcher'
 
 const LOGGED_HOME = '/estante'
 
-export function useLoginForm() {
+export const useLoginForm = () => {
 	const navigate = useNavigate()
 	const [submitError, setSubmitError] = useState<string | null>(null)
 	const login = usePostApiAuthLogin()
@@ -29,7 +29,6 @@ export function useLoginForm() {
 			{ data: { email: values.email.trim(), password: values.password, rememberMe: values.rememberMe } },
 			{
 				onSuccess: (response) => {
-					// customFetch só resolve em respostas ok; o 200 carrega o LoginResponse.
 					if (response.status !== 200) return
 					saveAuthTokens(response.data.token, response.data.refreshToken, values.rememberMe)
 					navigate(LOGGED_HOME)

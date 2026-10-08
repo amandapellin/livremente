@@ -11,12 +11,7 @@ async function fetchConsent(): Promise<UserConsent> {
 	return res.data
 }
 
-/**
- * Consentimento LGPD do usuário (RF-privacidade). Lê o estado atual e permite
- * alterar o consentimento **opcional** (avisos). O obrigatório vale enquanto a
- * conta existir — para retirá-lo, exclui-se a conta.
- */
-export function useConsent() {
+export const useConsent = () => {
 	const queryClient = useQueryClient()
 	const query = useQuery({ queryKey: CONSENT_KEY, queryFn: fetchConsent })
 

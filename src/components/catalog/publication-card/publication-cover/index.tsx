@@ -4,7 +4,6 @@ import { Box, Stack, Typography } from "@mui/material"
 interface Props {
     title: string
     coverUrl?: string | null
-    /** 'thumb' = miniatura fixa (lista); 'full' = largura total, proporção 2/3 (grade). */
     variant?: 'thumb' | 'full'
 }
 

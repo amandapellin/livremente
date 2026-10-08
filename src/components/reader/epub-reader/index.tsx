@@ -13,25 +13,16 @@ interface Props {
 	data: PublicationDetails
 }
 
-/**
- * Leitor de EPUB (RF15) via epub.js. O fundo acompanha o tema do leitor (cobre
- * as margens da renderização); topbar e navegação seguem a mesma cor. O tema é
- * sincronizado com o back-end via `useReaderPreferences` (RF26): hidrata ao abrir
- * e grava as trocas feitas no modal.
- */
 export default function EpubReader({ data }: Props) {
 	const reader = useEpubReader(data.epubFileUrl, data.id)
 	const prefs = useReaderPreferences()
 	const surface = readerThemeColors[reader.theme]
 
-	// Aplica o tema do servidor quando ele chega (cross-device, ao abrir). Só muda
-	// quando a query resolve, então não briga com o usuário durante a sessão.
 	useEffect(() => {
 		if (prefs.serverTheme) reader.setTheme(prefs.serverTheme)
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [prefs.serverTheme])
 
-	// Troca do tema no modal: aplica no epub e persiste (cache + back-end).
 	const changeTheme = (value: ReaderTheme) => {
 		reader.setTheme(value)
 		prefs.setTheme(value)

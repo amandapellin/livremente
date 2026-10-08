@@ -11,13 +11,11 @@ export interface ReaderSurface {
 	border: string
 }
 
-/** Opção de seleção (valor + rótulo) de um campo do leitor. */
 export interface ReaderOption<T> {
 	value: T
 	label: string
 }
 
-/** Opção de seleção com ícone (alinhamento, tipo de página). */
 export interface ReaderIconOption<T> extends ReaderOption<T> {
 	Icon: SvgIconComponent
 }

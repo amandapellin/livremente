@@ -5,7 +5,6 @@ import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import DetailActions from "../detail-actions";
 import ReadingProgressCard from "../reading-progress-card";
 
-// Estados em que faz sentido exibir o progresso de leitura (não "quero ler").
 const PROGRESS_STATUSES: ReadingStatus[] = ['read', 'reading', 'abandoned']
 
 interface Props {

@@ -12,7 +12,7 @@ import {
 
 type RelocatedLocation = { start: { cfi: string; href: string } }
 
-function findTocItem(toc: NavItem[], href: string): NavItem | undefined {
+const findTocItem = (toc: NavItem[], href: string): NavItem | undefined => {
 	for (const item of toc) {
 		if (item.href && href.includes(item.href.split('#')[0])) return item
 		const sub = item.subitems?.length ? findTocItem(item.subitems, href) : undefined
@@ -21,14 +21,14 @@ function findTocItem(toc: NavItem[], href: string): NavItem | undefined {
 	return undefined
 }
 
-function applyTypography(r: Rendition, fontScale: number, lineHeight: number, font: ReaderFont, align: ReaderAlign) {
+const applyTypography = (r: Rendition, fontScale: number, lineHeight: number, font: ReaderFont, align: ReaderAlign) => {
 	r.themes.fontSize(`${fontScale}%`)
 	r.themes.override('line-height', String(lineHeight), true)
 	r.themes.override('font-family', FONT_FAMILIES[font], true)
 	r.themes.override('text-align', align, true)
 }
 
-function applyPageType(r: Rendition, type: ReaderPageType) {
+const applyPageType = (r: Rendition, type: ReaderPageType) => {
 	if (type === 'scroll') {
 		r.flow('scrolled-doc')
 		return
@@ -37,16 +37,13 @@ function applyPageType(r: Rendition, type: ReaderPageType) {
 	r.spread(type === 'double' ? 'auto' : 'none')
 }
 
-// Aplica as cores do tema ao corpo do EPUB via `override` (como nos demais
-// ajustes). `themes.select` não reverte de forma confiável ao voltar a um tema
-// (as regras do tema anterior persistem), então evitamos ele aqui.
-function applyTheme(r: Rendition, theme: ReaderTheme) {
+const applyTheme = (r: Rendition, theme: ReaderTheme) => {
 	const c = readerThemeColors[theme]
 	r.themes.override('color', c.text, true)
 	r.themes.override('background', c.background, true)
 }
 
-export function useEpubReader(url: string | undefined | null, bookId?: string) {
+export const useEpubReader = (url: string | undefined | null, bookId?: string) => {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const renditionRef = useRef<Rendition | null>(null)
 	const [chapter, setChapter] = useState('')
@@ -71,7 +68,6 @@ export function useEpubReader(url: string | undefined | null, bookId?: string) {
 		const rendition: Rendition = book.renderTo(el, { width: '100%', height: '100%' })
 		renditionRef.current = rendition
 
-		// Disponibiliza a OpenDyslexic dentro do iframe de cada seção.
 		rendition.hooks.content.register((contents: { document: Document }) => {
 			const style = contents.document.createElement('style')
 			style.textContent = `@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-regular.woff2') format('woff2');font-weight:400;font-display:swap}@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-bold.woff2') format('woff2');font-weight:700;font-display:swap}`
@@ -87,7 +83,6 @@ export function useEpubReader(url: string | undefined | null, bookId?: string) {
 			setIsLoading(false)
 		}
 
-		// Reflow (RNF15): só observa depois do display (o manager precisa existir).
 		const resizeObserver = new ResizeObserver(() => {
 			try {
 				rendition.resize(el.clientWidth, el.clientHeight)
@@ -96,8 +91,6 @@ export function useEpubReader(url: string | undefined | null, bookId?: string) {
 			}
 		})
 
-		// Retomada (RF18): com "retomar" ligado e posição salva, abre no CFI salvo;
-		// senão, do início. CFI inválido (ex.: obra mudou) → cai para o início.
 		const resumeCfi = bookId && getResumeAuto() ? getStoredPosition(bookId) : undefined
 		const onDisplayed = () => {
 			setIsLoading(false)
@@ -136,7 +129,6 @@ export function useEpubReader(url: string | undefined | null, bookId?: string) {
 			book.destroy()
 			renditionRef.current = null
 		}
-		// Valores iniciais aqui; mudanças nos efeitos abaixo.
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [url])
 
@@ -164,7 +156,6 @@ export function useEpubReader(url: string | undefined | null, bookId?: string) {
 		if (renditionRef.current) applyPageType(renditionRef.current, pageType)
 	}, [pageType])
 
-	// Aplica (efeito abaixo) e persiste o tema escolhido (RF26).
 	const setTheme = (next: ReaderTheme) => {
 		setThemeState(next)
 		setStoredTheme(next)

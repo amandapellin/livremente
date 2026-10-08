@@ -1,11 +1,5 @@
 import { z } from 'zod'
 
-/**
- * Validação da edição de perfil (RF03). O e-mail é read-only (troca exige
- * confirmação por e-mail — fluxo à parte), então o nome é o único dado
- * cadastral editável. O bloco de senha é opcional: só é validado/enviado quando
- * o usuário preenche algum de seus campos.
- */
 export const profileSchema = z
 	.object({
 		name: z.string().trim().min(2, 'Informe seu nome completo.'),

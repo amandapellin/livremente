@@ -12,7 +12,6 @@ interface Props {
 	externalLabel: string
 }
 
-// Botão quadrado contornado (voltar).
 const squareSx = {
 	width: 32,
 	height: 32,
@@ -22,10 +21,6 @@ const squareSx = {
 	'&:hover': { borderColor: colors.papel[400] },
 }
 
-/**
- * Topbar enxuta do leitor de PDF: voltar, título/subtítulo e link para a fonte.
- * Controles de página/zoom ficam no visualizador nativo (dentro do `<iframe>`).
- */
 export default function PdfTopbar({ backTo, title, subtitle, externalUrl, externalLabel }: Props) {
 	return (
 		<Stack

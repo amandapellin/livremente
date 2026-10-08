@@ -8,7 +8,6 @@ interface ReaderButtonProps extends Omit<ButtonProps, 'color' | 'variant'> {
 	borderColor?: string
 }
 
-// Tamanho/tipografia compactos padrão (o padding pode ser sobrescrito por `sx`).
 const BASE_SX = { px: 1.25, py: 0.5, minWidth: 0, fontSize: 12, lineHeight: '18px', whiteSpace: 'nowrap' }
 
 export function ReaderButton({ tone = 'surface', borderColor, sx, ...props }: ReaderButtonProps) {

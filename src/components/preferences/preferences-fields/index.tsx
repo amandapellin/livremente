@@ -10,11 +10,6 @@ import {
 	publicationOptions,
 } from '@/schemas/category-schemas'
 
-/**
- * Campos de preferência que o formulário hospedeiro precisa ter. Tanto o
- * cadastro (`CadastroForm`) quanto o perfil (`PreferencesValue`) satisfazem
- * este formato, permitindo reusar o componente via contexto do RHF.
- */
 export interface PreferencesFormShape {
 	languages: string[]
 	publications: string[]
@@ -34,13 +29,6 @@ function Section({ label, children }: { label: string; children: ReactNode }) {
 	)
 }
 
-/**
- * Campos de preferências de leitura (RF04), compartilhados entre o cadastro e o
- * perfil. Lê/grava via React Hook Form (`useFormContext`); as seções de
- * categorias e gênero literário aparecem conforme a publicação escolhida.
- * Deve ser usado dentro de um `FormProvider` cujo form tenha os campos de
- * `PreferencesFormShape`.
- */
 export default function PreferencesFields() {
 	const { control } = useFormContext<PreferencesFormShape>()
 	const publications = useWatch({ control, name: 'publications' })

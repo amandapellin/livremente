@@ -18,18 +18,11 @@ import {
 } from '@/api/generated/endpoints'
 import type { UserGenres, UserPreferences } from '@/api/generated/model'
 
-/**
- * Lógica das preferências de leitura no perfil (RF04). Combina DOIS recursos do
- * back-end: as preferências EAV (`/me/preferences` — idioma, tipo, área) e os
- * gêneros/categorias de livro (`/me/genres`). Busca ambos para pré-preencher e
- * salva os dois em paralelo, reaproveitando o formato de UI do cadastro.
- */
-export function useProfilePreferences() {
+export const useProfilePreferences = () => {
 	const queryClient = useQueryClient()
 
 	const prefsQuery = useGetApiUsersMePreferences()
 	const genresQuery = useGetApiUsersMeGenres()
-	// customFetch só resolve em respostas ok; o 200 carrega o corpo.
 	const eav = prefsQuery.data?.status === 200 ? prefsQuery.data.data : undefined
 	const genres = genresQuery.data?.status === 200 ? genresQuery.data.data : undefined
 	const isLoaded = eav !== undefined && genres !== undefined
@@ -42,7 +35,6 @@ export function useProfilePreferences() {
 
 	const methods = useForm<PreferencesValue>({
 		defaultValues: emptyPreferences,
-		// Prefill: quando as duas queries resolvem, o RHF sincroniza o form.
 		values: isLoaded ? apiToPreferences(eav, genres?.genres) : undefined,
 	})
 

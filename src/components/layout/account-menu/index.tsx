@@ -24,11 +24,6 @@ function initialsFromName(name: string): string {
 	return (first + last).toUpperCase()
 }
 
-/**
- * Botão de conta do header (usuário autenticado) com um popover contendo a
- * identidade (avatar, nome e e-mail) e as ações "Editar perfil" e "Sair" (RF29).
- * O perfil é buscado só quando este componente é montado (ou seja, autenticado).
- */
 export default function AccountMenu() {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 	const open = Boolean(anchorEl)

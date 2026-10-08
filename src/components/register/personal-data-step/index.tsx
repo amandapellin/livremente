@@ -3,10 +3,6 @@ import { MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { generoOptions } from '@/schemas/category-schemas'
 import type { CadastroForm } from '@/schemas/register-schemas'
 
-/**
- * Etapa 1 do cadastro — dados cadastrais exigidos pelo RF01: nome, data de
- * nascimento, gênero, e-mail e senha (com confirmação).
- */
 export default function DadosStep() {
 	const { control } = useFormContext<CadastroForm>()
 

@@ -1,6 +1,4 @@
-// Tokens do design system (Figma) em escalas tonais.
 export const colors = {
-	// Azul institucional (marca)
 	primary:
 		{ 
 			50: '#EEF2FB', 
@@ -14,7 +12,6 @@ export const colors = {
 			800: '#1E3A8A', 
 			900: '#14265C' 
 		},
-	// Azul de ação 
 	acao: 
 		{ 
 			50: '#EAF1FC', 
@@ -28,7 +25,6 @@ export const colors = {
 			800: '#0B3576', 
 			900: '#07234E' 
 		},
-	// Accent dourado
 	gold: 
 		{ 
 			50: '#FFFBEA', 
@@ -42,8 +38,7 @@ export const colors = {
 			800: '#A88E00', 
 			900: '#6B5A00' 
 		},
-	goldContrast: '#171A22', // palette/accent/contrastText
-	// Neutros "papel"
+	goldContrast: '#171A22',
 	papel: 
 		{ 
 			50: '#FAFAFB', 
@@ -58,15 +53,13 @@ export const colors = {
 			900: '#171A22' 
 		},
 	white: '#FFFFFF',
-	divider: '#0000001f', // palette/divider
-	// Superfície de leitura escura (único token escuro do DS)
+	divider: '#0000001f',
 	leitura: 
 		{ 
 			surfaceEscuro: '#14161C' 
 		},
-	// Semânticos — valor não exposto nas telas; confirmar no Figma
 	error: '#D32F2F',
-	info: '#1351B4', // usa o azul de ação
+	info: '#1351B4',
 } as const
 
 export const fontFamilies = {
@@ -74,12 +67,9 @@ export const fontFamilies = {
 	body: '"Lexend", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
 } as const
 
-// Raios de canto recorrentes que não seguem a escala base (`shape.borderRadius`).
 export const radii = {
-	section: '6px', // cards de seção "outlined" (perfil)
-	card: '12px', // cards maiores e caixas de destaque (cadastro, landing, LGPD)
+	section: '6px',
+	card: '12px',
 } as const
 
-// Fundo do painel de marca: overlay azul institucional (primary[900] a 78%) sobre
-// a imagem do hero. Reutilizado na landing e no login.
 export const heroBackground = `linear-gradient(rgba(20,38,92,0.78), rgba(20,38,92,0.78)), url('/hero-landing.jpg')`

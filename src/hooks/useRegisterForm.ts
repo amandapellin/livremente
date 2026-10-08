@@ -13,7 +13,7 @@ import { buildPayload } from '@/utils/register-utils'
 
 const STEPS = ['Dados Cadastrais', 'Preferências', 'LGPD'] as const
 
-export function useRegisterForm() {
+export const useRegisterForm = () => {
 	const [activeStep, setActiveStep] = useState(0)
 	const [submitError, setSubmitError] = useState<string | null>(null)
 	const [createdEmail, setCreatedEmail] = useState<string | null>(null)

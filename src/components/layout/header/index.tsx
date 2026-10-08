@@ -36,23 +36,13 @@ const navItems = [
 	{ label: "Recomendações", to: "/recomendacoes" },
 ];
 
-/**
- * Item de navegação do menu mobile (Drawer). Usa a mesma classe `.active` do
- * `NavLink` para destacar a rota atual em azul de ação.
- */
 const NavDrawerItem = styled(ListItemButton)(({ theme }) => ({
 	"&.active .MuiListItemText-primary": {
 		color: (theme.vars ?? theme).palette.info.main,
 		fontWeight: 700,
 	},
-	// `as typeof ListItemButton` preserva a tipagem polimórfica (prop `component`)
-	// que o `styled()` perde, permitindo `component={NavLink}` com `to`/`end`.
 })) as typeof ListItemButton;
 
-/**
- * Link de navegação do cabeçalho. O estado ativo usa a classe `.active` que o
- * `NavLink` do react-router injeta na rota atual (azul de ação + borda inferior).
- */
 const NavItemLink = styled(NavLink)(({ theme }) => ({
 	display: "flex",
 	alignItems: "center",
@@ -114,7 +104,6 @@ export default function Header() {
 						px: { xs: 2, md: 3 },
 					}}
 				>
-					{/* Esquerda: menu mobile + logo + navegação */}
 					<Stack
 						direction="row"
 						sx={{ alignItems: "center", gap: { xs: 1, md: 3 }, minWidth: 0 }}
@@ -173,7 +162,6 @@ export default function Header() {
 						</Stack>
 					</Stack>
 
-					{/* Direita: ações */}
 					<Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
 						<IconButton
 							aria-label="Buscar"
@@ -205,7 +193,6 @@ export default function Header() {
 				</Toolbar>
 			</AppBar>
 
-			{/* Menu mobile */}
 			<Drawer anchor="left" open={menuOpen} onClose={() => setMenuOpen(false)}>
 				<Box
 					sx={{ width: 260 }}
