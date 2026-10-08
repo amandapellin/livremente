@@ -4,6 +4,7 @@ const THEME_KEY = 'reader:theme'
 const RESUME_KEY = 'reader:resume-auto'
 const DICTIONARY_KEY = 'reader:save-dictionary'
 const POSITION_PREFIX = 'reader:position:'
+const PERCENT_PREFIX = 'reader:percent:'
 
 export const getStoredTheme = (): ReaderTheme => {
 	try {
@@ -59,6 +60,25 @@ export const getStoredPosition = (bookId: string): string | undefined => {
 export const setStoredPosition = (bookId: string, cfi: string) => {
 	try {
 		localStorage.setItem(POSITION_PREFIX + bookId, cfi)
+	} catch {
+		/* storage indisponível — ignora */
+	}
+}
+
+export const getStoredPercentage = (bookId: string): number | undefined => {
+	try {
+		const v = localStorage.getItem(PERCENT_PREFIX + bookId)
+		if (v == null) return undefined
+		const n = Number(v)
+		return Number.isFinite(n) ? n : undefined
+	} catch {
+		return undefined
+	}
+}
+
+export const setStoredPercentage = (bookId: string, percent: number) => {
+	try {
+		localStorage.setItem(PERCENT_PREFIX + bookId, String(percent))
 	} catch {
 		/* storage indisponível — ignora */
 	}

@@ -4,8 +4,10 @@ import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/typ
 import { FONT_FAMILIES, FONT_SIZE, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
 import {
 	getResumeAuto,
+	getStoredPercentage,
 	getStoredPosition,
 	getStoredTheme,
+	setStoredPercentage,
 	setStoredPosition,
 	setStoredTheme,
 } from '@/utils/reader-preferences'
@@ -47,7 +49,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const renditionRef = useRef<Rendition | null>(null)
 	const [chapter, setChapter] = useState('')
-	const [progress, setProgress] = useState(0)
+	const [progress, setProgress] = useState(() => (bookId ? getStoredPercentage(bookId) ?? 0 : 0))
 	const [isLoading, setIsLoading] = useState(true)
 	const [isError, setIsError] = useState(false)
 	const [theme, setThemeState] = useState<ReaderTheme>(getStoredTheme)
@@ -91,6 +93,19 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			}
 		})
 
+		const updateProgress = (cfi: string) => {
+			try {
+				const pct = book.locations.percentageFromCfi(cfi)
+				if (typeof pct === 'number' && !Number.isNaN(pct)) {
+					const rounded = Math.round(pct * 100)
+					setProgress(rounded)
+					if (bookId) setStoredPercentage(bookId, rounded)
+				}
+			} catch {
+				/* locations ainda não geradas */
+			}
+		}
+
 		const resumeCfi = bookId && getResumeAuto() ? getStoredPosition(bookId) : undefined
 		const onDisplayed = () => {
 			setIsLoading(false)
@@ -100,17 +115,18 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			if (resumeCfi) rendition.display().then(onDisplayed, fail)
 			else fail()
 		})
-		book.ready.then(() => book.locations.generate(1600)).catch(() => undefined)
+		book.ready
+			.then(() => book.locations.generate(1600))
+			.then(() => {
+				const loc = rendition.currentLocation() as unknown as RelocatedLocation | undefined
+				if (loc?.start?.cfi) updateProgress(loc.start.cfi)
+			})
+			.catch(() => undefined)
 		book.opened.catch(fail)
 
 		rendition.on('relocated', (location: RelocatedLocation) => {
 			if (bookId) setStoredPosition(bookId, location.start.cfi)
-			try {
-				const pct = book.locations.percentageFromCfi(location.start.cfi)
-				if (typeof pct === 'number') setProgress(Math.round(pct * 100))
-			} catch {
-				/* locations ainda não geradas */
-			}
+			updateProgress(location.start.cfi)
 			const item = findTocItem(book.navigation?.toc ?? [], location.start.href)
 			if (item?.label) setChapter(item.label.trim())
 		})
