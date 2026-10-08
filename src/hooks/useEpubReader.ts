@@ -1,29 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import ePub, { type Book, type NavItem, type Rendition } from 'epubjs'
-import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderSurface, ReaderTheme } from '@/types/reader-types'
+import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/types/reader-types'
 import { FONT_FAMILIES, FONT_SIZE, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
-
-// Temas aplicados ao conteúdo do EPUB (derivados das cores acima).
-const bodyTheme = (c: ReaderSurface) => ({ body: { color: c.text, background: c.background } })
-const THEMES: Record<ReaderTheme, Record<string, Record<string, string>>> = {
-	light: bodyTheme(readerThemeColors.light),
-	sepia: bodyTheme(readerThemeColors.sepia),
-	dark: bodyTheme(readerThemeColors.dark),
-}
-
-// Tema do leitor persistido globalmente (RF26): mantido ao reabrir a leitura.
-const THEME_STORAGE_KEY = 'reader:theme'
-
-/** Lê o tema salvo, validando o valor; cai em 'light' se ausente/ inválido. */
-function readStoredTheme(): ReaderTheme {
-	try {
-		const v = localStorage.getItem(THEME_STORAGE_KEY)
-		if (v === 'light' || v === 'sepia' || v === 'dark') return v
-	} catch {
-		/* storage indisponível (aba anônima etc.) */
-	}
-	return 'light'
-}
+import { getStoredTheme, setStoredTheme } from '@/utils/reader-preferences'
 
 type RelocatedLocation = { start: { cfi: string; href: string } }
 
@@ -52,6 +31,15 @@ function applyPageType(r: Rendition, type: ReaderPageType) {
 	r.spread(type === 'double' ? 'auto' : 'none')
 }
 
+// Aplica as cores do tema ao corpo do EPUB via `override` (como nos demais
+// ajustes). `themes.select` não reverte de forma confiável ao voltar a um tema
+// (as regras do tema anterior persistem), então evitamos ele aqui.
+function applyTheme(r: Rendition, theme: ReaderTheme) {
+	const c = readerThemeColors[theme]
+	r.themes.override('color', c.text, true)
+	r.themes.override('background', c.background, true)
+}
+
 export function useEpubReader(url: string | undefined | null) {
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const renditionRef = useRef<Rendition | null>(null)
@@ -59,7 +47,7 @@ export function useEpubReader(url: string | undefined | null) {
 	const [progress, setProgress] = useState(0)
 	const [isLoading, setIsLoading] = useState(true)
 	const [isError, setIsError] = useState(false)
-	const [theme, setThemeState] = useState<ReaderTheme>(readStoredTheme)
+	const [theme, setThemeState] = useState<ReaderTheme>(getStoredTheme)
 	const [fontScale, setFontScale] = useState(FONT_SIZE.default)
 	const [lineHeight, setLineHeight] = useState(LINE_SPACING.default)
 	const [fontFamily, setFontFamily] = useState<ReaderFont>('editor')
@@ -84,8 +72,7 @@ export function useEpubReader(url: string | undefined | null) {
 			contents.document.head.appendChild(style)
 		})
 
-		Object.entries(THEMES).forEach(([name, rules]) => rendition.themes.register(name, rules))
-		rendition.themes.select(theme)
+		applyTheme(rendition, theme)
 		applyTypography(rendition, fontScale, lineHeight, fontFamily, textAlign)
 		applyPageType(rendition, pageType)
 
@@ -140,7 +127,7 @@ export function useEpubReader(url: string | undefined | null) {
 	}, [url])
 
 	useEffect(() => {
-		renditionRef.current?.themes.select(theme)
+		if (renditionRef.current) applyTheme(renditionRef.current, theme)
 	}, [theme])
 
 	useEffect(() => {
@@ -166,11 +153,7 @@ export function useEpubReader(url: string | undefined | null) {
 	// Aplica (efeito abaixo) e persiste o tema escolhido (RF26).
 	const setTheme = (next: ReaderTheme) => {
 		setThemeState(next)
-		try {
-			localStorage.setItem(THEME_STORAGE_KEY, next)
-		} catch {
-			/* ignora falha de storage */
-		}
+		setStoredTheme(next)
 	}
 
 	return {

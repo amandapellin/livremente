@@ -1,6 +1,9 @@
+import { useEffect } from 'react'
 import { Box } from '@mui/material'
 import type { PublicationDetails } from '@/api/generated/model'
+import type { ReaderTheme } from '@/types/reader-types'
 import { useEpubReader } from '@/hooks/useEpubReader'
+import { useReaderPreferences } from '@/hooks/useReaderPreferences'
 import { readerThemeColors } from '@/constants/reader-const'
 import ReaderTopbar from '@/components/reader/reader-topbar'
 import ReaderView from '@/components/reader/reader-view'
@@ -12,11 +15,27 @@ interface Props {
 
 /**
  * Leitor de EPUB (RF15) via epub.js. O fundo acompanha o tema do leitor (cobre
- * as margens da renderização); topbar e navegação seguem a mesma cor.
+ * as margens da renderização); topbar e navegação seguem a mesma cor. O tema é
+ * sincronizado com o back-end via `useReaderPreferences` (RF26): hidrata ao abrir
+ * e grava as trocas feitas no modal.
  */
 export default function EpubReader({ data }: Props) {
 	const reader = useEpubReader(data.epubFileUrl)
+	const prefs = useReaderPreferences()
 	const surface = readerThemeColors[reader.theme]
+
+	// Aplica o tema do servidor quando ele chega (cross-device, ao abrir). Só muda
+	// quando a query resolve, então não briga com o usuário durante a sessão.
+	useEffect(() => {
+		if (prefs.serverTheme) reader.setTheme(prefs.serverTheme)
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [prefs.serverTheme])
+
+	// Troca do tema no modal: aplica no epub e persiste (cache + back-end).
+	const changeTheme = (value: ReaderTheme) => {
+		reader.setTheme(value)
+		prefs.setTheme(value)
+	}
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, bgcolor: surface.background, transition: 'background-color .15s' }}>
@@ -32,7 +51,7 @@ export default function EpubReader({ data }: Props) {
 				fontFamily={reader.fontFamily}
 				textAlign={reader.textAlign}
 				pageType={reader.pageType}
-				onThemeChange={reader.setTheme}
+				onThemeChange={changeTheme}
 				onFontScaleChange={reader.setFontScale}
 				onLineHeightChange={reader.setLineHeight}
 				onFontFamilyChange={reader.setFontFamily}
