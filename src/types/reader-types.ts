@@ -26,3 +26,11 @@ export interface Bookmark {
 	cfi: string
 	createdAt: number
 }
+
+export interface Highlight {
+	id: string
+	cfiRange: string
+	text: string
+	chapter: string
+	createdAt: number
+}

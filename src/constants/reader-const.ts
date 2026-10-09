@@ -14,6 +14,9 @@ import type {
 	ReaderSurface,
 	ReaderTheme,
 } from "@/types/reader-types"
+import { colors } from '@/theme/tokens'
+
+export const HIGHLIGHT_FILL = colors.gold[300]
 
 export const readerThemeColors: Record<ReaderTheme, ReaderSurface> = {
     light: { background: '#fafafb', text: '#171a22', border: 'rgba(23, 26, 34, 0.12)' },

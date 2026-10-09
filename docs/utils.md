@@ -36,6 +36,19 @@ Restrito a EPUB (o viewer nativo de PDF não expõe a página atual). Ver `useBo
 - **`addBookmark(bookId, bookmark)`** — adiciona se o `id` ainda não existe.
 - **`removeBookmark(bookId, id)`** — remove pelo `id`.
 
+## `reader-highlights.ts` — grifos (RF22, EPUB)
+
+Persistência **por obra** dos grifos em `localStorage` (`reader:highlights:<bookId>`,
+lista de `Highlight` em JSON; `id = cfiRange` do epub.js) + envio *best-effort* ao
+back-end atrás do flag `USE_HIGHLIGHTS_API` (hoje `false`). Ver `useHighlights`
+(estado reativo) e, no leitor, `useEpubReader` (seleção/overlay via `annotations`).
+
+- **`getHighlights(bookId)`** / **`saveHighlight(bookId, h)`** / **`deleteHighlight(bookId, id)`**
+  — leitura, inserção idempotente (por `id`) e remoção no `localStorage`.
+- **`sendHighlight(bookId, h)`** — `POST /api/users/me/reading-progress/{id}/highlights`
+  (`{ cfiRange, text }`), proposto pelo front; no-op com o flag desligado.
+- **`removeHighlightRemote(bookId, id)`** — `DELETE .../highlights/{cfiRange}`.
+
 ## `reading-session.ts` — tempo de leitura da sessão (RF20)
 
 Acumula o **tempo de tela ativa** por obra e envia ao back-end. O envio fica atrás

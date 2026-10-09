@@ -25,10 +25,19 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
 
 - **`reader-topbar/` → `ReaderTopbar`** — topo: voltar, título, capítulo atual,
   barra de progresso, `SessionTimer`, botão de configurações (`ReaderSettings`) e
-  "Grifos e Anotações" (em breve). Responsivo: no mobile reduz `gap`/`px`, oculta
-  "Grifos e Anotações" e o timer, e `ReaderSettings` fica só-ícone.
+  **"Grifos e Anotações"** — toggle do painel lateral (RF22; `highlightsOpen` +
+  `onToggleHighlights`, fica gold quando aberto). Responsivo: no mobile reduz
+  `gap`/`px`, oculta "Grifos e Anotações" e o timer, e `ReaderSettings` fica só-ícone.
 - **`reader-view/` → `ReaderView`** — área de renderização (o `containerRef` recebe
-  a *rendition* do epub.js) + estados de carregando/erro.
+  a *rendition* do epub.js) + estados de carregando/erro. `minWidth: 0` para encolher
+  ao lado do painel de grifos (flex item não encolhe abaixo do conteúdo sem isso).
+- **`highlight-toolbar/` → `HighlightToolbar`** — toolbar flutuante (RF22) ancorada na
+  seleção/no grifo clicado: ação única ("Grifar" ou "Remover grifo"), fecha no
+  `ClickAway`. Posição `fixed` a partir das coordenadas de `useEpubReader`.
+- **`highlights-panel/` → `HighlightsPanel`** — painel lateral (RF22) aberto pelo
+  botão "Grifos e Anotações": lista os grifos (overline do capítulo + trecho com borda
+  gold), com ir (`display`) e remover; segue a cor do tema (`surface`); estado vazio
+  quando não há grifos.
 - **`reader-nav/` → `ReaderNav`** — rodapé: "Anterior"/"Próxima" e a marcação de
   página (RF21) — botão **toggle** ("Marcar Página" ⇄ "Página marcada", ícone
   contornado/cheio conforme `marked`) + `BookmarksMenu` para revisitar/remover.
