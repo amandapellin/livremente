@@ -61,6 +61,10 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   (RF13); 404 quando não existe. Também com mock trocável (mesmo flag).
 - **`useDebouncedValue.ts` → `useDebouncedValue(value, delay=350)`** — valor com
   atraso; usado na busca por palavra-chave (RF11) para não requisitar a cada tecla.
+- **`useBookmarks.ts` → `useBookmarks(bookId?)`** — marcadores de página (RF21, EPUB)
+  como estado reativo sobre `reader-bookmarks` (localStorage). Retorna `{ bookmarks,
+  add, remove, has }`; `has(cfi)` dá a indicação visual de "página já marcada" (toggle).
+  Usado pelo `EpubReader` (id = CFI atual).
 - **`useReadingSession.ts` → `useReadingSession(bookId?)`** — tempo de tela ativa da
   sessão de leitura (RF20). Mede por timestamps (não por contador que atrasa em aba
   inativa); **só avança com a aba visível e a janela focada** (`visibilitychange`,
@@ -76,5 +80,6 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   está ligado, com fallback para o início. **Percentual** (RF19): `updateProgress`
   calcula via `book.locations.percentageFromCfi` no `relocated` **e** assim que as
   *locations* são geradas (evita 0% travado no load), persistindo em
-  `setStoredPercentage`. Helpers de módulo: `findTocItem`, `applyTypography`,
-  `applyPageType`, `applyTheme`.
+  `setStoredPercentage`. Expõe também `currentCfi` (posição atual) e `display(cfi)`
+  (ir a uma posição), usados pela marcação de página (RF21). Helpers de módulo:
+  `findTocItem`, `applyTypography`, `applyPageType`, `applyTheme`.
