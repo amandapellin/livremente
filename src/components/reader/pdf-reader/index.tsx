@@ -1,6 +1,7 @@
 import { Box } from '@mui/material'
 import type { PublicationDetails } from '@/api/generated/model'
 import { colors } from '@/theme/tokens'
+import { useReadingSession } from '@/hooks/useReadingSession'
 import PdfTopbar from '@/components/reader/pdf-topbar'
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export default function PdfReader({ data }: Props) {
+	const session = useReadingSession(data.id)
 	const subtitle = [data.source, data.type === 'scientific_article' ? 'artigo científico' : 'livro', data.format]
 		.filter(Boolean)
 		.join(' · ')
@@ -18,6 +20,7 @@ export default function PdfReader({ data }: Props) {
 				backTo={`/obra/${data.id}`}
 				title={data.title}
 				subtitle={subtitle}
+				sessionTime={session.label}
 				externalUrl={data.downloadUrl}
 				externalLabel={`Abrir no ${data.source ?? 'site'}`}
 			/>

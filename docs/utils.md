@@ -9,7 +9,7 @@ como cache). Todos os acessos são protegidos com `try/catch` (storage pode lan�
 aba anônima).
 
 Chaves: `reader:theme`, `reader:resume-auto`, `reader:save-dictionary`,
-`reader:position:<bookId>`.
+`reader:position:<bookId>`, `reader:percent:<bookId>`.
 
 - **`getStoredTheme()` / `setStoredTheme(value)`** — tema salvo (RF26); a leitura
   valida o valor e cai em `'light'`.
@@ -20,6 +20,26 @@ Chaves: `reader:theme`, `reader:resume-auto`, `reader:save-dictionary`,
 - **`getStoredPosition(bookId)` / `setStoredPosition(bookId, cfi)`** — última posição
   lida por obra (RF18), como **CFI** do epub.js. Em obra *reflowable* o número de
   página é instável; o CFI é a posição robusta para retomar.
+- **`getStoredPercentage(bookId)` / `setStoredPercentage(bookId, percent)`** —
+  percentual lido por obra (RF19), inteiro 0–100. Hidrata o indicador do leitor sem
+  flash de 0% e serve de *fallback* até o endpoint de progresso do back-end existir.
+
+## `reading-session.ts` — tempo de leitura da sessão (RF20)
+
+Acumula o **tempo de tela ativa** por obra e envia ao back-end. O envio fica atrás
+de `USE_READING_SESSION_API` (hoje `false`): enquanto a rota não existe, só acumula
+em `localStorage` (chave `reader:time:<bookId>`, em **segundos**). Ver
+`useReadingSession`, que orquestra pausa/retomada e os *flushes*.
+
+- **`getStoredReadingTime(bookId)` / `addStoredReadingTime(bookId, seconds)`** —
+  total acumulado por obra (incrementa; alimenta o `ReadingProgress.readingTimeMinutes`
+  da estante/detalhes). Protegido com `try/catch`.
+- **`formatDuration(totalSeconds)`** — formata `m:ss` (ou `h:mm:ss` a partir de 1h).
+- **`sendReadingTime(bookId, seconds)`** — envia o **delta** ao contrato proposto
+  `POST /api/users/me/reading-progress/{id}/session` (`{ seconds }`). *Best-effort* e
+  com `keepalive: true` para sobreviver ao fechamento da aba (*flush* em `pagehide`);
+  por isso usa `fetch` + token manual em vez do cliente gerado. No-op com o flag
+  desligado. Ao ligar: atualizar `openapi.json` → `pnpm gen:api`.
 
 ## `register-utils.ts`
 

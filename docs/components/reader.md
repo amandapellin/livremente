@@ -16,15 +16,16 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
 - **`pdf-reader/` → `PdfReader`** — leitor de PDF (RF16): delega a renderização ao
   **visualizador nativo do navegador** via `<iframe>` (scroll, zoom, miniaturas,
   busca e impressão vêm prontos). Mantém só a topbar da marca.
-- **`pdf-topbar/` → `PdfTopbar`** — topbar enxuta do PDF: voltar, título/subtítulo e
-  link externo para a fonte. Controles de página/zoom ficam no visualizador nativo.
-  `squareSx` estiliza o botão quadrado de voltar.
+- **`pdf-topbar/` → `PdfTopbar`** — topbar enxuta do PDF: voltar, título/subtítulo,
+  `SessionTimer` e link externo para a fonte. Controles de página/zoom ficam no
+  visualizador nativo. `squareSx` estiliza o botão quadrado de voltar.
 
 ## Casca do leitor de EPUB
 
 - **`reader-topbar/` → `ReaderTopbar`** — topo: voltar, título, capítulo atual,
-  barra de progresso, botão de configurações (`ReaderSettings`) e "Grifos e
-  Anotações" (em breve).
+  barra de progresso, `SessionTimer`, botão de configurações (`ReaderSettings`) e
+  "Grifos e Anotações" (em breve). Responsivo: no mobile reduz `gap`/`px`, oculta
+  "Grifos e Anotações" e o timer, e `ReaderSettings` fica só-ícone.
 - **`reader-view/` → `ReaderView`** — área de renderização (o `containerRef` recebe
   a *rendition* do epub.js) + estados de carregando/erro.
 - **`reader-nav/` → `ReaderNav`** — rodapé: "Anterior"/"Próxima" e "Marcar Página"
@@ -32,6 +33,9 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
 - **`buttons/` → `ReaderButton`** — botão compacto compartilhado do leitor, com
   `tone` `'surface'` (contornado) ou `'gold'` (destaque). `BASE_SX` define o
   tamanho/tipografia compactos padrão (o padding pode ser sobrescrito por `sx`).
+- **`session-timer/` → `SessionTimer`** — indicador compacto (ícone de relógio +
+  rótulo) do tempo da sessão de leitura (RF20), usado por ambas as topbars; recebe
+  `label` (de `useReadingSession`) e `color`/`sx` para casar com o tema de cada leitor.
 
 ## Modal de configurações (`reader-settings/`)
 

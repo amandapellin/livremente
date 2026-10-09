@@ -61,11 +61,20 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   (RF13); 404 quando não existe. Também com mock trocável (mesmo flag).
 - **`useDebouncedValue.ts` → `useDebouncedValue(value, delay=350)`** — valor com
   atraso; usado na busca por palavra-chave (RF11) para não requisitar a cada tecla.
+- **`useReadingSession.ts` → `useReadingSession(bookId?)`** — tempo de tela ativa da
+  sessão de leitura (RF20). Mede por timestamps (não por contador que atrasa em aba
+  inativa); **só avança com a aba visível e a janela focada** (`visibilitychange`,
+  `blur`/`focus`). Faz *flush* do **delta** acumulado a cada 30s, ao perder o foco, no
+  `pagehide` e ao desmontar (sair da tela) — via `addStoredReadingTime` +
+  `sendReadingTime`. Retorna `{ seconds, label }` da sessão atual (zera ao reabrir).
 - **`useEpubReader.ts` → `useEpubReader(url, bookId?)`** — ciclo de vida do epub.js
   (RF15): render, navegação (botões/teclado), **reflow** (`ResizeObserver`), capítulo
   (TOC) e progresso. Ajustes de leitura via `themes.override` (fonte, entrelinha,
   alinhamento, tipo de página) e **tema** (RF26, `applyTheme` — `override` em vez de
   `themes.select`, que não reverte de forma confiável). **Retomada** (RF18): salva a
   posição como CFI (`setStoredPosition`) e retoma no `display(cfi)` quando `resumeAuto`
-  está ligado, com fallback para o início. Helpers de módulo: `findTocItem`,
-  `applyTypography`, `applyPageType`, `applyTheme`.
+  está ligado, com fallback para o início. **Percentual** (RF19): `updateProgress`
+  calcula via `book.locations.percentageFromCfi` no `relocated` **e** assim que as
+  *locations* são geradas (evita 0% travado no load), persistindo em
+  `setStoredPercentage`. Helpers de módulo: `findTocItem`, `applyTypography`,
+  `applyPageType`, `applyTheme`.

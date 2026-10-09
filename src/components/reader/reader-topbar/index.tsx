@@ -5,6 +5,7 @@ import EditNoteIcon from '@mui/icons-material/EditNote'
 import { colors } from '@/theme/tokens'
 
 import ReaderSettings from '@/components/reader/reader-settings'
+import SessionTimer from '@/components/reader/session-timer'
 import { ReaderButton } from '@/components/reader/buttons'
 import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderSurface, ReaderTheme } from '@/types/reader-types'
 
@@ -13,6 +14,7 @@ interface Props {
 	title: string
 	chapter: string
 	progress: number
+	sessionTime: string
 	surface: ReaderSurface
 	theme: ReaderTheme
 	fontScale: number
@@ -33,6 +35,7 @@ export default function ReaderTopbar({
 	title,
 	chapter,
 	progress,
+	sessionTime,
 	surface,
 	theme,
 	fontScale,
@@ -86,6 +89,8 @@ export default function ReaderTopbar({
 					sx={{ width: 120, height: 4, borderRadius: 999, backgroundColor: surface.border, display: { xs: 'none', md: 'block' }, '& .MuiLinearProgress-bar': { backgroundColor: colors.gold[500] } }}
 				/>
 			</Stack>
+
+			<SessionTimer label={sessionTime} sx={{ display: { xs: 'none', md: 'flex' } }} />
 
 			<ReaderSettings
 				borderColor={surface.border}

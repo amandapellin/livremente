@@ -282,6 +282,24 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   **"Grifos e Anotações"** (placeholder "Em breve") **oculto abaixo de `md`** e
   **"Configurações" só-ícone** no mobile (rótulo responsivo + `aria-label`).
 
+- **#21 (RF20) Contador de tempo de sessão:** hook compartilhado
+  **`useReadingSession(bookId)`** usado pelos dois leitores (EPUB e PDF). Mede o
+  **tempo de tela ativa** por *timestamps* (não por contador que atrasa em aba
+  inativa) e **só conta com a aba visível e a janela focada**; um *tick* de 1s é
+  **auto-reconciliável** (sincroniza ativo/pausado a cada segundo, robusto a eventos
+  de foco perdidos), além dos listeners `visibilitychange`/`blur`/`focus`/`pagehide`.
+  Faz *flush* do **delta** acumulado a cada 30s, ao perder o foco, no `pagehide` e ao
+  desmontar (sair da tela). A exibição (`SessionTimer`: relógio + `m:ss`) mostra a
+  **sessão atual** (zera ao reabrir) na topbar de cada leitor, **oculta no mobile**
+  (`xs`) para não reapertar a barra. Utilitários em **`utils/reading-session.ts`**:
+  acumulação por obra em `localStorage` (`reader:time:<id>`, segundos; alimenta o
+  `ReadingProgress.readingTimeMinutes` da estante/detalhes), `formatDuration` e
+  `sendReadingTime` (envio do delta, *best-effort* com `keepalive` para sobreviver ao
+  `pagehide`). **Contrato proposto pelo front** (e atrás do flag
+  `USE_READING_SESSION_API`, hoje `false`): `POST /api/users/me/reading-progress/{id}/session`
+  (`{ seconds }`, incrementa o `read_time`). Ao implementar: `openapi.json` →
+  `pnpm gen:api` → trocar o `fetch` manual pela função gerada.
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 
