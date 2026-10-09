@@ -1,20 +1,28 @@
-import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
+import { Box, IconButton, Stack, Tab, Tabs, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
+import EditNoteIcon from '@mui/icons-material/EditNote'
 import { colors } from '@/theme/tokens'
 import { highlightFill } from '@/constants/reader-const'
 import type { Highlight, ReaderSurface } from '@/types/reader-types'
+
+type PanelTab = 'todos' | 'grifos' | 'anotacoes'
 
 interface Props {
 	highlights: Highlight[]
 	surface: ReaderSurface
 	onSelect: (highlight: Highlight) => void
+	onEditNote: (highlight: Highlight) => void
 	onRemove: (id: string) => void
 	onClose: () => void
 }
 
-export default function HighlightsPanel({ highlights, surface, onSelect, onRemove, onClose }: Props) {
+export default function HighlightsPanel({ highlights, surface, onSelect, onEditNote, onRemove, onClose }: Props) {
+	const [tab, setTab] = useState<PanelTab>('todos')
 	const ordered = [...highlights].sort((a, b) => b.createdAt - a.createdAt)
+	const shown = ordered.filter((h) => (tab === 'anotacoes' ? h.note : tab === 'grifos' ? !h.note : true))
+	const emptyLabel = tab === 'anotacoes' ? 'Selecione um trecho para anotar.' : 'Selecione um trecho no texto para grifar.'
 
 	return (
 		<Stack
@@ -37,15 +45,26 @@ export default function HighlightsPanel({ highlights, surface, onSelect, onRemov
 				</IconButton>
 			</Stack>
 
-			{ordered.length === 0 ? (
-				<Stack sx={{ alignItems: 'center', justifyContent: 'center', flex: 1, p: 3, gap: 1 }}>
+			<Tabs
+				value={tab}
+				onChange={(_, v) => setTab(v)}
+				variant="fullWidth"
+				sx={{ minHeight: 40, borderBottom: `1px solid ${surface.border}`, '& .MuiTab-root': { minHeight: 40, color: 'inherit', opacity: 0.7 }, '& .Mui-selected': { opacity: 1 } }}
+			>
+				<Tab value="todos" label="Todos" />
+				<Tab value="grifos" label="Grifos" />
+				<Tab value="anotacoes" label="Anotações" />
+			</Tabs>
+
+			{shown.length === 0 ? (
+				<Stack sx={{ alignItems: 'center', justifyContent: 'center', flex: 1, p: 3 }}>
 					<Typography variant="body2" sx={{ opacity: 0.7, textAlign: 'center' }}>
-						Selecione um trecho no texto para grifar.
+						{emptyLabel}
 					</Typography>
 				</Stack>
 			) : (
 				<Stack sx={{ gap: 1.5, p: 2, overflowY: 'auto' }}>
-					{ordered.map((h) => (
+					{shown.map((h) => (
 						<Box
 							key={h.id}
 							role="button"
@@ -60,7 +79,7 @@ export default function HighlightsPanel({ highlights, surface, onSelect, onRemov
 								p: 1.5,
 								pl: 2,
 								'&:hover': { borderColor: colors.gold[500] },
-								'&:hover .hl-remove': { opacity: 1 },
+								'&:hover .hl-actions': { opacity: 1 },
 								'&::before': {
 									content: '""',
 									position: 'absolute',
@@ -77,18 +96,30 @@ export default function HighlightsPanel({ highlights, surface, onSelect, onRemov
 								<Typography variant="overline" sx={{ opacity: 0.6 }}>
 									{h.chapter || 'Trecho'}
 								</Typography>
-								<IconButton
-									className="hl-remove"
-									aria-label="Remover grifo"
-									size="small"
-									onClick={(e) => {
-										e.stopPropagation()
-										onRemove(h.id)
-									}}
-									sx={{ color: 'inherit', opacity: 0, transition: 'opacity .15s', mt: -0.5, mr: -0.5 }}
-								>
-									<DeleteOutlineIcon fontSize="small" />
-								</IconButton>
+								<Stack direction="row" className="hl-actions" sx={{ opacity: 0, transition: 'opacity .15s', mt: -0.5, mr: -0.5 }}>
+									<IconButton
+										aria-label={h.note ? 'Editar anotação' : 'Anotar'}
+										size="small"
+										onClick={(e) => {
+											e.stopPropagation()
+											onEditNote(h)
+										}}
+										sx={{ color: 'inherit' }}
+									>
+										<EditNoteIcon fontSize="small" />
+									</IconButton>
+									<IconButton
+										aria-label="Remover grifo"
+										size="small"
+										onClick={(e) => {
+											e.stopPropagation()
+											onRemove(h.id)
+										}}
+										sx={{ color: 'inherit' }}
+									>
+										<DeleteOutlineIcon fontSize="small" />
+									</IconButton>
+								</Stack>
 							</Stack>
 							<Typography
 								variant="body2"
@@ -96,6 +127,11 @@ export default function HighlightsPanel({ highlights, surface, onSelect, onRemov
 							>
 								{h.text}
 							</Typography>
+							{h.note && (
+								<Typography variant="caption" sx={{ display: 'block', mt: 0.75, opacity: 0.75 }}>
+									{h.note}
+								</Typography>
+							)}
 						</Box>
 					))}
 				</Stack>

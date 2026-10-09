@@ -13,6 +13,7 @@ import ReaderView from '@/components/reader/reader-view'
 import ReaderNav from '@/components/reader/reader-nav'
 import HighlightToolbar from '@/components/reader/highlight-toolbar'
 import HighlightsPanel from '@/components/reader/highlights-panel'
+import NoteDialog from '@/components/reader/note-dialog'
 
 interface Props {
 	data: PublicationDetails
@@ -27,7 +28,9 @@ export default function EpubReader({ data }: Props) {
 	const surface = readerThemeColors[reader.theme]
 	const marked = bookmarks.has(reader.currentCfi)
 	const [panelOpen, setPanelOpen] = useState(false)
+	const [noteTarget, setNoteTarget] = useState<string | null>(null)
 	const appliedRef = useRef(false)
+	const noteHl = highlights.highlights.find((h) => h.cfiRange === noteTarget)
 
 	useEffect(() => {
 		if (prefs.serverTheme) reader.setTheme(prefs.serverTheme)
@@ -92,6 +95,31 @@ export default function EpubReader({ data }: Props) {
 		reader.clearActiveMark()
 	}
 
+	const annotateSelection = () => {
+		const sel = reader.selection
+		if (!sel) return
+		if (!highlights.highlights.some((h) => h.id === sel.cfiRange)) {
+			reader.addHighlight(sel.cfiRange, DEFAULT_HIGHLIGHT)
+			highlights.add({
+				id: sel.cfiRange,
+				cfiRange: sel.cfiRange,
+				text: sel.text,
+				chapter: reader.chapter,
+				color: DEFAULT_HIGHLIGHT,
+				createdAt: Date.now(),
+			})
+		}
+		setNoteTarget(sel.cfiRange)
+		reader.clearSelection()
+	}
+
+	const annotateActive = () => {
+		const mark = reader.activeMark
+		if (!mark) return
+		setNoteTarget(mark.cfiRange)
+		reader.clearActiveMark()
+	}
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, bgcolor: surface.background, transition: 'background-color .15s' }}>
 			<GlobalStyles styles={{ '.epub-highlight': { pointerEvents: 'fill', cursor: 'pointer' } }} />
@@ -124,6 +152,7 @@ export default function EpubReader({ data }: Props) {
 						highlights={highlights.highlights}
 						surface={surface}
 						onSelect={(h) => reader.display(h.cfiRange)}
+						onEditNote={(h) => setNoteTarget(h.cfiRange)}
 						onRemove={(id) => {
 							reader.removeHighlight(id)
 							highlights.remove(id)
@@ -148,6 +177,7 @@ export default function EpubReader({ data }: Props) {
 					top={reader.selection.top}
 					left={reader.selection.left}
 					onPick={createHighlight}
+					onAnnotate={annotateSelection}
 					onClose={reader.clearSelection}
 				/>
 			)}
@@ -157,10 +187,19 @@ export default function EpubReader({ data }: Props) {
 					left={reader.activeMark.left}
 					activeColor={activeHighlight?.color}
 					onPick={recolorActive}
+					onAnnotate={annotateActive}
 					onRemove={removeActive}
 					onClose={reader.clearActiveMark}
 				/>
 			)}
+
+			<NoteDialog
+				key={noteTarget ?? 'none'}
+				open={noteTarget !== null}
+				initialValue={noteHl?.note ?? ''}
+				onSave={(note) => noteTarget && highlights.setNote(noteTarget, note)}
+				onClose={() => setNoteTarget(null)}
+			/>
 		</Box>
 	)
 }

@@ -335,7 +335,28 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   layout:** `ReaderView` ganhou `minWidth: 0` para encolher ao lado do painel (flex
   item não encolhe abaixo do conteúdo do iframe sem isso). **Fora de escopo:** as abas
   Todos/Grifos/Anotações do Figma (anotações/dicionário) — issues próprias, reusando
-  `useHighlights`.
+  `useHighlights`. (A escolha de cor do grifo — paleta `HIGHLIGHT_COLORS`
+  amarelo/verde/azul/rosa — e a recoloração de grifo existente foram adicionadas ainda
+  nesta branch; a toolbar vira **paleta de bolinhas** e o `markClicked` só dispara
+  porque o `EpubReader` reabilita `pointer-events` na classe `.epub-highlight` via
+  `GlobalStyles`.)
+
+- **#24 (RF23) Interface de criação de anotação (EPUB):** anotar um trecho = **grifo +
+  nota**, reusando toda a infra do #23. O `Highlight` ganhou **`note?`** (um grifo com
+  `note` é uma "anotação"). A toolbar flutuante ganhou a ação **"Anotar"** (`onAnnotate`,
+  ícone de lápis), que **garante o grifo** (cria em `DEFAULT_HIGHLIGHT` se o trecho
+  ainda não estiver grifado) e abre o **`NoteDialog`** (campo de texto multiline,
+  Salvar/Cancelar; remontado por `key={cfiRange}` no `EpubReader` para o valor inicial
+  refletir a nota atual — evita `setState` em effect). O **painel lateral** ganhou as
+  **abas Todos/Grifos/Anotações** (Grifos = sem nota, Anotações = com nota), exibe a
+  **nota** no card e um botão de **editar anotação**. Persistência/sync reusa
+  `reader-highlights`/`useHighlights`: `setNote` → `updateHighlightNote` (`note` vazio
+  volta a `undefined`) + `updateHighlightNoteRemote`; o `POST` de grifo e o `PATCH`
+  passam a carregar `note`. **Contrato:** `PATCH /api/users/me/reading-progress/{id}/highlights/{cfiRange}`
+  aceita `{ note }` (além de `{ color }`), atrás do flag `USE_HIGHLIGHTS_API`. **PDF não
+  tem anotação** (RN07 — `PdfReader` inalterado). **Decisões de produto:** "Anotar"
+  sempre ancora num grifo; editor em diálogo. **Fora de escopo:** dicionário (issue
+  própria).
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.

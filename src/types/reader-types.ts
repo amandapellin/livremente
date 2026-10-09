@@ -35,5 +35,6 @@ export interface Highlight {
 	text: string
 	chapter: string
 	color: HighlightColor
+	note?: string
 	createdAt: number
 }

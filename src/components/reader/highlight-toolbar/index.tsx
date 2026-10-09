@@ -1,5 +1,6 @@
 import { Box, ClickAwayListener, Divider, IconButton, Paper, Stack } from '@mui/material'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
+import EditNoteIcon from '@mui/icons-material/EditNote'
 import { HIGHLIGHT_COLORS } from '@/constants/reader-const'
 import { colors } from '@/theme/tokens'
 import type { HighlightColor } from '@/types/reader-types'
@@ -10,10 +11,11 @@ interface Props {
 	onPick: (color: HighlightColor) => void
 	onClose: () => void
 	activeColor?: HighlightColor
+	onAnnotate?: () => void
 	onRemove?: () => void
 }
 
-export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, onRemove }: Props) {
+export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, onAnnotate, onRemove }: Props) {
 	return (
 		<ClickAwayListener onClickAway={onClose}>
 			<Paper
@@ -44,13 +46,16 @@ export default function HighlightToolbar({ top, left, onPick, onClose, activeCol
 							/>
 						</IconButton>
 					))}
+					{(onAnnotate || onRemove) && <Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />}
+					{onAnnotate && (
+						<IconButton size="small" aria-label="Anotar" onClick={onAnnotate}>
+							<EditNoteIcon fontSize="small" />
+						</IconButton>
+					)}
 					{onRemove && (
-						<>
-							<Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />
-							<IconButton size="small" aria-label="Remover grifo" onClick={onRemove}>
-								<DeleteOutlineIcon fontSize="small" />
-							</IconButton>
-						</>
+						<IconButton size="small" aria-label="Remover grifo" onClick={onRemove}>
+							<DeleteOutlineIcon fontSize="small" />
+						</IconButton>
 					)}
 				</Stack>
 			</Paper>
