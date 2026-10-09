@@ -44,12 +44,13 @@ back-end atrás do flag `USE_HIGHLIGHTS_API` (hoje `false`). Ver `useHighlights`
 (estado reativo) e, no leitor, `useEpubReader` (seleção/overlay via `annotations`).
 
 - **`getHighlights(bookId)`** / **`saveHighlight(bookId, h)`** / **`deleteHighlight(bookId, id)`**
-  / **`updateHighlightColor(bookId, id, color)`** — leitura, inserção idempotente (por
-  `id`), remoção e troca de cor no `localStorage`.
+  / **`updateHighlightColor(bookId, id, color)`** / **`updateHighlightNote(bookId, id, note)`**
+  — leitura, inserção idempotente (por `id`), remoção, troca de cor e de **nota**
+  (RF23; `note` vazio volta a `undefined`) no `localStorage`.
 - **`sendHighlight(bookId, h)`** — `POST /api/users/me/reading-progress/{id}/highlights`
-  (`{ cfiRange, text, color }`), proposto pelo front; no-op com o flag desligado.
-- **`updateHighlightRemote(bookId, id, color)`** — `PATCH .../highlights/{cfiRange}`
-  (`{ color }`).
+  (`{ cfiRange, text, color, note }`), proposto pelo front; no-op com o flag desligado.
+- **`updateHighlightRemote(bookId, id, color)`** / **`updateHighlightNoteRemote(bookId, id, note)`**
+  — `PATCH .../highlights/{cfiRange}` (`{ color }` ou `{ note }`).
 - **`removeHighlightRemote(bookId, id)`** — `DELETE .../highlights/{cfiRange}`.
 
 ## `reading-session.ts` — tempo de leitura da sessão (RF20)

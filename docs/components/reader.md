@@ -31,14 +31,20 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
 - **`reader-view/` → `ReaderView`** — área de renderização (o `containerRef` recebe
   a *rendition* do epub.js) + estados de carregando/erro. `minWidth: 0` para encolher
   ao lado do painel de grifos (flex item não encolhe abaixo do conteúdo sem isso).
-- **`highlight-toolbar/` → `HighlightToolbar`** — toolbar flutuante (RF22) ancorada na
-  seleção/no grifo clicado: **paleta de cores** (`HIGHLIGHT_COLORS`) para grifar; no
-  grifo existente destaca a `activeColor` (recolorir) e mostra a lixeira (`onRemove`).
-  Fecha no `ClickAway`; posição `fixed` a partir das coordenadas de `useEpubReader`.
-- **`highlights-panel/` → `HighlightsPanel`** — painel lateral (RF22) aberto pelo
-  botão "Grifos e Anotações": lista os grifos (overline do capítulo + trecho com borda
-  **na cor do grifo**, `highlightFill`), com ir (`display`) e remover; segue a cor do
-  tema (`surface`); estado vazio quando não há grifos.
+- **`highlight-toolbar/` → `HighlightToolbar`** — toolbar flutuante (RF22/RF23) ancorada
+  na seleção/no grifo clicado: **paleta de cores** (`HIGHLIGHT_COLORS`) para grifar +
+  ação **"Anotar"** (`onAnnotate`); no grifo existente destaca a `activeColor`
+  (recolorir) e mostra a lixeira (`onRemove`). Fecha no `ClickAway`; posição `fixed` a
+  partir das coordenadas de `useEpubReader`.
+- **`note-dialog/` → `NoteDialog`** — editor da anotação (RF23): `TextField` multiline
+  com Salvar/Cancelar. Remontado por `key` (o `EpubReader` o keya pelo `cfiRange`-alvo)
+  para o valor inicial refletir a nota atual.
+- **`highlights-panel/` → `HighlightsPanel`** — painel lateral (RF22/RF23) aberto pelo
+  botão "Grifos e Anotações": **abas Todos/Grifos/Anotações** (Grifos = sem nota,
+  Anotações = com nota), lista os cards (overline do capítulo + trecho com borda **na
+  cor do grifo**, `highlightFill`, + a **nota** quando houver), com ir (`display`),
+  **editar nota** (`onEditNote`) e remover; segue a cor do tema (`surface`); estado
+  vazio por aba.
 - **`reader-nav/` → `ReaderNav`** — rodapé: "Anterior"/"Próxima" e a marcação de
   página (RF21) — botão **toggle** ("Marcar Página" ⇄ "Página marcada", ícone
   contornado/cheio conforme `marked`) + `BookmarksMenu` para revisitar/remover.

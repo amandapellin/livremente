@@ -67,8 +67,9 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   Usado pelo `EpubReader` (id = CFI atual).
 - **`useHighlights.ts` → `useHighlights(bookId?)`** — grifos (RF22, EPUB) como estado
   reativo sobre `reader-highlights` (localStorage + envio ao back-end). Retorna
-  `{ highlights, add, remove, setColor }`; usado pelo `EpubReader` para criar, remover
-  e **recolorir** grifos e alimentar o painel lateral. `id = cfiRange`.
+  `{ highlights, add, remove, setColor, setNote }`; usado pelo `EpubReader` para criar,
+  remover, **recolorir** e **anotar** (RF23) grifos e alimentar o painel lateral.
+  `id = cfiRange`.
 - **`useReadingSession.ts` → `useReadingSession(bookId?)`** — tempo de tela ativa da
   sessão de leitura (RF20). Mede por timestamps (não por contador que atrasa em aba
   inativa); **só avança com a aba visível e a janela focada** (`visibilitychange`,

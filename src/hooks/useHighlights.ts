@@ -7,6 +7,8 @@ import {
 	saveHighlight,
 	sendHighlight,
 	updateHighlightColor,
+	updateHighlightNote,
+	updateHighlightNoteRemote,
 	updateHighlightRemote,
 } from '@/utils/reader-highlights'
 
@@ -28,6 +30,11 @@ export const useHighlights = (bookId?: string) => {
 		setHighlights(updateHighlightColor(bookId, id, color))
 		updateHighlightRemote(bookId, id, color)
 	}
+	const setNote = (id: string, note: string) => {
+		if (!bookId) return
+		setHighlights(updateHighlightNote(bookId, id, note))
+		updateHighlightNoteRemote(bookId, id, note)
+	}
 
-	return { highlights, add, remove, setColor }
+	return { highlights, add, remove, setColor, setNote }
 }
