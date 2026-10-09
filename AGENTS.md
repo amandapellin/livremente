@@ -300,6 +300,20 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   (`{ seconds }`, incrementa o `read_time`). Ao implementar: `openapi.json` →
   `pnpm gen:api` → trocar o `fetch` manual pela função gerada.
 
+- **#22 (RF21) Marcar página (EPUB):** marcação manual de páginas como referência,
+  **restrita ao EPUB**. O `useEpubReader` passa a expor **`currentCfi`** (posição
+  atual, via `relocated`) e **`display(cfi)`** (ir a uma posição). No `ReaderNav`, o
+  botão "Marcar Página" vira **toggle**: adiciona/remove o CFI atual e mostra ícone
+  **contornado ⇄ cheio** ("Marcar Página" ⇄ "Página marcada", `aria-pressed`) —
+  indicação visual de "página já marcada". Ao lado, um **`BookmarksMenu`** lista os
+  marcadores (rótulo = capítulo ou `N% lido`), com ir (`display`) e remover.
+  Persistência por obra em `localStorage` (`reader:bookmarks:<id>`, lista de
+  `Bookmark { id=cfi, label, cfi, createdAt }`) via **`utils/reader-bookmarks.ts`** +
+  hook **`useBookmarks`** (`{ bookmarks, add, remove, has }`). **PDF não tem marcação**
+  — o visualizador nativo é caixa-preta e não expõe a página atual (decisão de
+  produto; reavaliar PDF.js se um dia for necessário). Cross-device depois via o
+  endpoint de progresso (poderia carregar `bookmarks[]`), com o cache como *fallback*.
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 

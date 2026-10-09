@@ -24,6 +24,18 @@ Chaves: `reader:theme`, `reader:resume-auto`, `reader:save-dictionary`,
   percentual lido por obra (RF19), inteiro 0–100. Hidrata o indicador do leitor sem
   flash de 0% e serve de *fallback* até o endpoint de progresso do back-end existir.
 
+## `reader-bookmarks.ts` — páginas marcadas (RF21, EPUB)
+
+Persistência **por obra** dos marcadores de página em `localStorage` (chave
+`reader:bookmarks:<bookId>`, lista de `Bookmark` serializada como JSON). O `Bookmark`
+(`types/reader-types.ts`) guarda `id` (= CFI, único por página), `label` e `createdAt`.
+Restrito a EPUB (o viewer nativo de PDF não expõe a página atual). Ver `useBookmarks`
+(estado reativo) e `BookmarksMenu` (UI).
+
+- **`getBookmarks(bookId)`** — lista salva (sempre um array; tolera JSON inválido).
+- **`addBookmark(bookId, bookmark)`** — adiciona se o `id` ainda não existe.
+- **`removeBookmark(bookId, id)`** — remove pelo `id`.
+
 ## `reading-session.ts` — tempo de leitura da sessão (RF20)
 
 Acumula o **tempo de tela ativa** por obra e envia ao back-end. O envio fica atrás

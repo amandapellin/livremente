@@ -18,7 +18,8 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
   busca e impressão vêm prontos). Mantém só a topbar da marca.
 - **`pdf-topbar/` → `PdfTopbar`** — topbar enxuta do PDF: voltar, título/subtítulo,
   `SessionTimer` e link externo para a fonte. Controles de página/zoom ficam no
-  visualizador nativo. `squareSx` estiliza o botão quadrado de voltar.
+  visualizador nativo. `squareSx` estiliza o botão quadrado de voltar. (Sem marcação
+  de página — o viewer nativo não expõe a página atual; RF21 é só EPUB.)
 
 ## Casca do leitor de EPUB
 
@@ -28,14 +29,18 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
   "Grifos e Anotações" e o timer, e `ReaderSettings` fica só-ícone.
 - **`reader-view/` → `ReaderView`** — área de renderização (o `containerRef` recebe
   a *rendition* do epub.js) + estados de carregando/erro.
-- **`reader-nav/` → `ReaderNav`** — rodapé: "Anterior"/"Próxima" e "Marcar Página"
-  (em breve).
+- **`reader-nav/` → `ReaderNav`** — rodapé: "Anterior"/"Próxima" e a marcação de
+  página (RF21) — botão **toggle** ("Marcar Página" ⇄ "Página marcada", ícone
+  contornado/cheio conforme `marked`) + `BookmarksMenu` para revisitar/remover.
 - **`buttons/` → `ReaderButton`** — botão compacto compartilhado do leitor, com
   `tone` `'surface'` (contornado) ou `'gold'` (destaque). `BASE_SX` define o
   tamanho/tipografia compactos padrão (o padding pode ser sobrescrito por `sx`).
 - **`session-timer/` → `SessionTimer`** — indicador compacto (ícone de relógio +
   rótulo) do tempo da sessão de leitura (RF20), usado por ambas as topbars; recebe
   `label` (de `useReadingSession`) e `color`/`sx` para casar com o tema de cada leitor.
+- **`bookmarks-menu/` → `BookmarksMenu`** — menu das páginas marcadas (RF21): lista os
+  `Bookmark` (rótulo), com ação de ir (`onSelect`) e remover (`onRemove`); usado pelo
+  EPUB (`ReaderNav`).
 
 ## Modal de configurações (`reader-settings/`)
 

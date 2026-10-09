@@ -19,3 +19,10 @@ export interface ReaderOption<T> {
 export interface ReaderIconOption<T> extends ReaderOption<T> {
 	Icon: SvgIconComponent
 }
+
+export interface Bookmark {
+	id: string
+	label: string
+	cfi: string
+	createdAt: number
+}

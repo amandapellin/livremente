@@ -49,6 +49,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 	const containerRef = useRef<HTMLDivElement | null>(null)
 	const renditionRef = useRef<Rendition | null>(null)
 	const [chapter, setChapter] = useState('')
+	const [currentCfi, setCurrentCfi] = useState('')
 	const [progress, setProgress] = useState(() => (bookId ? getStoredPercentage(bookId) ?? 0 : 0))
 	const [isLoading, setIsLoading] = useState(true)
 	const [isError, setIsError] = useState(false)
@@ -126,6 +127,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 
 		rendition.on('relocated', (location: RelocatedLocation) => {
 			if (bookId) setStoredPosition(bookId, location.start.cfi)
+			setCurrentCfi(location.start.cfi)
 			updateProgress(location.start.cfi)
 			const item = findTocItem(book.navigation?.toc ?? [], location.start.href)
 			if (item?.label) setChapter(item.label.trim())
@@ -180,6 +182,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 	return {
 		containerRef,
 		chapter,
+		currentCfi,
 		progress,
 		isLoading,
 		isError,
@@ -187,6 +190,9 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		setTheme,
 		next: () => renditionRef.current?.next(),
 		prev: () => renditionRef.current?.prev(),
+		display: (cfi: string) => {
+			renditionRef.current?.display(cfi)
+		},
 		fontScale,
 		setFontScale,
 		lineHeight,
