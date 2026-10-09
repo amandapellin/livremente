@@ -314,6 +314,29 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   produto; reavaliar PDF.js se um dia for necessário). Cross-device depois via o
   endpoint de progresso (poderia carregar `bookmarks[]`), com o cache como *fallback*.
 
+- **#23 (RF22) Grifo por seleção de texto (EPUB):** grifar trechos durante a leitura,
+  **só EPUB** (RN07 — o `PdfReader` segue inalterado, sem seleção interceptável). O
+  `useEpubReader` passa a ouvir **`rendition.on('selected')`** → expõe `selection`
+  (`{ cfiRange, text, top, left }`, âncora do toolbar flutuante **"Grifar"**) e
+  **`markClicked`** → `activeMark` (toolbar **"Remover grifo"**); `addHighlight`/
+  `removeHighlight` desenham/apagam o overlay via **`rendition.annotations`** (cor
+  única **gold `HIGHLIGHT_FILL` = `colors.gold[300]`**, `fill-opacity .45` +
+  `mix-blend-mode: multiply`). `anchorFrom` traduz o range do iframe para coordenadas
+  da viewport (soma o rect do `frameElement`). Os grifos salvos são **reaplicados ao
+  abrir** (uma vez, após `isLoading`). **Painel lateral `HighlightsPanel`** (RF22,
+  alinhado ao Figma): aberto/fechado pelo botão **"Grifos e Anotações"** da topbar
+  (vira toggle, gold quando aberto), lista os grifos (overline do capítulo + trecho
+  com borda gold), com ir (`display`) e remover; segue a cor do tema. Persistência por
+  obra em `localStorage` (`reader:highlights:<id>`, lista de `Highlight { id=cfiRange,
+  text, chapter, createdAt }`) via **`utils/reader-highlights.ts`** + hook
+  **`useHighlights`**; envio ao back-end *best-effort* atrás do flag
+  `USE_HIGHLIGHTS_API` (hoje `false`). **Contrato proposto pelo front:**
+  `POST`/`DELETE /api/users/me/reading-progress/{id}/highlights`. **Correção de
+  layout:** `ReaderView` ganhou `minWidth: 0` para encolher ao lado do painel (flex
+  item não encolhe abaixo do conteúdo do iframe sem isso). **Fora de escopo:** as abas
+  Todos/Grifos/Anotações do Figma (anotações/dicionário) — issues próprias, reusando
+  `useHighlights`.
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 

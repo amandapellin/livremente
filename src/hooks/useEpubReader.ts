@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import ePub, { type Book, type NavItem, type Rendition } from 'epubjs'
-import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/types/reader-types'
-import { FONT_FAMILIES, FONT_SIZE, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
+import ePub, { type Book, type Contents, type NavItem, type Rendition } from 'epubjs'
+import type { HighlightColor, ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/types/reader-types'
+import { FONT_FAMILIES, FONT_SIZE, highlightFill, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
 import {
 	getResumeAuto,
 	getStoredPercentage,
@@ -13,6 +13,16 @@ import {
 } from '@/utils/reader-preferences'
 
 type RelocatedLocation = { start: { cfi: string; href: string } }
+
+export type SelectionAnchor = { cfiRange: string; text: string; top: number; left: number }
+export type MarkAnchor = { cfiRange: string; top: number; left: number }
+
+const anchorFrom = (range: Range, contents: Contents): { top: number; left: number } => {
+	const r = range.getBoundingClientRect()
+	const frame = contents.document.defaultView?.frameElement as HTMLElement | null
+	const f = frame?.getBoundingClientRect()
+	return { top: (f?.top ?? 0) + r.top, left: (f?.left ?? 0) + r.left + r.width / 2 }
+}
 
 const findTocItem = (toc: NavItem[], href: string): NavItem | undefined => {
 	for (const item of toc) {
@@ -50,6 +60,8 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 	const renditionRef = useRef<Rendition | null>(null)
 	const [chapter, setChapter] = useState('')
 	const [currentCfi, setCurrentCfi] = useState('')
+	const [selection, setSelection] = useState<SelectionAnchor | null>(null)
+	const [activeMark, setActiveMark] = useState<MarkAnchor | null>(null)
 	const [progress, setProgress] = useState(() => (bookId ? getStoredPercentage(bookId) ?? 0 : 0))
 	const [isLoading, setIsLoading] = useState(true)
 	const [isError, setIsError] = useState(false)
@@ -129,8 +141,25 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			if (bookId) setStoredPosition(bookId, location.start.cfi)
 			setCurrentCfi(location.start.cfi)
 			updateProgress(location.start.cfi)
+			setSelection(null)
+			setActiveMark(null)
 			const item = findTocItem(book.navigation?.toc ?? [], location.start.href)
 			if (item?.label) setChapter(item.label.trim())
+		})
+
+		rendition.on('selected', (cfiRange: string, contents: Contents) => {
+			const sel = contents.window.getSelection()
+			const text = sel?.toString().trim() ?? ''
+			if (!text || !sel || sel.rangeCount === 0) return
+			setSelection({ cfiRange, text, ...anchorFrom(sel.getRangeAt(0), contents) })
+			setActiveMark(null)
+		})
+
+		rendition.on('markClicked', (cfiRange: string, _data: unknown, contents: Contents) => {
+			const range = rendition.getRange(cfiRange)
+			if (!range) return
+			setActiveMark({ cfiRange, ...anchorFrom(range, contents) })
+			setSelection(null)
 		})
 
 		const onKey = (e: KeyboardEvent) => {
@@ -179,6 +208,18 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		setStoredTheme(next)
 	}
 
+	const addHighlight = (cfiRange: string, color: HighlightColor) => {
+		renditionRef.current?.annotations.add('highlight', cfiRange, {}, undefined, 'epub-highlight', {
+			fill: highlightFill(color),
+			'fill-opacity': '0.45',
+			'mix-blend-mode': 'multiply',
+		})
+	}
+
+	const removeHighlight = (cfiRange: string) => {
+		renditionRef.current?.annotations.remove(cfiRange, 'highlight')
+	}
+
 	return {
 		containerRef,
 		chapter,
@@ -188,6 +229,12 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		isError,
 		theme,
 		setTheme,
+		selection,
+		clearSelection: () => setSelection(null),
+		activeMark,
+		clearActiveMark: () => setActiveMark(null),
+		addHighlight,
+		removeHighlight,
 		next: () => renditionRef.current?.next(),
 		prev: () => renditionRef.current?.prev(),
 		display: (cfi: string) => {

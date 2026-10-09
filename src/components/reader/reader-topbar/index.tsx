@@ -28,6 +28,8 @@ interface Props {
 	onFontFamilyChange: (value: ReaderFont) => void
 	onTextAlignChange: (value: ReaderAlign) => void
 	onPageTypeChange: (value: ReaderPageType) => void
+	highlightsOpen: boolean
+	onToggleHighlights: () => void
 }
 
 export default function ReaderTopbar({
@@ -49,6 +51,8 @@ export default function ReaderTopbar({
 	onFontFamilyChange,
 	onTextAlignChange,
 	onPageTypeChange,
+	highlightsOpen,
+	onToggleHighlights,
 }: Props) {
 	return (
 		<Stack
@@ -110,8 +114,10 @@ export default function ReaderTopbar({
 
 			<ReaderButton
 				borderColor={surface.border}
+				tone={highlightsOpen ? 'gold' : 'surface'}
 				startIcon={<EditNoteIcon />}
-				title="Em breve"
+				onClick={onToggleHighlights}
+				aria-pressed={highlightsOpen}
 				sx={{ display: { xs: 'none', md: 'inline-flex' } }}
 			>
 				Grifos e Anotações

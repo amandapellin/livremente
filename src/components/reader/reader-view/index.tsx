@@ -9,7 +9,7 @@ interface Props {
 
 export default function ReaderView({ containerRef, isLoading, isError }: Props) {
 	return (
-		<Box sx={{ position: 'relative', flex: 1, minHeight: 0, width: '100%' }}>
+		<Box sx={{ position: 'relative', flex: 1, minWidth: 0, minHeight: 0 }}>
 			<Box ref={containerRef} sx={{ height: '100%', width: '100%' }} />
 			{isLoading && (
 				<Box sx={{ position: 'absolute', inset: 0, display: 'grid', placeItems: 'center' }}>
