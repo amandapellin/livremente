@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import ePub, { type Book, type Contents, type NavItem, type Rendition } from 'epubjs'
-import type { ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/types/reader-types'
-import { FONT_FAMILIES, FONT_SIZE, HIGHLIGHT_FILL, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
+import type { HighlightColor, ReaderAlign, ReaderFont, ReaderPageType, ReaderTheme } from '@/types/reader-types'
+import { FONT_FAMILIES, FONT_SIZE, highlightFill, LINE_SPACING, readerThemeColors } from '@/constants/reader-const'
 import {
 	getResumeAuto,
 	getStoredPercentage,
@@ -208,9 +208,9 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		setStoredTheme(next)
 	}
 
-	const addHighlight = (cfiRange: string) => {
+	const addHighlight = (cfiRange: string, color: HighlightColor) => {
 		renditionRef.current?.annotations.add('highlight', cfiRange, {}, undefined, 'epub-highlight', {
-			fill: HIGHLIGHT_FILL,
+			fill: highlightFill(color),
 			'fill-opacity': '0.45',
 			'mix-blend-mode': 'multiply',
 		})

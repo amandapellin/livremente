@@ -67,8 +67,8 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   Usado pelo `EpubReader` (id = CFI atual).
 - **`useHighlights.ts` → `useHighlights(bookId?)`** — grifos (RF22, EPUB) como estado
   reativo sobre `reader-highlights` (localStorage + envio ao back-end). Retorna
-  `{ highlights, add, remove }`; usado pelo `EpubReader` para criar/remover grifos e
-  alimentar o painel lateral. `id = cfiRange`.
+  `{ highlights, add, remove, setColor }`; usado pelo `EpubReader` para criar, remover
+  e **recolorir** grifos e alimentar o painel lateral. `id = cfiRange`.
 - **`useReadingSession.ts` → `useReadingSession(bookId?)`** — tempo de tela ativa da
   sessão de leitura (RF20). Mede por timestamps (não por contador que atrasa em aba
   inativa); **só avança com a aba visível e a janela focada** (`visibilitychange`,
@@ -88,7 +88,10 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   (ir a uma posição), usados pela marcação de página (RF21). **Grifos** (RF22): no
   evento `selected` expõe `selection` (`{ cfiRange, text, top, left }`, âncora do
   toolbar "Grifar"); no `markClicked`, `activeMark` (toolbar "Remover grifo");
-  `addHighlight`/`removeHighlight` desenham/apagam o overlay via
-  `rendition.annotations` (gold `HIGHLIGHT_FILL`). `anchorFrom` converte o range do
-  iframe para coordenadas da viewport. Helpers de módulo: `findTocItem`,
+  `addHighlight(cfiRange, color)`/`removeHighlight` desenham/apagam o overlay via
+  `rendition.annotations` (cor da paleta `HIGHLIGHT_COLORS`; recolorir = remove+add).
+  `anchorFrom` converte o range do iframe para coordenadas da viewport. (O overlay é
+  desenhado no documento TOP com `pointer-events:none`; o `EpubReader` reabilita o
+  clique na classe `.epub-highlight` via `GlobalStyles` para o `markClicked` disparar.)
+  Helpers de módulo: `findTocItem`,
   `applyTypography`, `applyPageType`, `applyTheme`.

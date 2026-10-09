@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Box } from '@mui/material'
-import BorderColorOutlinedIcon from '@mui/icons-material/BorderColorOutlined'
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
+import { Box, GlobalStyles } from '@mui/material'
 import type { PublicationDetails } from '@/api/generated/model'
-import type { ReaderTheme } from '@/types/reader-types'
+import type { HighlightColor, ReaderTheme } from '@/types/reader-types'
 import { useEpubReader } from '@/hooks/useEpubReader'
 import { useReaderPreferences } from '@/hooks/useReaderPreferences'
 import { useReadingSession } from '@/hooks/useReadingSession'
 import { useBookmarks } from '@/hooks/useBookmarks'
 import { useHighlights } from '@/hooks/useHighlights'
-import { readerThemeColors } from '@/constants/reader-const'
+import { DEFAULT_HIGHLIGHT, readerThemeColors } from '@/constants/reader-const'
 import ReaderTopbar from '@/components/reader/reader-topbar'
 import ReaderView from '@/components/reader/reader-view'
 import ReaderNav from '@/components/reader/reader-nav'
@@ -39,9 +37,11 @@ export default function EpubReader({ data }: Props) {
 	useEffect(() => {
 		if (reader.isLoading || appliedRef.current) return
 		appliedRef.current = true
-		highlights.highlights.forEach((h) => reader.addHighlight(h.cfiRange))
+		highlights.highlights.forEach((h) => reader.addHighlight(h.cfiRange, h.color ?? DEFAULT_HIGHLIGHT))
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [reader.isLoading])
+
+	const activeHighlight = highlights.highlights.find((h) => h.cfiRange === reader.activeMark?.cfiRange)
 
 	const changeTheme = (value: ReaderTheme) => {
 		reader.setTheme(value)
@@ -60,18 +60,28 @@ export default function EpubReader({ data }: Props) {
 			})
 	}
 
-	const createHighlight = () => {
+	const createHighlight = (color: HighlightColor) => {
 		const sel = reader.selection
 		if (!sel) return
-		reader.addHighlight(sel.cfiRange)
+		reader.addHighlight(sel.cfiRange, color)
 		highlights.add({
 			id: sel.cfiRange,
 			cfiRange: sel.cfiRange,
 			text: sel.text,
 			chapter: reader.chapter,
+			color,
 			createdAt: Date.now(),
 		})
 		reader.clearSelection()
+	}
+
+	const recolorActive = (color: HighlightColor) => {
+		const mark = reader.activeMark
+		if (!mark) return
+		reader.removeHighlight(mark.cfiRange)
+		reader.addHighlight(mark.cfiRange, color)
+		highlights.setColor(mark.cfiRange, color)
+		reader.clearActiveMark()
 	}
 
 	const removeActive = () => {
@@ -84,6 +94,7 @@ export default function EpubReader({ data }: Props) {
 
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, bgcolor: surface.background, transition: 'background-color .15s' }}>
+			<GlobalStyles styles={{ '.epub-highlight': { pointerEvents: 'fill', cursor: 'pointer' } }} />
 			<ReaderTopbar
 				backTo={`/obra/${data.id}`}
 				title={data.title}
@@ -136,9 +147,7 @@ export default function EpubReader({ data }: Props) {
 				<HighlightToolbar
 					top={reader.selection.top}
 					left={reader.selection.left}
-					label="Grifar"
-					icon={<BorderColorOutlinedIcon fontSize="small" />}
-					onAction={createHighlight}
+					onPick={createHighlight}
 					onClose={reader.clearSelection}
 				/>
 			)}
@@ -146,9 +155,9 @@ export default function EpubReader({ data }: Props) {
 				<HighlightToolbar
 					top={reader.activeMark.top}
 					left={reader.activeMark.left}
-					label="Remover grifo"
-					icon={<DeleteOutlineIcon fontSize="small" />}
-					onAction={removeActive}
+					activeColor={activeHighlight?.color}
+					onPick={recolorActive}
+					onRemove={removeActive}
 					onClose={reader.clearActiveMark}
 				/>
 			)}

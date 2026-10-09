@@ -17,5 +17,6 @@ Configurações e pela seção "Leitor e interface" do perfil.
   opção com ícone (alinhamento, tipo de página).
 - **`Bookmark`** — `{ id, label, cfi, createdAt }`: marcador de página do EPUB (RF21;
   `id = cfi`). Ver `reader-bookmarks`/`useBookmarks`.
-- **`Highlight`** — `{ id, cfiRange, text, chapter, createdAt }`: grifo do EPUB (RF22;
-  `id = cfiRange` do epub.js). Ver `reader-highlights`/`useHighlights`.
+- **`HighlightColor`** — `'amarelo' | 'verde' | 'azul' | 'rosa'` (cor do grifo).
+- **`Highlight`** — `{ id, cfiRange, text, chapter, color, createdAt }`: grifo do EPUB
+  (RF22; `id = cfiRange` do epub.js). Ver `reader-highlights`/`useHighlights`.

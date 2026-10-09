@@ -2,6 +2,7 @@ import { Box, IconButton, Stack, Typography } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
 import { colors } from '@/theme/tokens'
+import { highlightFill } from '@/constants/reader-const'
 import type { Highlight, ReaderSurface } from '@/types/reader-types'
 
 interface Props {
@@ -68,7 +69,7 @@ export default function HighlightsPanel({ highlights, surface, onSelect, onRemov
 									bottom: 8,
 									width: 3,
 									borderRadius: 999,
-									bgcolor: colors.gold[500],
+									bgcolor: highlightFill(h.color),
 								},
 							}}
 						>

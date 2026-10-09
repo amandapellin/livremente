@@ -1,16 +1,19 @@
-import type { ReactNode } from 'react'
-import { Button, ClickAwayListener, Paper } from '@mui/material'
+import { Box, ClickAwayListener, Divider, IconButton, Paper, Stack } from '@mui/material'
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
+import { HIGHLIGHT_COLORS } from '@/constants/reader-const'
+import { colors } from '@/theme/tokens'
+import type { HighlightColor } from '@/types/reader-types'
 
 interface Props {
 	top: number
 	left: number
-	label: string
-	icon: ReactNode
-	onAction: () => void
+	onPick: (color: HighlightColor) => void
 	onClose: () => void
+	activeColor?: HighlightColor
+	onRemove?: () => void
 }
 
-export default function HighlightToolbar({ top, left, label, icon, onAction, onClose }: Props) {
+export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, onRemove }: Props) {
 	return (
 		<ClickAwayListener onClickAway={onClose}>
 			<Paper
@@ -25,9 +28,31 @@ export default function HighlightToolbar({ top, left, label, icon, onAction, onC
 					borderRadius: 2,
 				}}
 			>
-				<Button size="small" color="inherit" startIcon={icon} onClick={onAction} sx={{ px: 1.5 }}>
-					{label}
-				</Button>
+				<Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
+					{HIGHLIGHT_COLORS.map((c) => (
+						<IconButton key={c.value} size="small" aria-label={`Grifar em ${c.label}`} onClick={() => onPick(c.value)}>
+							<Box
+								sx={{
+									width: 18,
+									height: 18,
+									borderRadius: '50%',
+									bgcolor: c.fill,
+									border: '1px solid rgba(0,0,0,0.2)',
+									outline: activeColor === c.value ? `2px solid ${colors.gold[700]}` : 'none',
+									outlineOffset: 2,
+								}}
+							/>
+						</IconButton>
+					))}
+					{onRemove && (
+						<>
+							<Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />
+							<IconButton size="small" aria-label="Remover grifo" onClick={onRemove}>
+								<DeleteOutlineIcon fontSize="small" />
+							</IconButton>
+						</>
+					)}
+				</Stack>
 			</Paper>
 		</ClickAwayListener>
 	)

@@ -27,10 +27,13 @@ export interface Bookmark {
 	createdAt: number
 }
 
+export type HighlightColor = 'amarelo' | 'verde' | 'azul' | 'rosa'
+
 export interface Highlight {
 	id: string
 	cfiRange: string
 	text: string
 	chapter: string
+	color: HighlightColor
 	createdAt: number
 }

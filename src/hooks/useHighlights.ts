@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import type { Highlight } from '@/types/reader-types'
+import type { Highlight, HighlightColor } from '@/types/reader-types'
 import {
 	deleteHighlight,
 	getHighlights,
 	removeHighlightRemote,
 	saveHighlight,
 	sendHighlight,
+	updateHighlightColor,
+	updateHighlightRemote,
 } from '@/utils/reader-highlights'
 
 export const useHighlights = (bookId?: string) => {
@@ -21,6 +23,11 @@ export const useHighlights = (bookId?: string) => {
 		setHighlights(deleteHighlight(bookId, id))
 		removeHighlightRemote(bookId, id)
 	}
+	const setColor = (id: string, color: HighlightColor) => {
+		if (!bookId) return
+		setHighlights(updateHighlightColor(bookId, id, color))
+		updateHighlightRemote(bookId, id, color)
+	}
 
-	return { highlights, add, remove }
+	return { highlights, add, remove, setColor }
 }

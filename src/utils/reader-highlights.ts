@@ -1,5 +1,5 @@
 import { getAuthToken } from '@/api/auth-storage'
-import type { Highlight } from '@/types/reader-types'
+import type { Highlight, HighlightColor } from '@/types/reader-types'
 
 const PREFIX = 'reader:highlights:'
 const baseURL = import.meta.env.VITE_API_URL ?? ''
@@ -33,6 +33,9 @@ export const saveHighlight = (bookId: string, highlight: Highlight): Highlight[]
 export const deleteHighlight = (bookId: string, id: string): Highlight[] =>
 	persist(bookId, getHighlights(bookId).filter((h) => h.id !== id))
 
+export const updateHighlightColor = (bookId: string, id: string, color: HighlightColor): Highlight[] =>
+	persist(bookId, getHighlights(bookId).map((h) => (h.id === id ? { ...h, color } : h)))
+
 const authHeaders = () => {
 	const headers: Record<string, string> = { 'Content-Type': 'application/json' }
 	const token = getAuthToken()
@@ -45,7 +48,16 @@ export const sendHighlight = (bookId: string, highlight: Highlight): void => {
 	fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/highlights`, {
 		method: 'POST',
 		headers: authHeaders(),
-		body: JSON.stringify({ cfiRange: highlight.cfiRange, text: highlight.text }),
+		body: JSON.stringify({ cfiRange: highlight.cfiRange, text: highlight.text, color: highlight.color }),
+	}).catch(() => undefined)
+}
+
+export const updateHighlightRemote = (bookId: string, id: string, color: HighlightColor): void => {
+	if (!USE_HIGHLIGHTS_API) return
+	fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/highlights/${encodeURIComponent(id)}`, {
+		method: 'PATCH',
+		headers: authHeaders(),
+		body: JSON.stringify({ color }),
 	}).catch(() => undefined)
 }
 

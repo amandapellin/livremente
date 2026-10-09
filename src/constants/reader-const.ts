@@ -13,10 +13,21 @@ import type {
 	ReaderPageType,
 	ReaderSurface,
 	ReaderTheme,
+	HighlightColor,
 } from "@/types/reader-types"
 import { colors } from '@/theme/tokens'
 
-export const HIGHLIGHT_FILL = colors.gold[300]
+export const HIGHLIGHT_COLORS: { value: HighlightColor; label: string; fill: string }[] = [
+	{ value: 'amarelo', label: 'Amarelo', fill: colors.gold[300] },
+	{ value: 'verde', label: 'Verde', fill: '#A5D6A7' },
+	{ value: 'azul', label: 'Azul', fill: '#90CAF9' },
+	{ value: 'rosa', label: 'Rosa', fill: '#F48FB1' },
+]
+
+export const DEFAULT_HIGHLIGHT: HighlightColor = 'amarelo'
+
+export const highlightFill = (color: HighlightColor) =>
+	HIGHLIGHT_COLORS.find((c) => c.value === color)?.fill ?? HIGHLIGHT_COLORS[0].fill
 
 export const readerThemeColors: Record<ReaderTheme, ReaderSurface> = {
     light: { background: '#fafafb', text: '#171a22', border: 'rgba(23, 26, 34, 0.12)' },

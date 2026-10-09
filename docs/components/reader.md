@@ -32,12 +32,13 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
   a *rendition* do epub.js) + estados de carregando/erro. `minWidth: 0` para encolher
   ao lado do painel de grifos (flex item não encolhe abaixo do conteúdo sem isso).
 - **`highlight-toolbar/` → `HighlightToolbar`** — toolbar flutuante (RF22) ancorada na
-  seleção/no grifo clicado: ação única ("Grifar" ou "Remover grifo"), fecha no
-  `ClickAway`. Posição `fixed` a partir das coordenadas de `useEpubReader`.
+  seleção/no grifo clicado: **paleta de cores** (`HIGHLIGHT_COLORS`) para grifar; no
+  grifo existente destaca a `activeColor` (recolorir) e mostra a lixeira (`onRemove`).
+  Fecha no `ClickAway`; posição `fixed` a partir das coordenadas de `useEpubReader`.
 - **`highlights-panel/` → `HighlightsPanel`** — painel lateral (RF22) aberto pelo
   botão "Grifos e Anotações": lista os grifos (overline do capítulo + trecho com borda
-  gold), com ir (`display`) e remover; segue a cor do tema (`surface`); estado vazio
-  quando não há grifos.
+  **na cor do grifo**, `highlightFill`), com ir (`display`) e remover; segue a cor do
+  tema (`surface`); estado vazio quando não há grifos.
 - **`reader-nav/` → `ReaderNav`** — rodapé: "Anterior"/"Próxima" e a marcação de
   página (RF21) — botão **toggle** ("Marcar Página" ⇄ "Página marcada", ícone
   contornado/cheio conforme `marked`) + `BookmarksMenu` para revisitar/remover.
