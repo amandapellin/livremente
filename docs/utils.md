@@ -53,6 +53,17 @@ back-end atrás do flag `USE_HIGHLIGHTS_API` (hoje `false`). Ver `useHighlights`
   — `PATCH .../highlights/{cfiRange}` (`{ color }` ou `{ note }`).
 - **`removeHighlightRemote(bookId, id)`** — `DELETE .../highlights/{cfiRange}`.
 
+## `reader-progress.ts` — sincronização da posição ao back-end (RF17)
+
+- **`sendReadingProgress(bookId, cfi, percent)`** — envia a última posição lida ao
+  contrato proposto `PUT /api/users/me/reading-progress/{id}` (`{ cfi, percent }`).
+  *Best-effort* e com `keepalive: true` (sobrevive ao fechamento da aba — flush em
+  `pagehide`); por isso usa `fetch` + token manual. Atrás do flag
+  `USE_READING_PROGRESS_API` (hoje `false`, no-op). O `useEpubReader` chama com
+  **debounce** (4s) a cada `relocated` e faz **flush ao sair da tela**. Só EPUB (PDF
+  não passa pelo hook). O `localStorage` (`reader:position:<id>`) segue como fonte
+  local/fallback (RF18).
+
 ## `reading-session.ts` — tempo de leitura da sessão (RF20)
 
 Acumula o **tempo de tela ativa** por obra e envia ao back-end. O envio fica atrás
