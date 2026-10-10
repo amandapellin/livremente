@@ -358,6 +358,17 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   sempre ancora num grifo; editor em diálogo. **Fora de escopo:** dicionário (issue
   própria).
 
+- **#25 (RF24) Exibição de grifos/anotações salvos (EPUB):** incremento **enxuto** —
+  grande parte já vinha pronta. (1) **Grifos destacados ao reabrir**: já feito no #23
+  (o `EpubReader` reaplica todos os grifos salvos após o load). (2) **Anotações
+  acessíveis a partir do trecho marcado**: ao clicar num trecho **com nota**, o
+  `HighlightToolbar` passa a exibir o **texto da nota** (leitura) acima das ações, e o
+  lápis vira "Editar anotação" (nova prop `note`, passada via `activeHighlight?.note`).
+  **Alinhado ao Figma (node 176):** o trecho anotado **não** ganha marcador próprio no
+  texto — o grifo é o marcador clicável e o review acontece no painel lateral (abas do
+  #24). O clique depende do `pointer-events: fill` em `.epub-highlight` (do #23). **PDF
+  não tem** (RN07).
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 

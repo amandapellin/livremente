@@ -31,11 +31,12 @@ ciclo de vida do EPUB fica em `useEpubReader`; o tema/preferências em
 - **`reader-view/` → `ReaderView`** — área de renderização (o `containerRef` recebe
   a *rendition* do epub.js) + estados de carregando/erro. `minWidth: 0` para encolher
   ao lado do painel de grifos (flex item não encolhe abaixo do conteúdo sem isso).
-- **`highlight-toolbar/` → `HighlightToolbar`** — toolbar flutuante (RF22/RF23) ancorada
-  na seleção/no grifo clicado: **paleta de cores** (`HIGHLIGHT_COLORS`) para grifar +
-  ação **"Anotar"** (`onAnnotate`); no grifo existente destaca a `activeColor`
-  (recolorir) e mostra a lixeira (`onRemove`). Fecha no `ClickAway`; posição `fixed` a
-  partir das coordenadas de `useEpubReader`.
+- **`highlight-toolbar/` → `HighlightToolbar`** — toolbar flutuante (RF22/RF23/RF24)
+  ancorada na seleção/no grifo clicado: **paleta de cores** (`HIGHLIGHT_COLORS`) para
+  grifar + ação **"Anotar"** (`onAnnotate`); no grifo existente destaca a `activeColor`
+  (recolorir) e mostra a lixeira (`onRemove`). **Quando o trecho tem nota** (RF24),
+  exibe o **texto da nota** (leitura) acima das ações e o lápis vira "Editar anotação".
+  Fecha no `ClickAway`; posição `fixed` a partir das coordenadas de `useEpubReader`.
 - **`note-dialog/` → `NoteDialog`** — editor da anotação (RF23): `TextField` multiline
   com Salvar/Cancelar. Remontado por `key` (o `EpubReader` o keya pelo `cfiRange`-alvo)
   para o valor inicial refletir a nota atual.
