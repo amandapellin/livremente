@@ -186,6 +186,7 @@ export default function EpubReader({ data }: Props) {
 					top={reader.activeMark.top}
 					left={reader.activeMark.left}
 					activeColor={activeHighlight?.color}
+					note={activeHighlight?.note}
 					onPick={recolorActive}
 					onAnnotate={annotateActive}
 					onRemove={removeActive}

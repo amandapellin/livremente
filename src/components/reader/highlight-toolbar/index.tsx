@@ -1,4 +1,4 @@
-import { Box, ClickAwayListener, Divider, IconButton, Paper, Stack } from '@mui/material'
+import { Box, ClickAwayListener, Divider, IconButton, Paper, Stack, Typography } from '@mui/material'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
 import EditNoteIcon from '@mui/icons-material/EditNote'
 import { HIGHLIGHT_COLORS } from '@/constants/reader-const'
@@ -11,11 +11,12 @@ interface Props {
 	onPick: (color: HighlightColor) => void
 	onClose: () => void
 	activeColor?: HighlightColor
+	note?: string
 	onAnnotate?: () => void
 	onRemove?: () => void
 }
 
-export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, onAnnotate, onRemove }: Props) {
+export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, note, onAnnotate, onRemove }: Props) {
 	return (
 		<ClickAwayListener onClickAway={onClose}>
 			<Paper
@@ -30,6 +31,22 @@ export default function HighlightToolbar({ top, left, onPick, onClose, activeCol
 					borderRadius: 2,
 				}}
 			>
+				{note && (
+					<Typography
+						variant="body2"
+						sx={{
+							px: 1,
+							pt: 0.75,
+							pb: 1,
+							maxWidth: 280,
+							whiteSpace: 'pre-wrap',
+							borderBottom: (t) => `1px solid ${t.palette.divider}`,
+							mb: 0.5,
+						}}
+					>
+						{note}
+					</Typography>
+				)}
 				<Stack direction="row" sx={{ alignItems: 'center', gap: 0.25 }}>
 					{HIGHLIGHT_COLORS.map((c) => (
 						<IconButton key={c.value} size="small" aria-label={`Grifar em ${c.label}`} onClick={() => onPick(c.value)}>
@@ -48,7 +65,7 @@ export default function HighlightToolbar({ top, left, onPick, onClose, activeCol
 					))}
 					{(onAnnotate || onRemove) && <Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />}
 					{onAnnotate && (
-						<IconButton size="small" aria-label="Anotar" onClick={onAnnotate}>
+						<IconButton size="small" aria-label={note ? 'Editar anotação' : 'Anotar'} onClick={onAnnotate}>
 							<EditNoteIcon fontSize="small" />
 						</IconButton>
 					)}
