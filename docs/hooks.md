@@ -82,7 +82,10 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
   alinhamento, tipo de página) e **tema** (RF26, `applyTheme` — `override` em vez de
   `themes.select`, que não reverte de forma confiável). **Retomada** (RF18): salva a
   posição como CFI (`setStoredPosition`) e retoma no `display(cfi)` quando `resumeAuto`
-  está ligado, com fallback para o início. **Percentual** (RF19): `updateProgress`
+  está ligado, com fallback para o início. **Salvamento da posição** (RF17): a cada
+  `relocated` grava o CFI no `localStorage` e **envia ao back-end com debounce (4s)**
+  via `sendReadingProgress`, com **flush ao sair da tela** (`pagehide`/desmontar,
+  `keepalive`); só EPUB. **Percentual** (RF19): `updateProgress`
   calcula via `book.locations.percentageFromCfi` no `relocated` **e** assim que as
   *locations* são geradas (evita 0% travado no load), persistindo em
   `setStoredPercentage`. Expõe também `currentCfi` (posição atual) e `display(cfi)`

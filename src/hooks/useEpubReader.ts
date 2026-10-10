@@ -11,6 +11,9 @@ import {
 	setStoredPosition,
 	setStoredTheme,
 } from '@/utils/reader-preferences'
+import { sendReadingProgress } from '@/utils/reader-progress'
+
+const PROGRESS_SYNC_MS = 4000
 
 type RelocatedLocation = { start: { cfi: string; href: string } }
 
@@ -106,11 +109,27 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			}
 		})
 
+		let latestCfi = ''
+		let latestPct = 0
+		let syncTimer: number | undefined
+
+		const scheduleSync = () => {
+			if (!bookId) return
+			window.clearTimeout(syncTimer)
+			syncTimer = window.setTimeout(() => sendReadingProgress(bookId, latestCfi, latestPct), PROGRESS_SYNC_MS)
+		}
+		const flushSync = () => {
+			if (!bookId || !latestCfi) return
+			window.clearTimeout(syncTimer)
+			sendReadingProgress(bookId, latestCfi, latestPct)
+		}
+
 		const updateProgress = (cfi: string) => {
 			try {
 				const pct = book.locations.percentageFromCfi(cfi)
 				if (typeof pct === 'number' && !Number.isNaN(pct)) {
 					const rounded = Math.round(pct * 100)
+					latestPct = rounded
 					setProgress(rounded)
 					if (bookId) setStoredPercentage(bookId, rounded)
 				}
@@ -141,6 +160,8 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			if (bookId) setStoredPosition(bookId, location.start.cfi)
 			setCurrentCfi(location.start.cfi)
 			updateProgress(location.start.cfi)
+			latestCfi = location.start.cfi
+			scheduleSync()
 			setSelection(null)
 			setActiveMark(null)
 			const item = findTocItem(book.navigation?.toc ?? [], location.start.href)
@@ -168,9 +189,12 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		}
 		document.addEventListener('keydown', onKey)
 		rendition.on('keyup', onKey)
+		window.addEventListener('pagehide', flushSync)
 
 		return () => {
 			document.removeEventListener('keydown', onKey)
+			window.removeEventListener('pagehide', flushSync)
+			flushSync()
 			resizeObserver.disconnect()
 			rendition.destroy()
 			book.destroy()

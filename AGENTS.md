@@ -369,6 +369,21 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   #24). O clique depende do `pointer-events: fill` em `.epub-highlight` (do #23). **PDF
   não tem** (RN07).
 
+- **#47 (RF17) Salvamento automático da última página lida (EPUB):** a posição já era
+  gravada no `localStorage` a cada `relocated` (desde o #19); esta issue adiciona o
+  **envio ao back-end** (RN08). O `useEpubReader` passa a registrar `latestCfi`/
+  `latestPct` e, a cada `relocated`, agenda `sendReadingProgress` com **debounce de 4s**
+  (`PROGRESS_SYNC_MS`); faz **flush ao sair da tela** (`pagehide` + cleanup do efeito).
+  **`utils/reader-progress.ts`** faz o `PUT /api/users/me/reading-progress/{id}`
+  (`{ cfi, percent }`) *best-effort* com `keepalive` (sobrevive ao fechamento da aba),
+  atrás do flag **`USE_READING_PROGRESS_API`** (hoje `false`; verificado ligando o flag
+  — 3 viradas → 1 PUT, e um PUT no *flush* de saída). **Só EPUB** (o hook é exclusivo de
+  EPUB; PDF não envia). O `localStorage` (`reader:position:<id>`) segue como
+  fonte/fallback. **Base do RF18:** a retomada (#19) ainda lê do `localStorage`; quando
+  a rota existir, o `useEpubReader` pode ler o CFI do back-end no load
+  (`GET /reading-progress/{id}`) com fallback local. Ao implementar: `openapi.json` →
+  `pnpm gen:api` → trocar o `fetch` manual pela função gerada.
+
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
 
