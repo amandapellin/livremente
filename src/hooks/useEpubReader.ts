@@ -11,7 +11,7 @@ import {
 	setStoredPosition,
 	setStoredTheme,
 } from '@/utils/reader-preferences'
-import { fetchLastPage, saveLastPage } from '@/utils/reader-progress'
+import { fetchLastPage, saveLastPage, savePercentage } from '@/utils/reader-progress'
 
 const PROGRESS_SYNC_MS = 4000
 
@@ -112,9 +112,11 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		})
 
 		let latestCfi = ''
+		let latestPct = -1
 		let syncTimer: number | undefined
 
-		// RF17/RN08: salva a última página (índice de location do epub.js) no back-end.
+		// RF17/RN08 + RF19: salva a última página (índice de location) e o percentual
+		// lido no back-end.
 		const saveProgress = () => {
 			if (!bookId || !latestCfi) return
 			try {
@@ -123,6 +125,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			} catch {
 				/* locations ainda não geradas */
 			}
+			if (latestPct >= 0) savePercentage(bookId, latestPct)
 		}
 		const scheduleSync = () => {
 			if (!bookId) return
@@ -139,6 +142,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 				const pct = book.locations.percentageFromCfi(cfi)
 				if (typeof pct === 'number' && !Number.isNaN(pct)) {
 					const rounded = Math.round(pct * 100)
+					latestPct = rounded
 					setProgress(rounded)
 					if (bookId) setStoredPercentage(bookId, rounded)
 				}

@@ -23,6 +23,25 @@ export const saveLastPage = (bookId: string, lastPageRead: number): void => {
 }
 
 /**
+ * Salva o percentual lido (RF19) no back-end (0–100). Fire-and-forget, keepalive;
+ * só envia se houver sessão (endpoint autenticado).
+ */
+export const savePercentage = (bookId: string, readPercentage: number): void => {
+	const token = getAuthToken()
+	if (!token || readPercentage < 0 || readPercentage > 100) return
+	try {
+		fetch(`${baseURL}/api/reading/${bookId}/percentage`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ readPercentage }),
+			keepalive: true,
+		}).catch(() => undefined)
+	} catch {
+		/* ignora */
+	}
+}
+
+/**
  * Retomada de leitura (RF18): última página salva no back-end (cross-device),
  * ou null (nunca leu / anônimo / erro).
  */
