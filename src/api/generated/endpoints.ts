@@ -30,7 +30,7 @@ import type {
   LoginRequest,
   LoginResponse,
   LogoutRequest,
-  PublicationDetails,
+  PublicationDetailsApi,
   PublicationListPage,
   PutApiUsersMeAvatarBody,
   RefreshRequest,
@@ -1705,126 +1705,6 @@ export const usePutApiUsersMePreferences = <TError = ErrorResponse,
       return useMutation(getPutApiUsersMePreferencesMutationOptions(options), queryClient);
     }
 
-export type getApiCatalogIdResponse200 = {
-  data: PublicationDetails
-  status: 200
-}
-
-export type getApiCatalogIdResponse404 = {
-  data: ErrorResponse
-  status: 404
-}
-
-export type getApiCatalogIdResponseSuccess = (getApiCatalogIdResponse200) & {
-  headers: Headers;
-};
-export type getApiCatalogIdResponseError = (getApiCatalogIdResponse404) & {
-  headers: Headers;
-};
-
-export type getApiCatalogIdResponse = (getApiCatalogIdResponseSuccess | getApiCatalogIdResponseError)
-
-export const getGetApiCatalogIdUrl = (id: string,) => {
-
-
-
-
-  return `/api/catalog/${id}`
-}
-
-/**
- * @summary Detalhes de uma publicação (RF13).
- */
-export const getApiCatalogId = async (id: string, options?: Parameters<typeof customFetch>[1]): Promise<getApiCatalogIdResponse> => {
-
-  return customFetch<getApiCatalogIdResponse>(getGetApiCatalogIdUrl(id),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetApiCatalogIdQueryKey = (id: string,) => {
-    return [
-    `/api/catalog/${id}`
-    ] as const;
-    }
-
-
-export const getGetApiCatalogIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiCatalogId>>, TError = ErrorResponse>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalogId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetApiCatalogIdQueryKey(id);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiCatalogId>>> = ({ signal }) => getApiCatalogId(id, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiCatalogId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetApiCatalogIdQueryResult = NonNullable<Awaited<ReturnType<typeof getApiCatalogId>>>
-export type GetApiCatalogIdQueryError = ErrorResponse
-
-
-export function useGetApiCatalogId<TData = Awaited<ReturnType<typeof getApiCatalogId>>, TError = ErrorResponse>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalogId>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiCatalogId>>,
-          TError,
-          Awaited<ReturnType<typeof getApiCatalogId>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiCatalogId<TData = Awaited<ReturnType<typeof getApiCatalogId>>, TError = ErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalogId>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getApiCatalogId>>,
-          TError,
-          Awaited<ReturnType<typeof getApiCatalogId>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetApiCatalogId<TData = Awaited<ReturnType<typeof getApiCatalogId>>, TError = ErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalogId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Detalhes de uma publicação (RF13).
- */
-
-export function useGetApiCatalogId<TData = Awaited<ReturnType<typeof getApiCatalogId>>, TError = ErrorResponse>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiCatalogId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetApiCatalogIdQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
-
 export type getApiUsersMeGenresResponse200 = {
   data: UserGenres
   status: 200
@@ -2278,6 +2158,126 @@ export function useGetApiPublications<TData = Awaited<ReturnType<typeof getApiPu
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetApiPublicationsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export type getApiPublicationsIdResponse200 = {
+  data: PublicationDetailsApi
+  status: 200
+}
+
+export type getApiPublicationsIdResponse404 = {
+  data: ErrorResponse
+  status: 404
+}
+
+export type getApiPublicationsIdResponseSuccess = (getApiPublicationsIdResponse200) & {
+  headers: Headers;
+};
+export type getApiPublicationsIdResponseError = (getApiPublicationsIdResponse404) & {
+  headers: Headers;
+};
+
+export type getApiPublicationsIdResponse = (getApiPublicationsIdResponseSuccess | getApiPublicationsIdResponseError)
+
+export const getGetApiPublicationsIdUrl = (id: number,) => {
+
+
+
+
+  return `/api/publications/${id}`
+}
+
+/**
+ * @summary Detalhes de uma publicação (RF13).
+ */
+export const getApiPublicationsId = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<getApiPublicationsIdResponse> => {
+
+  return customFetch<getApiPublicationsIdResponse>(getGetApiPublicationsIdUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetApiPublicationsIdQueryKey = (id: number,) => {
+    return [
+    `/api/publications/${id}`
+    ] as const;
+    }
+
+
+export const getGetApiPublicationsIdQueryOptions = <TData = Awaited<ReturnType<typeof getApiPublicationsId>>, TError = ErrorResponse>(id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiPublicationsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetApiPublicationsIdQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getApiPublicationsId>>> = ({ signal }) => getApiPublicationsId(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getApiPublicationsId>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetApiPublicationsIdQueryResult = NonNullable<Awaited<ReturnType<typeof getApiPublicationsId>>>
+export type GetApiPublicationsIdQueryError = ErrorResponse
+
+
+export function useGetApiPublicationsId<TData = Awaited<ReturnType<typeof getApiPublicationsId>>, TError = ErrorResponse>(
+ id: number, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiPublicationsId>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiPublicationsId>>,
+          TError,
+          Awaited<ReturnType<typeof getApiPublicationsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiPublicationsId<TData = Awaited<ReturnType<typeof getApiPublicationsId>>, TError = ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiPublicationsId>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getApiPublicationsId>>,
+          TError,
+          Awaited<ReturnType<typeof getApiPublicationsId>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetApiPublicationsId<TData = Awaited<ReturnType<typeof getApiPublicationsId>>, TError = ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiPublicationsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Detalhes de uma publicação (RF13).
+ */
+
+export function useGetApiPublicationsId<TData = Awaited<ReturnType<typeof getApiPublicationsId>>, TError = ErrorResponse>(
+ id: number, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getApiPublicationsId>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetApiPublicationsIdQueryOptions(id,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

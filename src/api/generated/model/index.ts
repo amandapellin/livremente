@@ -22,6 +22,7 @@ export * from './logoutRequest';
 export * from './publication';
 export * from './publicationCard';
 export * from './publicationDetails';
+export * from './publicationDetailsApi';
 export * from './publicationListPage';
 export * from './publicationType';
 export * from './putApiUsersMeAvatarBody';
