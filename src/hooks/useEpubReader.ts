@@ -82,7 +82,9 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		setIsLoading(true)
 		setIsError(false)
 
-		const book: Book = ePub(url)
+		// openAs:'epub' força o epub.js a baixar a URL como arquivo ZIP (não como
+		// diretório), mesmo sem extensão .epub. A URL é o proxy same-origin do back.
+		const book: Book = ePub(url, { openAs: 'epub' })
 		const rendition: Rendition = book.renderTo(el, { width: '100%', height: '100%' })
 		renditionRef.current = rendition
 

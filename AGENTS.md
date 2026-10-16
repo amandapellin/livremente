@@ -78,6 +78,10 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - Catálogo (detalhe): **`GET /api/catalog/{id}`** (→ `PublicationDetails`) ainda é
   **proposto pelo front** e segue em **mock** (`publicationMocks` em
   `catalog-mock.ts`, via `usePublicationDetails`) até a issue de detalhes (#20 do back).
+- Leitor (arquivos): o EPUB/PDF **não** é buscado direto do Gutenberg/arXiv (CORS +
+  "modo diretório" do epub.js). O leitor usa o **proxy same-origin do back-end**:
+  `useEpubReader` recebe `/api/reading/{id}/epub` e abre com `ePub(url, { openAs: 'epub' })`;
+  o `pdf-reader` aponta o `<iframe>` para `/api/reading/{id}/pdf`.
 - **`ReadingStatus`** (estado na estante) espelha o enum do back-end
   (`read | reading | want_to_read | abandoned`) e trafega como **string** no JSON.
   O back-end já garante isso globalmente (`JsonStringEnumConverter` em

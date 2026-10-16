@@ -20,7 +20,8 @@ interface Props {
 }
 
 export default function EpubReader({ data }: Props) {
-	const reader = useEpubReader(data.epubFileUrl, data.id)
+	// Proxy do back-end (mesma origem): evita CORS do Gutenberg e o "modo diretório" do epub.js.
+	const reader = useEpubReader(data.epubFileUrl ? `/api/reading/${data.id}/epub` : null, data.id)
 	const prefs = useReaderPreferences()
 	const session = useReadingSession(data.id)
 	const bookmarks = useBookmarks(data.id)
