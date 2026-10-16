@@ -26,7 +26,7 @@ export default function PdfReader({ data }: Props) {
 			/>
 			<Box sx={{ flex: 1, minHeight: 0 }}>
 				<iframe
-					src={data.pdfFileUrl ?? undefined}
+					src={data.pdfFileUrl ? `/api/reading/${data.id}/pdf` : undefined}
 					title={data.title}
 					style={{ width: '100%', height: '100%', border: 0, display: 'block' }}
 				/>
