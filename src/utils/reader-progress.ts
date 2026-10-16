@@ -1,21 +1,42 @@
 import { getAuthToken } from '@/api/auth-storage'
 
 const baseURL = import.meta.env.VITE_API_URL ?? ''
-const USE_READING_PROGRESS_API = false
 
-export const sendReadingProgress = (bookId: string, cfi: string, percent: number): void => {
-	if (!USE_READING_PROGRESS_API || !cfi) return
+/**
+ * Salva a última página lida (RF17/RN08) no back-end: `lastPageRead` é o índice
+ * de *location* do epub.js. Fire-and-forget, com `keepalive` para sobreviver ao
+ * fechamento da aba. Só envia se houver sessão (endpoint autenticado).
+ */
+export const saveLastPage = (bookId: string, lastPageRead: number): void => {
+	const token = getAuthToken()
+	if (!token || lastPageRead < 0) return
 	try {
-		const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-		const token = getAuthToken()
-		if (token) headers.Authorization = `Bearer ${token}`
-		fetch(`${baseURL}/api/users/me/reading-progress/${bookId}`, {
+		fetch(`${baseURL}/api/reading/${bookId}/last-page`, {
 			method: 'PUT',
-			headers,
-			body: JSON.stringify({ cfi, percent }),
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ lastPageRead }),
 			keepalive: true,
 		}).catch(() => undefined)
 	} catch {
 		/* ignora */
+	}
+}
+
+/**
+ * Retomada de leitura (RF18): última página salva no back-end (cross-device),
+ * ou null (nunca leu / anônimo / erro).
+ */
+export const fetchLastPage = async (bookId: string): Promise<number | null> => {
+	const token = getAuthToken()
+	if (!token) return null
+	try {
+		const res = await fetch(`${baseURL}/api/reading/${bookId}/last-page`, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		if (!res.ok) return null
+		const data = await res.json()
+		return typeof data?.lastPageRead === 'number' ? data.lastPageRead : null
+	} catch {
+		return null
 	}
 }

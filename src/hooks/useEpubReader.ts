@@ -11,7 +11,7 @@ import {
 	setStoredPosition,
 	setStoredTheme,
 } from '@/utils/reader-preferences'
-import { sendReadingProgress } from '@/utils/reader-progress'
+import { fetchLastPage, saveLastPage } from '@/utils/reader-progress'
 
 const PROGRESS_SYNC_MS = 4000
 
@@ -112,18 +112,26 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		})
 
 		let latestCfi = ''
-		let latestPct = 0
 		let syncTimer: number | undefined
 
+		// RF17/RN08: salva a última página (índice de location do epub.js) no back-end.
+		const saveProgress = () => {
+			if (!bookId || !latestCfi) return
+			try {
+				const loc = book.locations.locationFromCfi(latestCfi)
+				if (typeof loc === 'number' && loc >= 0) saveLastPage(bookId, loc)
+			} catch {
+				/* locations ainda não geradas */
+			}
+		}
 		const scheduleSync = () => {
 			if (!bookId) return
 			window.clearTimeout(syncTimer)
-			syncTimer = window.setTimeout(() => sendReadingProgress(bookId, latestCfi, latestPct), PROGRESS_SYNC_MS)
+			syncTimer = window.setTimeout(saveProgress, PROGRESS_SYNC_MS)
 		}
 		const flushSync = () => {
-			if (!bookId || !latestCfi) return
 			window.clearTimeout(syncTimer)
-			sendReadingProgress(bookId, latestCfi, latestPct)
+			saveProgress()
 		}
 
 		const updateProgress = (cfi: string) => {
@@ -131,7 +139,6 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 				const pct = book.locations.percentageFromCfi(cfi)
 				if (typeof pct === 'number' && !Number.isNaN(pct)) {
 					const rounded = Math.round(pct * 100)
-					latestPct = rounded
 					setProgress(rounded)
 					if (bookId) setStoredPercentage(bookId, rounded)
 				}
@@ -151,9 +158,19 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		})
 		book.ready
 			.then(() => book.locations.generate(1600))
-			.then(() => {
+			.then(async () => {
 				const loc = rendition.currentLocation() as unknown as RelocatedLocation | undefined
 				if (loc?.start?.cfi) updateProgress(loc.start.cfi)
+
+				// RF18 — retomada cross-device: sem posição local e com "retomar"
+				// ligado, salta para a última página salva no back-end.
+				if (bookId && getResumeAuto() && !resumeCfi) {
+					const backendLoc = await fetchLastPage(bookId)
+					if (backendLoc != null) {
+						const cfi = book.locations.cfiFromLocation(backendLoc)
+						if (cfi) await rendition.display(cfi)
+					}
+				}
 			})
 			.catch(() => undefined)
 		book.opened.catch(fail)
