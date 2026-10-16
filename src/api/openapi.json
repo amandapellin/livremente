@@ -562,47 +562,6 @@
         }
       }
     },
-    "/api/catalog/{id}": {
-      "get": {
-        "tags": [
-          "Catalog"
-        ],
-        "summary": "Detalhes de uma publicação (RF13).",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            },
-            "description": "ID da publicação."
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Detalhes da publicação.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/PublicationDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Publicação não encontrada.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/users/me/genres": {
       "get": {
         "tags": [
@@ -819,6 +778,46 @@
           },
           "400": {
             "description": "Parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/publications/{id}": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "Detalhes de uma publicação (RF13).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metadados da publicação.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationDetailsApi"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Publicação não encontrada.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1573,6 +1572,78 @@
           },
           "counts": {
             "$ref": "#/components/schemas/CatalogCounts"
+          }
+        }
+      },
+      "PublicationDetailsApi": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "type",
+          "authors",
+          "genres",
+          "publicDomain"
+        ],
+        "description": "Detalhes de publicação do back-end (GET /api/publications/{id}).",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PublicationType"
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "gutendex | arxiv."
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "synopsis": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Slugs de gênero (livro) ou área (artigo)."
+          },
+          "publicDomain": {
+            "type": "boolean"
+          },
+          "epubFileUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "pdfFileUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "downloadUrl": {
+            "type": "string",
+            "nullable": true
           }
         }
       }

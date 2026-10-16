@@ -1,27 +1,49 @@
 import { useQuery } from '@tanstack/react-query'
-import { getApiCatalogId } from '@/api/generated/endpoints'
-import type { PublicationDetails } from '@/api/generated/model'
+import { getApiPublicationsId } from '@/api/generated/endpoints'
+import type { PublicationDetails, PublicationDetailsApi, ReadingLanguage } from '@/api/generated/model'
 import { HttpError } from '@/api/fetcher'
-import { publicationDetailsMock } from '@/api/catalog-details-mock'
+import { genreLabel } from '@/schemas/catalog-schemas'
 
-const USE_CATALOG_MOCK = true
+/**
+ * Adapta os detalhes reais do back-end (`PublicationDetailsApi`: `authors[]`/
+ * `genres[]` slugs) para o `PublicationDetails` do front consumido pela tela.
+ * Campos de estante/leitura (`readingStatus`/`readingProgress`) não vêm deste
+ * endpoint (outros épicos) e ficam nulos.
+ */
+const toDetails = (d: PublicationDetailsApi): PublicationDetails => ({
+	id: d.id,
+	title: d.title,
+	author: d.authors.join(', '),
+	type: d.type,
+	language: (d.language ?? '') as ReadingLanguage,
+	genre: d.genres[0] ?? null,
+	year: d.year ?? null,
+	format: d.epubFileUrl ? 'EPUB' : d.pdfFileUrl ? 'PDF' : undefined,
+	source: d.source === 'gutendex' ? 'Project Gutenberg' : d.source === 'arxiv' ? 'arXiv' : (d.source ?? null),
+	coverUrl: d.coverUrl ?? null,
+	synopsis: d.synopsis ?? null,
+	contributors: d.authors.map((name) => ({ name, role: 'author' })),
+	subjects: d.genres.map(genreLabel),
+	pages: null,
+	rights: d.publicDomain ? 'Domínio público' : null,
+	publicDomain: d.publicDomain,
+	downloadUrl: d.downloadUrl ?? null,
+	readingStatus: null,
+	readingProgress: null,
+	epubFileUrl: d.epubFileUrl ?? null,
+	pdfFileUrl: d.pdfFileUrl ?? null,
+})
 
-async function fetchReal(id: string): Promise<PublicationDetails> {
-	const res = await getApiCatalogId(id)
-	if (res.status !== 200) throw new HttpError(res.status, res.data, `/api/catalog/${id}`)
-	return res.data
-}
-async function fetchMock(id: string): Promise<PublicationDetails> {
-	await new Promise((r) => setTimeout(r, 300))
-	const details = publicationDetailsMock(id)
-	if (!details) throw new HttpError(404, { message: 'Publicação não encontrada.' }, `/api/catalog/${id}`)
-	return details
+const fetchDetails = async (id: string): Promise<PublicationDetails> => {
+	const res = await getApiPublicationsId(Number(id))
+	if (res.status !== 200) throw new HttpError(res.status, res.data, `/api/publications/${id}`)
+	return toDetails(res.data)
 }
 
 export const usePublicationDetails = (id: string | undefined) => {
 	return useQuery({
 		queryKey: ['catalog', 'details', id],
-		queryFn: () => (USE_CATALOG_MOCK ? fetchMock(id!) : fetchReal(id!)),
+		queryFn: () => fetchDetails(id!),
 		enabled: !!id,
 	})
 }

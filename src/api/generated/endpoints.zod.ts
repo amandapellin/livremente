@@ -224,53 +224,6 @@ export const PutApiUsersMePreferencesResponse = zod.object({
 
 
 /**
- * @summary Detalhes de uma publicação (RF13).
- */
-export const GetApiCatalogIdParams = zod.object({
-  "id": zod.string().describe('ID da publicação.')
-})
-
-export const GetApiCatalogIdResponse = zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "author": zod.string(),
-  "type": zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).'),
-  "language": zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.'),
-  "genre": zod.string().nullish().describe('Slug de gênero (livro) ou área de conhecimento (artigo).'),
-  "year": zod.int().nullish(),
-  "format": zod.string().nullish().describe('EPUB, PDF...'),
-  "source": zod.string().nullish().describe('Project Gutemberg | arXiv.'),
-  "description": zod.string().nullish(),
-  "coverUrl": zod.string().nullish()
-}).and(zod.object({
-  "synopsis": zod.string().nullish().describe('Parágrafos separados por linha em branco.'),
-  "contributors": zod.array(zod.object({
-  "name": zod.string(),
-  "role": zod.string().describe('author | translator | editor | illustrator'),
-  "lifespan": zod.string().nullish().describe('ex.: 1864–1927')
-})).optional(),
-  "subjects": zod.array(zod.string()).optional().describe('  Gêneros/assuntos (rótulos).'),
-  "pages": zod.int().nullish(),
-  "rights": zod.string().nullish().describe('ex.: Domínio público'),
-  "publicDomain": zod.boolean().nullish(),
-  "downloadUrl": zod.string().nullish(),
-  "readingStatus": zod.union([zod.enum(['read', 'reading', 'want_to_read', 'abandoned']).describe('Estado de leitura na estante (espelha o enum ReadingStatus do back-end).'),zod.null()]).optional().describe('Estado na estante do usuário (épico Estante); null quando não está na estante.'),
-  "readingProgress": zod.union([zod.object({
-  "percent": zod.int().describe('Percentual lido (0–100).'),
-  "currentPage": zod.int().nullish(),
-  "totalPages": zod.int().nullish(),
-  "lastSession": zod.string().nullish().describe('Rótulo/descrição da última sessão (ex.: "ontem").'),
-  "readingTimeMinutes": zod.int().nullish().describe('Tempo total de leitura em minutos.'),
-  "highlights": zod.int().nullish(),
-  "notes": zod.int().nullish(),
-  "bookmarks": zod.int().nullish()
-}).describe('Progresso de leitura do usuário (épico Leitura/Estante).'),zod.null()]).optional().describe('Progresso de leitura; presente quando na estante em leitura/lido/abandonado.'),
-  "epubFileUrl": zod.string().nullish().describe('URL do arquivo EPUB para leitura (RF15).'),
-  "pdfFileUrl": zod.string().nullish().describe('URL do arquivo PDF para leitura (RF16).')
-}))
-
-
-/**
  * @summary Retorna os gêneros preferidos do usuário como slugs (RF04).
  */
 export const GetApiUsersMeGenresResponse = zod.object({
@@ -343,3 +296,28 @@ export const GetApiPublicationsResponse = zod.object({
   "scientific_article": zod.int()
 })
 })
+
+
+/**
+ * @summary Detalhes de uma publicação (RF13).
+ */
+export const GetApiPublicationsIdParams = zod.object({
+  "id": zod.int()
+})
+
+export const GetApiPublicationsIdResponse = zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "type": zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).'),
+  "source": zod.string().nullish().describe('gutendex | arxiv.'),
+  "language": zod.string().nullish(),
+  "year": zod.int().nullish(),
+  "synopsis": zod.string().nullish(),
+  "coverUrl": zod.string().nullish(),
+  "authors": zod.array(zod.string()),
+  "genres": zod.array(zod.string()).describe('Slugs de gênero (livro) ou área (artigo).'),
+  "publicDomain": zod.boolean(),
+  "epubFileUrl": zod.string().nullish(),
+  "pdfFileUrl": zod.string().nullish(),
+  "downloadUrl": zod.string().nullish()
+}).describe('Detalhes de publicação do back-end (GET /api/publications/{id}).')
