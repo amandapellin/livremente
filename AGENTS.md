@@ -68,11 +68,16 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - *Slugs* de categorias/gêneros/idiomas em `src/schemas/category-schemas.ts` são o
   contrato de vocabulário: **devem casar com as chaves do `PreferenceCatalog`** do
   back-end.
-- Catálogo: **`GET /api/catalog`** (lista → `CatalogPage` com `Publication[]`) e
-  **`GET /api/catalog/{id}`** (detalhes → `PublicationDetails`) são **propostos
-  pelo front** e ainda não existem no back-end — a UI usa mocks trocáveis
-  (`USE_CATALOG_MOCK` em `useCatalogSearch`/`usePublicationDetails`). Ao
-  implementar, alinhar o *shape* e desligar o flag.
+- Catálogo (lista): **integrado ao back-end real** — `useCatalogSearch` chama
+  **`GET /api/publications`** (RF10/RF11/RF12: busca `q`, filtros `type`/`languages`/
+  `genres`, `sort`, paginação, `counts`). A resposta real é `PublicationListPage`
+  com `PublicationCard` (`authors[]`/`genres[]`); o hook **adapta** para o
+  `Publication` do front (author/genre únicos) — cards inalterados. Mock de lista
+  **removido** (`searchCatalogMock`). `languages`/`genres` vão como parâmetros
+  repetidos (explode), casando o binding `string[]` do back-end.
+- Catálogo (detalhe): **`GET /api/catalog/{id}`** (→ `PublicationDetails`) ainda é
+  **proposto pelo front** e segue em **mock** (`publicationMocks` em
+  `catalog-mock.ts`, via `usePublicationDetails`) até a issue de detalhes (#20 do back).
 - **`ReadingStatus`** (estado na estante) espelha o enum do back-end
   (`read | reading | want_to_read | abandoned`) e trafega como **string** no JSON.
   O back-end já garante isso globalmente (`JsonStringEnumConverter` em
@@ -146,11 +151,12 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   quebrados em componentes (`TypeFilter` com contagem, `LanguageFilter`,
   `GenreFilter`) com **visibilidade condicional por tipo** (idioma e gênero só
   para livro; área só para artigo), ordenação, **paginação numerada** e estados
-  de carregando/vazio/erro. Contrato `GET /api/catalog` proposto pelo front
-  (params `q/type/languages/genres/sort/page` → `CatalogPage` com `Publication[]`
-  e `counts`), regenerado com orval. Enquanto o back-end não expõe o endpoint,
-  os dados vêm de um **mock trocável** (`src/api/catalog-mock.ts` +
-  `useCatalogSearch`, flag `USE_CATALOG_MOCK`). O filtro de **ano** foi removido
+  de carregando/vazio/erro. **Integrado ao back-end real** (`GET /api/publications`,
+  RF10/RF11/RF12): `useCatalogSearch` envia `q/type/languages/genres/sort/page` e
+  adapta o `PublicationListPage`/`PublicationCard` (`authors[]`/`genres[]`) para o
+  `Publication` do front; **mock de lista removido**. Verificado no navegador
+  contra o banco de dev (counts 58062/54535/3527, filtro de tipo, labels de
+  área/categoria). O filtro de **ano** foi removido
   do critério do #13. Entidade nomeada `Publication` (casa com `PublicationType`);
   `obra` fica só como rótulo de UI/rota (`/obra/:id`). Há alternância de
   visualização **lista ⇄ grade** (`PublicationGridCard`; preferência em

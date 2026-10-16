@@ -224,53 +224,6 @@ export const PutApiUsersMePreferencesResponse = zod.object({
 
 
 /**
- * @summary Retorna o catálogo de livros e artigos com filtros e paginação (RF10).
- */
-export const getApiCatalogQuerySortDefault = `relevance`;
-export const getApiCatalogQueryPageDefault = 1;
-
-export const getApiCatalogQueryPageSizeDefault = 10;
-export const getApiCatalogQueryPageSizeMax = 50;
-
-
-
-export const GetApiCatalogQueryParams = zod.object({
-  "q": zod.string().optional().describe('Busca por título ou autor.'),
-  "type": zod.enum(['book', 'scientific_article']).optional(),
-  "language": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
-  "genres": zod.array(zod.string()).optional().describe('Gênero literário (livros) ou área de conhecimento (artigos).'),
-  "sort": zod.enum(['relevance', 'recent', 'title', 'popularity']).default(getApiCatalogQuerySortDefault),
-  "page": zod.int().min(1).default(getApiCatalogQueryPageDefault),
-  "pageSize": zod.int().min(1).max(getApiCatalogQueryPageSizeMax).default(getApiCatalogQueryPageSizeDefault)
-})
-
-export const GetApiCatalogResponse = zod.object({
-  "items": zod.array(zod.object({
-  "id": zod.string(),
-  "title": zod.string(),
-  "author": zod.string(),
-  "type": zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).'),
-  "language": zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.'),
-  "genre": zod.string().nullish().describe('Slug de gênero (livro) ou área de conhecimento (artigo).'),
-  "year": zod.int().nullish(),
-  "format": zod.string().nullish().describe('EPUB, PDF...'),
-  "source": zod.string().nullish().describe('Project Gutemberg | arXiv.'),
-  "description": zod.string().nullish(),
-  "coverUrl": zod.string().nullish()
-})),
-  "page": zod.int(),
-  "pageSize": zod.int(),
-  "total": zod.int(),
-  "totalPages": zod.int(),
-  "counts": zod.object({
-  "all": zod.int(),
-  "book": zod.int(),
-  "scientific_article": zod.int()
-})
-})
-
-
-/**
  * @summary Detalhes de uma publicação (RF13).
  */
 export const GetApiCatalogIdParams = zod.object({
@@ -345,3 +298,48 @@ export const DeleteApiUsersMeGenresGenreIdParams = zod.object({
 })
 
 export const DeleteApiUsersMeGenresGenreIdResponse = zod.void()
+
+
+/**
+ * @summary Listagem do catálogo com busca e filtros (RF10/RF11/RF12).
+ */
+export const getApiPublicationsQuerySortDefault = `relevance`;
+export const getApiPublicationsQueryPageDefault = 1;
+
+export const getApiPublicationsQueryPageSizeDefault = 10;
+export const getApiPublicationsQueryPageSizeMax = 50;
+
+
+
+export const GetApiPublicationsQueryParams = zod.object({
+  "q": zod.string().optional().describe('Busca por título ou autor.'),
+  "type": zod.enum(['book', 'scientific_article']).optional(),
+  "languages": zod.array(zod.enum(['pt', 'en', 'es', 'fr', 'ru']).describe('Idioma de leitura de preferência.')).optional(),
+  "genres": zod.array(zod.string()).optional().describe('Slugs de gênero literário (livros) ou área (artigos).'),
+  "sort": zod.enum(['relevance', 'recent', 'title', 'popularity']).default(getApiPublicationsQuerySortDefault),
+  "page": zod.int().min(1).default(getApiPublicationsQueryPageDefault),
+  "pageSize": zod.int().min(1).max(getApiPublicationsQueryPageSizeMax).default(getApiPublicationsQueryPageSizeDefault)
+})
+
+export const GetApiPublicationsResponse = zod.object({
+  "items": zod.array(zod.object({
+  "id": zod.string(),
+  "title": zod.string(),
+  "type": zod.enum(['book', 'scientific_article']).describe('Tipo de publicação de interesse (obra: livro ou artigo).'),
+  "source": zod.string().nullish().describe('gutendex | arxiv.'),
+  "language": zod.string().nullish(),
+  "year": zod.int().nullish(),
+  "coverUrl": zod.string().nullish(),
+  "authors": zod.array(zod.string()),
+  "genres": zod.array(zod.string()).describe('Slugs de gênero (livro) ou área (artigo).')
+}).describe('Card de publicação do catálogo (GET /api/publications).')),
+  "page": zod.int(),
+  "pageSize": zod.int(),
+  "total": zod.int(),
+  "totalPages": zod.int(),
+  "counts": zod.object({
+  "all": zod.int(),
+  "book": zod.int(),
+  "scientific_article": zod.int()
+})
+})

@@ -1,5 +1,5 @@
 import type { PublicationType, ReadingLanguage } from "@/api/generated/model"
-import { areasArtigos, generosLiterarios, idiomaOptions, publicationOptions, type Opcao } from "./category-schemas"
+import { areasArtigos, categoriasLivros, generosLiterarios, idiomaOptions, publicationOptions, type Opcao } from "./category-schemas"
 
 export type CatalogSort = 'relevance' | 'recent' | 'title' | 'popularity'
 
@@ -45,7 +45,7 @@ export const genreLabelFor = (type: CatalogQuery['type']): string => {
 }
 
 const langLabels = new Map(idiomaOptions.map((o)=> [o.value, o.label]))
-const genreLabels = new Map([...generosLiterarios, ...areasArtigos].map((o)=> [o.value, o.label]))
+const genreLabels = new Map([...generosLiterarios, ...categoriasLivros, ...areasArtigos].map((o)=> [o.value, o.label]))
 export const languageLabel = (v: string) => langLabels.get(v) ?? v
 export const genreLabel = (v: string) => genreLabels.get(v) ?? v
 

@@ -562,101 +562,6 @@
         }
       }
     },
-    "/api/catalog": {
-      "get": {
-        "tags": [
-          "Catalog"
-        ],
-        "summary": "Retorna o catálogo de livros e artigos com filtros e paginação (RF10).",
-        "parameters": [
-          {
-            "name": "q",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            },
-            "description": "Busca por título ou autor."
-          },
-          {
-            "name": "type",
-            "in": "query",
-            "schema": {
-              "$ref": "#/components/schemas/PublicationType"
-            }
-          },
-          {
-            "name": "language",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/ReadingLanguage"
-              }
-            }
-          },
-          {
-            "name": "genres",
-            "in": "query",
-            "style": "form",
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            },
-            "description": "Gênero literário (livros) ou área de conhecimento (artigos)."
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "relevance",
-                "recent",
-                "title",
-                "popularity"
-              ],
-              "default": "relevance"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 1,
-              "minimum": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "default": 10,
-              "minimum": 1,
-              "maximum": 50
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Página de resultados.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CatalogPage"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/catalog/{id}": {
       "get": {
         "tags": [
@@ -809,6 +714,111 @@
           },
           "404": {
             "description": "Gênero não associado ao usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/publications": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "Listagem do catálogo com busca e filtros (RF10/RF11/RF12).",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca por título ou autor."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PublicationType"
+            }
+          },
+          {
+            "name": "languages",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ReadingLanguage"
+              }
+            }
+          },
+          {
+            "name": "genres",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Slugs de gênero literário (livros) ou área (artigos)."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "relevance",
+                "recent",
+                "title",
+                "popularity"
+              ],
+              "default": "relevance"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página do catálogo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationListPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos.",
             "content": {
               "application/json": {
                 "schema": {
@@ -1453,10 +1463,10 @@
                 ],
                 "description": "Progresso de leitura; presente quando na estante em leitura/lido/abandonado."
               },
-              "epubFileUrl": { 
-                "type": "string", 
-                "nullable": true, 
-                "description": "URL do arquivo EPUB para leitura (RF15)." 
+              "epubFileUrl": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL do arquivo EPUB para leitura (RF15)."
               },
               "pdfFileUrl": {
                 "type": "string",
@@ -1477,6 +1487,92 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "PublicationCard": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "type",
+          "authors",
+          "genres"
+        ],
+        "description": "Card de publicação do catálogo (GET /api/publications).",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PublicationType"
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "gutendex | arxiv."
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Slugs de gênero (livro) ou área (artigo)."
+          }
+        }
+      },
+      "PublicationListPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total",
+          "totalPages",
+          "counts"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationCard"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CatalogCounts"
           }
         }
       }
