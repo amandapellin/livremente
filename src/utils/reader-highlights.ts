@@ -3,7 +3,11 @@ import type { Highlight, HighlightColor } from '@/types/reader-types'
 
 const PREFIX = 'reader:highlights:'
 const baseURL = import.meta.env.VITE_API_URL ?? ''
-const USE_HIGHLIGHTS_API = false
+// Back-end (#27): criação e listagem de grifos já existem em /api/reading/{id}/highlights.
+const USE_HIGHLIGHTS_API = true
+// Recolorir/nota/excluir ainda NÃO têm endpoint no back (issues futuras; nota = annotation
+// #28). Mantém essas mutações locais até lá, para não baterem em rota inexistente.
+const USE_HIGHLIGHT_MUTATIONS_API = false
 
 export const getHighlights = (bookId: string): Highlight[] => {
 	try {
@@ -46,18 +50,55 @@ const authHeaders = () => {
 	return headers
 }
 
+// Linha do grifo como vem do back-end (#27). `id` é inteiro; a unidade de posição
+// é o CFI range (epub_position). O front, porém, chaveia tudo pelo cfiRange.
+interface RemoteHighlight {
+	id: number
+	excerpt: string
+	epubPosition: string
+	color: HighlightColor
+	createdAt: string
+}
+
+// RF22: carrega os grifos do back-end (cross-device). Mapeia a linha para o modelo
+// do front usando o cfiRange como id (chave estável do epub.js e das operações locais).
+export const fetchHighlightsRemote = async (bookId: string): Promise<Highlight[]> => {
+	if (!USE_HIGHLIGHTS_API) return []
+	const token = getAuthToken()
+	if (!token) return []
+	try {
+		const res = await fetch(`${baseURL}/api/reading/${bookId}/highlights`, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		if (!res.ok) return []
+		const rows = (await res.json()) as RemoteHighlight[]
+		if (!Array.isArray(rows)) return []
+		return rows.map((r) => ({
+			id: r.epubPosition,
+			cfiRange: r.epubPosition,
+			text: r.excerpt,
+			chapter: '',
+			color: r.color,
+			createdAt: Date.parse(r.createdAt) || Date.now(),
+		}))
+	} catch {
+		return []
+	}
+}
+
 export const sendHighlight = (bookId: string, highlight: Highlight): void => {
 	if (!USE_HIGHLIGHTS_API) return
-	fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/highlights`, {
+	// Back (#27): só EPUB. Corpo { excerpt, epubPosition, color } — nota/capítulo não entram.
+	fetch(`${baseURL}/api/reading/${bookId}/highlights`, {
 		method: 'POST',
 		headers: authHeaders(),
-		body: JSON.stringify({ cfiRange: highlight.cfiRange, text: highlight.text, color: highlight.color, note: highlight.note ?? null }),
+		body: JSON.stringify({ excerpt: highlight.text, epubPosition: highlight.cfiRange, color: highlight.color }),
 	}).catch(() => undefined)
 }
 
 export const updateHighlightRemote = (bookId: string, id: string, color: HighlightColor): void => {
-	if (!USE_HIGHLIGHTS_API) return
-	fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/highlights/${encodeURIComponent(id)}`, {
+	if (!USE_HIGHLIGHT_MUTATIONS_API) return
+	fetch(`${baseURL}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
 		method: 'PATCH',
 		headers: authHeaders(),
 		body: JSON.stringify({ color }),
@@ -65,8 +106,8 @@ export const updateHighlightRemote = (bookId: string, id: string, color: Highlig
 }
 
 export const updateHighlightNoteRemote = (bookId: string, id: string, note: string): void => {
-	if (!USE_HIGHLIGHTS_API) return
-	fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/highlights/${encodeURIComponent(id)}`, {
+	if (!USE_HIGHLIGHT_MUTATIONS_API) return
+	fetch(`${baseURL}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
 		method: 'PATCH',
 		headers: authHeaders(),
 		body: JSON.stringify({ note }),
@@ -74,8 +115,8 @@ export const updateHighlightNoteRemote = (bookId: string, id: string, note: stri
 }
 
 export const removeHighlightRemote = (bookId: string, id: string): void => {
-	if (!USE_HIGHLIGHTS_API) return
-	fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/highlights/${encodeURIComponent(id)}`, {
+	if (!USE_HIGHLIGHT_MUTATIONS_API) return
+	fetch(`${baseURL}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
 		method: 'DELETE',
 		headers: authHeaders(),
 	}).catch(() => undefined)
