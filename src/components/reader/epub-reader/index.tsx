@@ -30,7 +30,7 @@ export default function EpubReader({ data }: Props) {
 	const marked = bookmarks.has(reader.currentCfi)
 	const [panelOpen, setPanelOpen] = useState(false)
 	const [noteTarget, setNoteTarget] = useState<string | null>(null)
-	const appliedRef = useRef(false)
+	const appliedRef = useRef<Set<string>>(new Set())
 	const noteHl = highlights.highlights.find((h) => h.cfiRange === noteTarget)
 
 	useEffect(() => {
@@ -38,12 +38,22 @@ export default function EpubReader({ data }: Props) {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [prefs.serverTheme])
 
+	// Desenha cada grifo uma vez (idempotente por cfiRange): cobre os grifos vindos
+	// do back-end que chegam depois do carregamento, sem redesenhar os já aplicados;
+	// esquece os removidos para permitir recriar o mesmo cfiRange depois.
 	useEffect(() => {
-		if (reader.isLoading || appliedRef.current) return
-		appliedRef.current = true
-		highlights.highlights.forEach((h) => reader.addHighlight(h.cfiRange, h.color ?? DEFAULT_HIGHLIGHT))
+		if (reader.isLoading) return
+		const current = new Set(highlights.highlights.map((h) => h.cfiRange))
+		highlights.highlights.forEach((h) => {
+			if (appliedRef.current.has(h.cfiRange)) return
+			appliedRef.current.add(h.cfiRange)
+			reader.addHighlight(h.cfiRange, h.color ?? DEFAULT_HIGHLIGHT)
+		})
+		appliedRef.current.forEach((cfi) => {
+			if (!current.has(cfi)) appliedRef.current.delete(cfi)
+		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [reader.isLoading])
+	}, [reader.isLoading, highlights.highlights])
 
 	const activeHighlight = highlights.highlights.find((h) => h.cfiRange === reader.activeMark?.cfiRange)
 
@@ -68,6 +78,7 @@ export default function EpubReader({ data }: Props) {
 		const sel = reader.selection
 		if (!sel) return
 		reader.addHighlight(sel.cfiRange, color)
+		appliedRef.current.add(sel.cfiRange) // já desenhado aqui; o efeito não redesenha
 		highlights.add({
 			id: sel.cfiRange,
 			cfiRange: sel.cfiRange,
@@ -101,6 +112,7 @@ export default function EpubReader({ data }: Props) {
 		if (!sel) return
 		if (!highlights.highlights.some((h) => h.id === sel.cfiRange)) {
 			reader.addHighlight(sel.cfiRange, DEFAULT_HIGHLIGHT)
+			appliedRef.current.add(sel.cfiRange) // já desenhado aqui; o efeito não redesenha
 			highlights.add({
 				id: sel.cfiRange,
 				cfiRange: sel.cfiRange,
