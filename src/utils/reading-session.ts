@@ -3,8 +3,6 @@ import { getAuthToken } from '@/api/auth-storage'
 const TIME_PREFIX = 'reader:time:'
 const baseURL = import.meta.env.VITE_API_URL ?? ''
 
-const USE_READING_SESSION_API = false
-
 export const getStoredReadingTime = (bookId: string): number => {
 	try {
 		const v = localStorage.getItem(TIME_PREFIX + bookId)
@@ -32,16 +30,38 @@ export const formatDuration = (totalSeconds: number): string => {
 	return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`
 }
 
-export const sendReadingTime = (bookId: string, seconds: number): void => {
-	if (!USE_READING_SESSION_API || seconds <= 0) return
+/**
+ * Abre uma sessão de leitura no back-end (RF20) e retorna o id, ou null se não
+ * houver sessão (endpoint autenticado) / erro. EPUB e PDF.
+ */
+export const startSession = async (bookId: string): Promise<number | null> => {
+	const token = getAuthToken()
+	if (!token) return null
 	try {
-		const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-		const token = getAuthToken()
-		if (token) headers.Authorization = `Bearer ${token}`
-		fetch(`${baseURL}/api/users/me/reading-progress/${bookId}/session`, {
+		const res = await fetch(`${baseURL}/api/reading/${bookId}/session`, {
 			method: 'POST',
-			headers,
-			body: JSON.stringify({ seconds }),
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		if (!res.ok) return null
+		const data = await res.json()
+		return typeof data?.sessionId === 'number' ? data.sessionId : null
+	} catch {
+		return null
+	}
+}
+
+/**
+ * Heartbeat/encerramento da sessão (RF20): grava o tempo de tela ativa TOTAL
+ * (segundos) da sessão. Fire-and-forget, keepalive; só com sessão.
+ */
+export const updateSession = (sessionId: number, activeSeconds: number): void => {
+	const token = getAuthToken()
+	if (!token || activeSeconds < 0) return
+	try {
+		fetch(`${baseURL}/api/reading/sessions/${sessionId}`, {
+			method: 'PUT',
+			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			body: JSON.stringify({ activeSeconds }),
 			keepalive: true,
 		}).catch(() => undefined)
 	} catch {
