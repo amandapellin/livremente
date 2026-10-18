@@ -14,10 +14,17 @@ import ReaderNav from '@/components/reader/reader-nav'
 import HighlightToolbar from '@/components/reader/highlight-toolbar'
 import HighlightsPanel from '@/components/reader/highlights-panel'
 import NoteDialog from '@/components/reader/note-dialog'
+import DictionaryPopup from '@/components/reader/dictionary-popup'
 
 interface Props {
 	data: PublicationDetails
 }
+
+type DictTarget = { word: string; cfiRange: string; top: number; left: number }
+
+// Primeira palavra da seleção, sem pontuação nas pontas (o dicionário é por palavra).
+const firstWord = (text: string): string =>
+	(text.trim().split(/\s+/)[0] ?? '').replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '')
 
 export default function EpubReader({ data }: Props) {
 	// Proxy do back-end (mesma origem): evita CORS do Gutenberg e o "modo diretório" do epub.js.
@@ -30,6 +37,7 @@ export default function EpubReader({ data }: Props) {
 	const marked = bookmarks.has(reader.currentCfi)
 	const [panelOpen, setPanelOpen] = useState(false)
 	const [noteTarget, setNoteTarget] = useState<string | null>(null)
+	const [dictTarget, setDictTarget] = useState<DictTarget | null>(null)
 	const appliedRef = useRef<Set<string>>(new Set())
 	const noteHl = highlights.highlights.find((h) => h.cfiRange === noteTarget)
 
@@ -133,6 +141,34 @@ export default function EpubReader({ data }: Props) {
 		reader.clearActiveMark()
 	}
 
+	// RF07: abre o popup de dicionário para a palavra selecionada, sem mexer na
+	// posição de leitura (o popup é overlay). Guarda o cfiRange para o "Grifar palavra".
+	const lookUpSelection = () => {
+		const sel = reader.selection
+		if (!sel) return
+		const word = firstWord(sel.text)
+		if (!word) return
+		setDictTarget({ word, cfiRange: sel.cfiRange, top: sel.top, left: sel.left })
+		reader.clearSelection()
+	}
+
+	const highlightFromDict = () => {
+		if (!dictTarget) return
+		if (!highlights.highlights.some((h) => h.id === dictTarget.cfiRange)) {
+			reader.addHighlight(dictTarget.cfiRange, DEFAULT_HIGHLIGHT)
+			appliedRef.current.add(dictTarget.cfiRange)
+			highlights.add({
+				id: dictTarget.cfiRange,
+				cfiRange: dictTarget.cfiRange,
+				text: dictTarget.word,
+				chapter: reader.chapter,
+				color: DEFAULT_HIGHLIGHT,
+				createdAt: Date.now(),
+			})
+		}
+		setDictTarget(null)
+	}
+
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, bgcolor: surface.background, transition: 'background-color .15s' }}>
 			<GlobalStyles styles={{ '.epub-highlight': { pointerEvents: 'fill', cursor: 'pointer' } }} />
@@ -191,7 +227,20 @@ export default function EpubReader({ data }: Props) {
 					left={reader.selection.left}
 					onPick={createHighlight}
 					onAnnotate={annotateSelection}
+					onLookup={lookUpSelection}
 					onClose={reader.clearSelection}
+				/>
+			)}
+
+			{dictTarget && (
+				<DictionaryPopup
+					key={dictTarget.cfiRange}
+					word={dictTarget.word}
+					bookId={data.id}
+					top={dictTarget.top}
+					left={dictTarget.left}
+					onHighlight={highlightFromDict}
+					onClose={() => setDictTarget(null)}
 				/>
 			)}
 			{reader.activeMark && (

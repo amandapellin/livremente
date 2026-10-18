@@ -1,6 +1,7 @@
 import { Box, ClickAwayListener, Divider, IconButton, Paper, Stack, Typography } from '@mui/material'
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlined'
 import EditNoteIcon from '@mui/icons-material/EditNote'
+import MenuBookIcon from '@mui/icons-material/MenuBook'
 import { HIGHLIGHT_COLORS } from '@/constants/reader-const'
 import { colors } from '@/theme/tokens'
 import type { HighlightColor } from '@/types/reader-types'
@@ -14,9 +15,10 @@ interface Props {
 	note?: string
 	onAnnotate?: () => void
 	onRemove?: () => void
+	onLookup?: () => void
 }
 
-export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, note, onAnnotate, onRemove }: Props) {
+export default function HighlightToolbar({ top, left, onPick, onClose, activeColor, note, onAnnotate, onRemove, onLookup }: Props) {
 	return (
 		<ClickAwayListener onClickAway={onClose}>
 			<Paper
@@ -63,7 +65,12 @@ export default function HighlightToolbar({ top, left, onPick, onClose, activeCol
 							/>
 						</IconButton>
 					))}
-					{(onAnnotate || onRemove) && <Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />}
+					{(onLookup || onAnnotate || onRemove) && <Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />}
+					{onLookup && (
+						<IconButton size="small" aria-label="Consultar no dicionário" onClick={onLookup}>
+							<MenuBookIcon fontSize="small" />
+						</IconButton>
+					)}
 					{onAnnotate && (
 						<IconButton size="small" aria-label={note ? 'Editar anotação' : 'Anotar'} onClick={onAnnotate}>
 							<EditNoteIcon fontSize="small" />

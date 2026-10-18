@@ -7,6 +7,7 @@ import PasswordSection from '@/components/profile/password-section'
 import PrivacySection from '@/components/profile/privacy-section'
 import ReaderSection from '@/components/profile/reader-section'
 import ReadingPreferencesSection from '@/components/profile/reading-preferences-section'
+import DictionaryHistorySection from '@/components/profile/dictionary-history-section'
 
 export default function PerfilPage() {
 	const {
@@ -93,6 +94,7 @@ export default function PerfilPage() {
 					<Stack sx={{ gap: 3 }}>
 						<ReaderSection />
 						<ReadingPreferencesSection />
+						<DictionaryHistorySection />
 					</Stack>
 				</Box>
 			)}
