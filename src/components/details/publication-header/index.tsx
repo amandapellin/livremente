@@ -62,6 +62,8 @@ export default function PublicationHeader({ publication, onSelectStatus }: Props
 				</Stack>
 				<DetailActions
 					id={publication.id}
+					type={publication.type}
+					source={publication.source}
 					downloadUrl={publication.downloadUrl}
 					readingStatus={publication.readingStatus}
 					onSelectStatus={onSelectStatus}
