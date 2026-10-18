@@ -20,14 +20,14 @@ import {
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import AutoStoriesIcon from "@mui/icons-material/AutoStories";
-import SearchIcon from "@mui/icons-material/Search";
-import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import { colors, fontFamilies } from "@/theme/tokens";
 import { useIsAuthenticated } from "@/hooks/useAuth";
 import { useLogout } from "@/hooks/useLogout";
 import AccountMenu from "@/components/layout/account-menu";
+import SearchPopover from "@/components/layout/search-popover";
+import NotificationsMenu from "@/components/layout/notifications-menu";
 
 const navItems = [
 	{ label: "Início", to: "/" },
@@ -163,24 +163,8 @@ export default function Header() {
 					</Stack>
 
 					<Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
-						<IconButton
-							aria-label="Buscar"
-							color="contrast"
-							sx={{
-								display: { xs: "none", sm: "inline-flex" },
-							}}
-						>
-							<SearchIcon />
-						</IconButton>
-						<IconButton
-							aria-label="Notificações"
-							color="contrast"
-							sx={{
-								display: { xs: "none", sm: "inline-flex" },
-							}}
-						>
-							<NotificationsNoneIcon />
-						</IconButton>
+						<SearchPopover />
+						<NotificationsMenu />
 						<ColorModeToggle />
 						{isAuthenticated ? (
 							<AccountMenu />

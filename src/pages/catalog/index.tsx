@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router";
 import { GridView, Search, SearchOff, ViewList } from "@mui/icons-material";
 import { Alert, Box, Button, Container, InputAdornment, MenuItem, Pagination, Paper, Select, Skeleton, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
 import CatalogFilters from "@/components/catalog/catalog-filters";
@@ -21,7 +22,12 @@ function readStoredView(): ViewMode {
 }
 
 export default function CatalogoPage() {
-	const [filters, setFilters] = useState<CatalogQuery>(emptyCatalogQuery)
+	const [searchParams] = useSearchParams()
+	// Semeia a busca a partir do ?q= da URL (usado pela lupa da navbar).
+	const [filters, setFilters] = useState<CatalogQuery>(() => {
+		const q = searchParams.get("q")
+		return q ? { ...emptyCatalogQuery, q } : emptyCatalogQuery
+	})
 	const [view, setView] = useState<ViewMode>(readStoredView)
 	const debouncedQ = useDebouncedValue(filters.q, 350)
 	const query = useMemo<CatalogQuery>(() => ({ ...filters, q: debouncedQ }), [filters, debouncedQ])
