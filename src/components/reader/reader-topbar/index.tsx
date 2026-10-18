@@ -2,6 +2,7 @@ import { NavLink } from 'react-router'
 import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import EditNoteIcon from '@mui/icons-material/EditNote'
+import FileDownloadOutlinedIcon from '@mui/icons-material/FileDownloadOutlined'
 import { colors } from '@/theme/tokens'
 
 import ReaderSettings from '@/components/reader/reader-settings'
@@ -30,6 +31,7 @@ interface Props {
 	onPageTypeChange: (value: ReaderPageType) => void
 	highlightsOpen: boolean
 	onToggleHighlights: () => void
+	downloadUrl?: string | null
 }
 
 export default function ReaderTopbar({
@@ -53,6 +55,7 @@ export default function ReaderTopbar({
 	onPageTypeChange,
 	highlightsOpen,
 	onToggleHighlights,
+	downloadUrl,
 }: Props) {
 	return (
 		<Stack
@@ -95,6 +98,19 @@ export default function ReaderTopbar({
 			</Stack>
 
 			<SessionTimer label={sessionTime} sx={{ display: { xs: 'none', md: 'flex' } }} />
+
+			{downloadUrl && (
+				<IconButton
+					component="a"
+					href={downloadUrl}
+					download
+					aria-label="Baixar EPUB"
+					title="Baixar EPUB"
+					sx={{ color: 'inherit' }}
+				>
+					<FileDownloadOutlinedIcon />
+				</IconButton>
+			)}
 
 			<ReaderSettings
 				borderColor={surface.border}

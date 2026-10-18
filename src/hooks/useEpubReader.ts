@@ -12,6 +12,7 @@ import {
 	setStoredTheme,
 } from '@/utils/reader-preferences'
 import { fetchLastPage, saveLastPage, savePercentage } from '@/utils/reader-progress'
+import { fetchReadingFileBlob } from '@/utils/reading-file'
 
 const PROGRESS_SYNC_MS = 4000
 
@@ -74,17 +75,40 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 	const [fontFamily, setFontFamily] = useState<ReaderFont>('editor')
 	const [textAlign, setTextAlign] = useState<ReaderAlign>('justify')
 	const [pageType, setPageType] = useState<ReaderPageType>('single')
+	const [fileUrl, setFileUrl] = useState<string | null>(null)
+
+	// Busca o EPUB com o JWT (o proxy agora exige autenticação) e cria um Blob URL
+	// LOCAL. O epub.js carrega esse Blob URL (same-origin, sem precisar do header),
+	// reusando o caminho já testado `ePub(url, { openAs: 'epub' })`.
+	useEffect(() => {
+		if (!url) return
+		let objectUrl: string | null = null
+		let cancelled = false
+		fetchReadingFileBlob(url).then((blob) => {
+			if (cancelled) return
+			if (!blob) {
+				setIsError(true)
+				setIsLoading(false)
+				return
+			}
+			objectUrl = URL.createObjectURL(blob)
+			setFileUrl(objectUrl)
+		})
+		return () => {
+			cancelled = true
+			if (objectUrl) URL.revokeObjectURL(objectUrl)
+		}
+	}, [url])
 
 	useEffect(() => {
 		const el = containerRef.current
-		if (!url || !el) return
+		if (!fileUrl || !el) return
 
 		setIsLoading(true)
 		setIsError(false)
 
-		// openAs:'epub' força o epub.js a baixar a URL como arquivo ZIP (não como
-		// diretório), mesmo sem extensão .epub. A URL é o proxy same-origin do back.
-		const book: Book = ePub(url, { openAs: 'epub' })
+		// Blob URL local (bytes já baixados com o JWT). openAs:'epub' força modo arquivo.
+		const book: Book = ePub(fileUrl, { openAs: 'epub' })
 		const rendition: Rendition = book.renderTo(el, { width: '100%', height: '100%' })
 		renditionRef.current = rendition
 
@@ -224,7 +248,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 			renditionRef.current = null
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [url])
+	}, [fileUrl])
 
 	useEffect(() => {
 		if (renditionRef.current) applyTheme(renditionRef.current, theme)

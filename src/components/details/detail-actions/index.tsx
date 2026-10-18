@@ -1,22 +1,29 @@
 import { useState } from "react"
 import { NavLink } from "react-router"
-import { ArrowDropDown, AutoStories, BookmarkAddOutlined, Check, FileDownloadOutlined } from "@mui/icons-material"
+import { ArrowDropDown, AutoStories, BookmarkAddOutlined, Check, FileDownloadOutlined, OpenInNew } from "@mui/icons-material"
 import { Button, ListItemIcon, Menu, MenuItem, Stack } from "@mui/material"
-import type { ReadingStatus } from "@/api/generated/model"
+import type { PublicationType, ReadingStatus } from "@/api/generated/model"
 import { readingStatusOptions } from "@/schemas/reading-status-schemas"
 
 interface Props {
 	id: string
+	type: PublicationType
+	source?: string | null
 	downloadUrl?: string | null
 	readingStatus?: ReadingStatus | null
 	onSelectStatus?: (status: ReadingStatus) => void
 }
 
-export default function DetailActions({ id, downloadUrl, readingStatus, onSelectStatus }: Props) {
+export default function DetailActions({ id, type, source, downloadUrl, readingStatus, onSelectStatus }: Props) {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 	const open = Boolean(anchorEl)
 	const close = () => setAnchorEl(null)
 	const current = readingStatusOptions.find((o) => o.value === readingStatus)
+	// RF25: livro (EPUB/Gutendex) baixa o arquivo pelo epub_file_url do material
+	// (= downloadUrl); artigo do arXiv é redirecionado à fonte, sem baixar localmente
+	// pelo sistema (RN06) — abre a fonte em nova aba, sem o atributo download.
+	const isArticle = type === "scientific_article"
+	const sourceLabel = source === "arxiv" ? "arXiv" : (source ?? "fonte")
 
 	const select = (status: ReadingStatus) => {
 		close()
@@ -40,18 +47,34 @@ export default function DetailActions({ id, downloadUrl, readingStatus, onSelect
 					>
 						Ler agora
 					</Button>
-					<Button
-						component="a"
-						href={downloadUrl ?? undefined}
-						download
-						variant="outlined"
-						color="inherit"
-						startIcon={<FileDownloadOutlined />}
-						disabled={!downloadUrl}
-						size="small"
-					>
-						Baixar epub
-					</Button>
+					{isArticle ? (
+						<Button
+							component="a"
+							href={downloadUrl ?? undefined}
+							target="_blank"
+							rel="noopener noreferrer"
+							variant="outlined"
+							color="inherit"
+							startIcon={<OpenInNew />}
+							disabled={!downloadUrl}
+							size="small"
+						>
+							Baixar no {sourceLabel}
+						</Button>
+					) : (
+						<Button
+							component="a"
+							href={downloadUrl ?? undefined}
+							download
+							variant="outlined"
+							color="inherit"
+							startIcon={<FileDownloadOutlined />}
+							disabled={!downloadUrl}
+							size="small"
+						>
+							Baixar EPUB
+						</Button>
+					)}
 				</Stack>
 
 				<Button

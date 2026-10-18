@@ -193,6 +193,7 @@ export default function EpubReader({ data }: Props) {
 				onPageTypeChange={reader.setPageType}
 				highlightsOpen={panelOpen}
 				onToggleHighlights={() => setPanelOpen((v) => !v)}
+				downloadUrl={data.downloadUrl}
 			/>
 			<Box sx={{ display: 'flex', flex: 1, minHeight: 0 }}>
 				<ReaderView containerRef={reader.containerRef} isLoading={reader.isLoading} isError={reader.isError} />
