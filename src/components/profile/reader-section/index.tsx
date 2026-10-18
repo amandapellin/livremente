@@ -63,7 +63,7 @@ export default function ReaderSection() {
 						checked={saveDictionary}
 						onChange={setSaveDictionary}
 						title="Salvar palavras consultadas no dicionário"
-						subtitle="Mantém o histórico visível em Minha biblioteca."
+						subtitle="Mantém o histórico visível no seu perfil."
 					/>
 				</Stack>
 			</Stack>
