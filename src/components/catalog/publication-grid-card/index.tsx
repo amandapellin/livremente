@@ -4,6 +4,7 @@ import type { Publication } from "@/api/generated/model"
 import PublicationCover from "@/components/catalog/publication-card/publication-cover"
 import TypeBadge from "@/components/catalog/publication-card/type-badge"
 import { radii } from "@/theme/tokens"
+import { formatPersonName } from "@/utils/format-name"
 
 interface Props {
     publication: Publication
@@ -27,7 +28,7 @@ export default function PublicationGridCard({ publication }: Props) {
                 >
                     {publication.title}
                 </Typography>
-                <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>{publication.author}</Typography>
+                <Typography variant="caption" sx={{ color: 'text.secondary' }} noWrap>{formatPersonName(publication.author)}</Typography>
             </CardActionArea>
         </Card>
     )

@@ -1,6 +1,7 @@
 import { Divider, Stack, Typography } from '@mui/material'
 import type { Contributor } from '@/api/generated/model'
 import MetaSection from '@/components/details/metadata-aside/meta-section'
+import { formatPersonName } from '@/utils/format-name'
 
 const roleLabels: Record<string, string> = {
 	author: 'Autoria', translator: 'Tradução', editor: 'Edição', illustrator: 'Ilustração',
@@ -15,7 +16,7 @@ export default function ContributorList({ contributors }: { contributors?: Contr
 				{contributors.map((c, i) => (
 					<Stack key={`${c.name}-${i}`} sx={{ py: 1, gap: 0.25 }}>
 						<Typography variant="overline" sx={{ color: 'text.secondary' }}>{roleLabels[c.role] ?? c.role}</Typography>
-						<Typography variant="body2">{c.name}</Typography>
+						<Typography variant="body2">{formatPersonName(c.name)}</Typography>
 						{c.lifespan && <Typography variant="caption" sx={{ color: 'text.secondary' }}>{c.lifespan}</Typography>}
 					</Stack>
 				))}

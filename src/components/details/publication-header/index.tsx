@@ -4,6 +4,7 @@ import { MuseumOutlined } from "@mui/icons-material";
 import { Box, Chip, Paper, Stack, Typography } from "@mui/material";
 import DetailActions from "../detail-actions";
 import ReadingProgressCard from "../reading-progress-card";
+import { formatPersonName } from "@/utils/format-name";
 
 const PROGRESS_STATUSES: ReadingStatus[] = ['read', 'reading', 'abandoned']
 
@@ -32,7 +33,7 @@ export default function PublicationHeader({ publication, onSelectStatus }: Props
 			<Stack sx={{ gap: 2, flex: 1, minWidth: 0 }}>
 				<Stack sx={{ gap: 0.5 }}>
 					<Typography variant="h3" component="h1">{publication.title}</Typography>
-					<Typography variant="h6" component="p" sx={{ color: 'text.secondary'}}>{publication.author}</Typography>
+					<Typography variant="h6" component="p" sx={{ color: 'text.secondary'}}>{formatPersonName(publication.author)}</Typography>
 				</Stack>
 				<Stack direction="row" sx={{ gap: 1.5, alignItems: 'center', flexWrap: 'wrap', color: 'text.secondary'}}>
 					{ publication.year && (

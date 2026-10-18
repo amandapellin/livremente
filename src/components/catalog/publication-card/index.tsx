@@ -1,5 +1,6 @@
 import type { Publication } from "@/api/generated/model";
 import { genreLabel, languageLabel } from "@/schemas/catalog-schemas";
+import { formatPersonName } from "@/utils/format-name";
 import { Paper, Stack, Typography } from "@mui/material";
 import PublicationCover from "./publication-cover";
 import TypeBadge from "./type-badge";
@@ -12,7 +13,7 @@ interface Props {
 
 export default function PublicationCard({ publication, onAddToShelf }: Props) {
     const meta = [
-        publication.author, 
+        formatPersonName(publication.author),
         publication.year, 
         languageLabel(publication.language),
         publication.genre && genreLabel(publication.genre)
