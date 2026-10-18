@@ -1,5 +1,6 @@
 import { getAuthToken } from '@/api/auth-storage'
 import type { Highlight, HighlightColor } from '@/types/reader-types'
+import { reduceRemoteAnnotations, type AnnotationSeed } from '@/utils/reader-annotations'
 
 const PREFIX = 'reader:highlights:'
 const baseURL = import.meta.env.VITE_API_URL ?? ''
@@ -60,8 +61,18 @@ interface RemoteHighlight {
 	createdAt: string
 }
 
-// RF22: carrega os grifos do back-end (cross-device). Mapeia a linha para o modelo
-// do front usando o cfiRange como id (chave estável do epub.js e das operações locais).
+// Mapeia a linha do back para o modelo do front, usando o cfiRange como id (chave
+// estável do epub.js e das operações locais).
+const toHighlight = (r: RemoteHighlight): Highlight => ({
+	id: r.epubPosition,
+	cfiRange: r.epubPosition,
+	text: r.excerpt,
+	chapter: '',
+	color: r.color,
+	createdAt: Date.parse(r.createdAt) || Date.now(),
+})
+
+// RF22: carrega os grifos do back-end (cross-device).
 export const fetchHighlightsRemote = async (bookId: string): Promise<Highlight[]> => {
 	if (!USE_HIGHLIGHTS_API) return []
 	const token = getAuthToken()
@@ -73,16 +84,38 @@ export const fetchHighlightsRemote = async (bookId: string): Promise<Highlight[]
 		if (!res.ok) return []
 		const rows = (await res.json()) as RemoteHighlight[]
 		if (!Array.isArray(rows)) return []
-		return rows.map((r) => ({
-			id: r.epubPosition,
-			cfiRange: r.epubPosition,
-			text: r.excerpt,
-			chapter: '',
-			color: r.color,
-			createdAt: Date.parse(r.createdAt) || Date.now(),
-		}))
+		return rows.map(toHighlight)
 	} catch {
 		return []
+	}
+}
+
+// RF24 (#29): grifos + anotações num único GET combinado — o snapshot de "reabrir
+// obra". Substitui as duas chamadas separadas (1 round-trip).
+interface ReadingNotesResponse {
+	highlights: RemoteHighlight[]
+	annotations: Array<{ epubPosition: string; content: string }>
+}
+
+export const fetchReadingNotesRemote = async (
+	bookId: string,
+): Promise<{ highlights: Highlight[]; notes: AnnotationSeed[] }> => {
+	const empty = { highlights: [], notes: [] }
+	if (!USE_HIGHLIGHTS_API) return empty
+	const token = getAuthToken()
+	if (!token) return empty
+	try {
+		const res = await fetch(`${baseURL}/api/reading/${bookId}/highlights-annotations`, {
+			headers: { Authorization: `Bearer ${token}` },
+		})
+		if (!res.ok) return empty
+		const data = (await res.json()) as ReadingNotesResponse
+		return {
+			highlights: Array.isArray(data?.highlights) ? data.highlights.map(toHighlight) : [],
+			notes: Array.isArray(data?.annotations) ? reduceRemoteAnnotations(data.annotations) : [],
+		}
+	} catch {
+		return empty
 	}
 }
 

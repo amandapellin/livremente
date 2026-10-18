@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import type { Highlight, HighlightColor } from '@/types/reader-types'
 import {
 	deleteHighlight,
-	fetchHighlightsRemote,
+	fetchReadingNotesRemote,
 	getHighlights,
 	removeHighlightRemote,
 	saveHighlight,
@@ -11,7 +11,7 @@ import {
 	updateHighlightNote,
 	updateHighlightRemote,
 } from '@/utils/reader-highlights'
-import { fetchAnnotationsRemote, sendAnnotation } from '@/utils/reader-annotations'
+import { sendAnnotation } from '@/utils/reader-annotations'
 
 export const useHighlights = (bookId?: string) => {
 	const [highlights, setHighlights] = useState<Highlight[]>(() => (bookId ? getHighlights(bookId) : []))
@@ -24,11 +24,10 @@ export const useHighlights = (bookId?: string) => {
 		if (!bookId || getHighlights(bookId).length > 0) return
 		let cancelled = false
 		void (async () => {
-			const remote = await fetchHighlightsRemote(bookId)
+			// RF24 (#29): grifos + anotações num único GET combinado.
+			const { highlights: remote, notes } = await fetchReadingNotesRemote(bookId)
 			if (cancelled) return
 			remote.forEach((h) => saveHighlight(bookId, h))
-			const notes = await fetchAnnotationsRemote(bookId)
-			if (cancelled) return
 			notes.forEach((n) => updateHighlightNote(bookId, n.cfiRange, n.content))
 			if (remote.length > 0 || notes.length > 0) setHighlights(getHighlights(bookId))
 		})()

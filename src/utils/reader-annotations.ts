@@ -20,8 +20,18 @@ export interface AnnotationSeed {
 	content: string
 }
 
-// RF23: carrega as anotações do back-end e as reduz a { cfiRange, content }. A lista
-// vem mais recente primeiro; mantém a primeira (mais nova) por cfiRange.
+// Reduz as linhas de anotação a { cfiRange, content }, mantendo a mais nova por
+// cfiRange (a lista do back vem mais recente primeiro). Reusado pela listagem
+// combinada (#29). Aceita o shape mínimo { epubPosition, content }.
+export const reduceRemoteAnnotations = (
+	rows: ReadonlyArray<Pick<RemoteAnnotation, 'epubPosition' | 'content'>>,
+): AnnotationSeed[] => {
+	const byCfi = new Map<string, string>()
+	for (const r of rows) if (!byCfi.has(r.epubPosition)) byCfi.set(r.epubPosition, r.content)
+	return [...byCfi].map(([cfiRange, content]) => ({ cfiRange, content }))
+}
+
+// RF23: carrega as anotações do back-end e as reduz a { cfiRange, content }.
 export const fetchAnnotationsRemote = async (bookId: string): Promise<AnnotationSeed[]> => {
 	if (!USE_ANNOTATIONS_API) return []
 	const token = getAuthToken()
@@ -33,9 +43,7 @@ export const fetchAnnotationsRemote = async (bookId: string): Promise<Annotation
 		if (!res.ok) return []
 		const rows = (await res.json()) as RemoteAnnotation[]
 		if (!Array.isArray(rows)) return []
-		const byCfi = new Map<string, string>()
-		for (const r of rows) if (!byCfi.has(r.epubPosition)) byCfi.set(r.epubPosition, r.content)
-		return [...byCfi].map(([cfiRange, content]) => ({ cfiRange, content }))
+		return reduceRemoteAnnotations(rows)
 	} catch {
 		return []
 	}
