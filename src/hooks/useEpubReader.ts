@@ -308,7 +308,10 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		const r = renditionRef.current
 		if (!r) return ''
 		try {
-			const contents = r.getContents()?.[0] as { document: Document; range: (cfi: string) => Range } | undefined
+			const rawContents = r.getContents() as unknown
+			const contents = (Array.isArray(rawContents) ? rawContents[0] : rawContents) as
+				| { document: Document; range: (cfi: string) => Range }
+				| undefined
 			const loc = r.currentLocation() as unknown as RelocatedLocation | undefined
 			const cfi = loc?.start?.cfi
 			if (!contents || !cfi) return ''
