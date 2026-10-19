@@ -1659,6 +1659,12 @@
             "format": "int32",
             "description": "Percentual lido (0–100) da obra na estante do usuário. Nulo se anônimo ou fora da estante.",
             "nullable": true
+          },
+          "readingTimeMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tempo total de leitura ativa (em minutos) da obra pelo usuário, somado das sessões (RF20). Nulo se anônimo ou sem leitura registrada.",
+            "nullable": true
           }
         }
       }

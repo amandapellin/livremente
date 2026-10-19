@@ -29,7 +29,13 @@ const toDetails = (d: PublicationDetailsApi): PublicationDetails => ({
 	publicDomain: d.publicDomain,
 	downloadUrl: d.downloadUrl ?? null,
 	readingStatus: d.readingStatus ?? null,
-	readingProgress: d.readingProgress ?? null,
+	// O back devolve o progresso como PERCENTUAL (número 0–100) + o tempo total de
+	// leitura (minutos); o card espera um objeto ReadingProgress. Monta quando a obra
+	// está na estante (readingStatus); os stats (grifos/anotações/páginas marcadas)
+	// são enriquecidos na tela de detalhes (useReadingStats).
+	readingProgress: d.readingStatus
+		? { percent: d.readingProgress ?? 0, readingTimeMinutes: d.readingTimeMinutes ?? null }
+		: null,
 	epubFileUrl: d.epubFileUrl ?? null,
 	pdfFileUrl: d.pdfFileUrl ?? null,
 })

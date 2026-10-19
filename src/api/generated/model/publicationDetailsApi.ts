@@ -44,4 +44,9 @@ export interface PublicationDetailsApi {
      * @nullable
      */
   readingProgress?: number | null;
+  /**
+     * Tempo total de leitura ativa (em minutos) da obra pelo usuário, somado das sessões (RF20). Nulo se anônimo ou sem leitura registrada.
+     * @nullable
+     */
+  readingTimeMinutes?: number | null;
 }
