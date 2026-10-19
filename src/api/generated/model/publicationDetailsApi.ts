@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0
  */
 import type { PublicationType } from './publicationType';
+import type { ReadingStatus } from './readingStatus';
 
 /**
  * Detalhes de publicação do back-end (GET /api/publications/{id}).
@@ -36,4 +37,16 @@ export interface PublicationDetailsApi {
   pdfFileUrl?: string | null;
   /** @nullable */
   downloadUrl?: string | null;
+  /** Estado da obra na estante do usuário (#20, ciente do usuário). Nulo se anônimo ou fora da estante. */
+  readingStatus?: ReadingStatus | null;
+  /**
+     * Percentual lido (0–100) da obra na estante do usuário. Nulo se anônimo ou fora da estante.
+     * @nullable
+     */
+  readingProgress?: number | null;
+  /**
+     * Tempo total de leitura ativa (em minutos) da obra pelo usuário, somado das sessões (RF20). Nulo se anônimo ou sem leitura registrada.
+     * @nullable
+     */
+  readingTimeMinutes?: number | null;
 }

@@ -7,8 +7,8 @@ import { genreLabel } from '@/schemas/catalog-schemas'
 /**
  * Adapta os detalhes reais do back-end (`PublicationDetailsApi`: `authors[]`/
  * `genres[]` slugs) para o `PublicationDetails` do front consumido pela tela.
- * Campos de estante/leitura (`readingStatus`/`readingProgress`) não vêm deste
- * endpoint (outros épicos) e ficam nulos.
+ * `readingStatus`/`readingProgress` vêm do endpoint ciente do usuário (#20): com
+ * JWT e obra na estante, trazem o estado/progresso; anônimo ou fora da estante → nulos.
  */
 const toDetails = (d: PublicationDetailsApi): PublicationDetails => ({
 	id: d.id,
@@ -28,8 +28,14 @@ const toDetails = (d: PublicationDetailsApi): PublicationDetails => ({
 	rights: d.publicDomain ? 'Domínio público' : null,
 	publicDomain: d.publicDomain,
 	downloadUrl: d.downloadUrl ?? null,
-	readingStatus: null,
-	readingProgress: null,
+	readingStatus: d.readingStatus ?? null,
+	// O back devolve o progresso como PERCENTUAL (número 0–100) + o tempo total de
+	// leitura (minutos); o card espera um objeto ReadingProgress. Monta quando a obra
+	// está na estante (readingStatus); os stats (grifos/anotações/páginas marcadas)
+	// são enriquecidos na tela de detalhes (useReadingStats).
+	readingProgress: d.readingStatus
+		? { percent: d.readingProgress ?? 0, readingTimeMinutes: d.readingTimeMinutes ?? null }
+		: null,
 	epubFileUrl: d.epubFileUrl ?? null,
 	pdfFileUrl: d.pdfFileUrl ?? null,
 })

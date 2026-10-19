@@ -319,5 +319,8 @@ export const GetApiPublicationsIdResponse = zod.object({
   "publicDomain": zod.boolean(),
   "epubFileUrl": zod.string().nullish(),
   "pdfFileUrl": zod.string().nullish(),
-  "downloadUrl": zod.string().nullish()
+  "downloadUrl": zod.string().nullish(),
+  "readingStatus": zod.union([zod.enum(['read', 'reading', 'want_to_read', 'abandoned']).describe('Estado de leitura na estante (espelha o enum ReadingStatus do back-end).'),zod.null()]).optional().describe('Estado da obra na estante do usuário (#20, ciente do usuário). Nulo se anônimo ou fora da estante.'),
+  "readingProgress": zod.int().nullish().describe('Percentual lido (0–100) da obra na estante do usuário. Nulo se anônimo ou fora da estante.'),
+  "readingTimeMinutes": zod.int().nullish().describe('Tempo total de leitura ativa (em minutos) da obra pelo usuário, somado das sessões (RF20). Nulo se anônimo ou sem leitura registrada.')
 }).describe('Detalhes de publicação do back-end (GET /api/publications/{id}).')

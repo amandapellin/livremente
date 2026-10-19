@@ -3,6 +3,8 @@ import { Alert, Box, Container, Link, Skeleton, Stack, Typography } from '@mui/m
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import { HttpError } from '@/api/fetcher'
 import { usePublicationDetails } from '@/hooks/usePublicationDetails'
+import { useShelfActions } from '@/hooks/useShelf'
+import { useReadingStats } from '@/hooks/useReadingStats'
 import PublicationHeader from '@/components/details/publication-header'
 import SynopsisSection from '@/components/details/synopsis-section'
 import MetadataAside from '@/components/details/metadata-aside'
@@ -10,6 +12,8 @@ import MetadataAside from '@/components/details/metadata-aside'
 export default function DetalhesObraPage() {
 	const { id } = useParams()
 	const { data, isLoading, isError, error } = usePublicationDetails(id)
+	const { setStatus, remove } = useShelfActions(id)
+	const stats = useReadingStats(id, !!data?.readingStatus)
 	const notFound = isError && error instanceof HttpError && error.status === 404
 
 	return (
@@ -37,11 +41,23 @@ export default function DetalhesObraPage() {
 				<Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', lg: 'minmax(0, 1fr) 368px' }, alignItems: 'start' }}>
 					<Stack sx={{ gap: 3 }}>
 						<PublicationHeader
-							publication={data}
-							onSelectStatus={(status) => {
-								// TODO(estante): persistir o estado quando o épico de Estante existir.
-								console.debug('estante:', data.id, status)
+							publication={{
+								...data,
+								readingProgress: data.readingProgress
+									? {
+											...data.readingProgress,
+											highlights: stats.highlights,
+											notes: stats.notes,
+											bookmarks: stats.bookmarks,
+										}
+									: null,
 							}}
+							onSelectStatus={(status) => setStatus.mutate({ id: data.id, status })}
+							onReadNow={() => {
+								// "Ler agora" adiciona à estante como "lendo" — mas NÃO rebaixa "lido".
+								if (data.readingStatus !== 'read') setStatus.mutate({ id: data.id, status: 'reading' })
+							}}
+							onRemove={() => remove.mutate(data.id)}
 						/>
 						<SynopsisSection synopsis={data.synopsis} />
 					</Stack>
