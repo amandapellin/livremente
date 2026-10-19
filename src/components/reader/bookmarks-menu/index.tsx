@@ -28,7 +28,7 @@ export default function BookmarksMenu({ bookmarks, onSelect, onRemove, color }: 
                     <BookmarksIcon sx={{ fontSize: 20 }} />
                 </IconButton>
             </Tooltip>
-            <Menu anchorEl={anchorEl} open={open} onClose={close} slotProps={{ paper: { sx: { minWidth: 220 } } }}>
+            <Menu anchorEl={anchorEl} open={open} onClose={close} slotProps={{ paper: { sx: { minWidth: 240, maxWidth: 320 } } }}>
                 {bookmarks.length === 0 ? (
                     <MenuItem disabled>
                         <Typography variant="body2">Nenhuma página marcada</Typography>
@@ -43,7 +43,21 @@ export default function BookmarksMenu({ bookmarks, onSelect, onRemove, color }: 
                             }}
                             sx={{ gap: 2, justifyContent: 'space-between' }}
                         >
-                            <ListItemText primary={b.label} />
+                            <ListItemText
+                                primary={b.label}
+                                secondary={b.secondary}
+                                slotProps={{
+                                    primary: {
+                                        sx: {
+                                            display: '-webkit-box',
+                                            WebkitLineClamp: 2,
+                                            WebkitBoxOrient: 'vertical',
+                                            overflow: 'hidden',
+                                        },
+                                    },
+                                    secondary: { variant: 'caption' },
+                                }}
+                            />
                             <DeleteIcon
                                 fontSize="small"
                                 role="button"

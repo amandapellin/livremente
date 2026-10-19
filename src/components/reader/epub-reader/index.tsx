@@ -72,14 +72,27 @@ export default function EpubReader({ data }: Props) {
 
 	const toggleMark = () => {
 		if (!reader.currentCfi) return
-		if (marked) bookmarks.remove(reader.currentCfi)
-		else
-			bookmarks.add({
-				id: reader.currentCfi,
-				cfi: reader.currentCfi,
-				label: reader.chapter || `${reader.progress}% lido`,
-				createdAt: Date.now(),
-			})
+		if (marked) {
+			bookmarks.remove(reader.currentCfi)
+			return
+		}
+		// Nome = trecho do texto da página (reconhecível, distingue páginas do
+		// mesmo capítulo). Sem trecho, cai para capítulo; sem capítulo, para o %.
+		const excerpt = reader.getSnippet()
+		const pct = `${reader.progress}% lido`
+		const label = excerpt || reader.chapter || pct
+		const secondary = excerpt
+			? [reader.chapter, pct].filter(Boolean).join(' · ')
+			: reader.chapter
+				? pct
+				: undefined
+		bookmarks.add({
+			id: reader.currentCfi,
+			cfi: reader.currentCfi,
+			label,
+			secondary,
+			createdAt: Date.now(),
+		})
 	}
 
 	const createHighlight = (color: HighlightColor) => {
