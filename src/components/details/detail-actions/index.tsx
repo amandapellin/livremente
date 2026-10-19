@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { NavLink } from "react-router"
-import { ArrowDropDown, AutoStories, BookmarkAddOutlined, Check, FileDownloadOutlined, OpenInNew } from "@mui/icons-material"
-import { Button, ListItemIcon, Menu, MenuItem, Stack } from "@mui/material"
+import { ArrowDropDown, AutoStories, BookmarkAddOutlined, BookmarkRemoveOutlined, Check, FileDownloadOutlined, OpenInNew } from "@mui/icons-material"
+import { Button, Divider, ListItemIcon, Menu, MenuItem, Stack } from "@mui/material"
 import type { PublicationType, ReadingStatus } from "@/api/generated/model"
 import { readingStatusOptions } from "@/schemas/reading-status-schemas"
 
@@ -12,9 +12,11 @@ interface Props {
 	downloadUrl?: string | null
 	readingStatus?: ReadingStatus | null
 	onSelectStatus?: (status: ReadingStatus) => void
+	onReadNow?: () => void
+	onRemove?: () => void
 }
 
-export default function DetailActions({ id, type, source, downloadUrl, readingStatus, onSelectStatus }: Props) {
+export default function DetailActions({ id, type, source, downloadUrl, readingStatus, onSelectStatus, onReadNow, onRemove }: Props) {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 	const open = Boolean(anchorEl)
 	const close = () => setAnchorEl(null)
@@ -40,6 +42,7 @@ export default function DetailActions({ id, type, source, downloadUrl, readingSt
 					<Button
 						component={NavLink}
 						to={`/leitura/${id}`}
+						onClick={onReadNow}
 						variant="contained"
 						color="secondary"
 						startIcon={<AutoStories />}
@@ -106,6 +109,21 @@ export default function DetailActions({ id, type, source, downloadUrl, readingSt
 						{o.label}
 					</MenuItem>
 				))}
+				{readingStatus && onRemove ? <Divider /> : null}
+				{readingStatus && onRemove ? (
+					<MenuItem
+						onClick={() => {
+							close()
+							onRemove()
+						}}
+						sx={{ color: 'error.main' }}
+					>
+						<ListItemIcon>
+							<BookmarkRemoveOutlined fontSize="small" color="error" />
+						</ListItemIcon>
+						Remover da estante
+					</MenuItem>
+				) : null}
 			</Menu>
 		</>
 	)

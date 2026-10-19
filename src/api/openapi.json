@@ -1644,6 +1644,21 @@
           "downloadUrl": {
             "type": "string",
             "nullable": true
+          },
+          "readingStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReadingStatus"
+              }
+            ],
+            "description": "Estado da obra na estante do usuário (#20, ciente do usuário). Nulo se anônimo ou fora da estante.",
+            "nullable": true
+          },
+          "readingProgress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Percentual lido (0–100) da obra na estante do usuário. Nulo se anônimo ou fora da estante.",
+            "nullable": true
           }
         }
       }

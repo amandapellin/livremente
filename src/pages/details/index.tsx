@@ -3,6 +3,7 @@ import { Alert, Box, Container, Link, Skeleton, Stack, Typography } from '@mui/m
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import { HttpError } from '@/api/fetcher'
 import { usePublicationDetails } from '@/hooks/usePublicationDetails'
+import { useShelfActions } from '@/hooks/useShelf'
 import PublicationHeader from '@/components/details/publication-header'
 import SynopsisSection from '@/components/details/synopsis-section'
 import MetadataAside from '@/components/details/metadata-aside'
@@ -10,6 +11,7 @@ import MetadataAside from '@/components/details/metadata-aside'
 export default function DetalhesObraPage() {
 	const { id } = useParams()
 	const { data, isLoading, isError, error } = usePublicationDetails(id)
+	const { setStatus, remove } = useShelfActions(id)
 	const notFound = isError && error instanceof HttpError && error.status === 404
 
 	return (
@@ -38,10 +40,12 @@ export default function DetalhesObraPage() {
 					<Stack sx={{ gap: 3 }}>
 						<PublicationHeader
 							publication={data}
-							onSelectStatus={(status) => {
-								// TODO(estante): persistir o estado quando o épico de Estante existir.
-								console.debug('estante:', data.id, status)
+							onSelectStatus={(status) => setStatus.mutate({ id: data.id, status })}
+							onReadNow={() => {
+								// "Ler agora" adiciona à estante como "lendo" — mas NÃO rebaixa "lido".
+								if (data.readingStatus !== 'read') setStatus.mutate({ id: data.id, status: 'reading' })
 							}}
+							onRemove={() => remove.mutate(data.id)}
 						/>
 						<SynopsisSection synopsis={data.synopsis} />
 					</Stack>

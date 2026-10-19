@@ -11,9 +11,11 @@ const PROGRESS_STATUSES: ReadingStatus[] = ['read', 'reading', 'abandoned']
 interface Props {
 	publication: PublicationDetails
 	onSelectStatus?: (status: ReadingStatus) => void
+	onReadNow?: () => void
+	onRemove?: () => void
 }
 
-export default function PublicationHeader({ publication, onSelectStatus }: Props) {
+export default function PublicationHeader({ publication, onSelectStatus, onReadNow, onRemove }: Props) {
 	return (
 		<Paper
 			variant="section"
@@ -68,6 +70,8 @@ export default function PublicationHeader({ publication, onSelectStatus }: Props
 					downloadUrl={publication.downloadUrl}
 					readingStatus={publication.readingStatus}
 					onSelectStatus={onSelectStatus}
+					onReadNow={onReadNow}
+					onRemove={onRemove}
 				/>
 				{publication.readingProgress &&
 					publication.readingStatus &&
