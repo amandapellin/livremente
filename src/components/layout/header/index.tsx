@@ -26,7 +26,7 @@ import { colors, fontFamilies } from "@/theme/tokens";
 import { useIsAuthenticated } from "@/hooks/useAuth";
 import { useLogout } from "@/hooks/useLogout";
 import AccountMenu from "@/components/layout/account-menu";
-import SearchPopover from "@/components/layout/search-popover";
+import HeaderSearch from "@/components/layout/header-search";
 import NotificationsMenu from "@/components/layout/notifications-menu";
 
 const navItems = [
@@ -163,7 +163,7 @@ export default function Header() {
 					</Stack>
 
 					<Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
-						<SearchPopover />
+						<HeaderSearch />
 						<NotificationsMenu />
 						<ColorModeToggle />
 						{isAuthenticated ? (

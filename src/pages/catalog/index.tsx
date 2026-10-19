@@ -28,6 +28,17 @@ export default function CatalogoPage() {
 		const q = searchParams.get("q")
 		return q ? { ...emptyCatalogQuery, q } : emptyCatalogQuery
 	})
+	// O initializer acima só roda na montagem. Quando a lupa da navbar navega com
+	// um novo ?q= estando JÁ no catálogo, a rota não remonta — então sincronizamos
+	// a busca com a URL durante o render (padrão React de "ajustar estado quando um
+	// valor externo muda", rastreando o valor anterior). Não briga com a digitação:
+	// o campo não altera a URL, só o `filters.q` local, e `urlQ` não muda ao digitar.
+	const urlQ = searchParams.get("q") ?? ""
+	const [prevUrlQ, setPrevUrlQ] = useState(urlQ)
+	if (urlQ !== prevUrlQ) {
+		setPrevUrlQ(urlQ)
+		setFilters((f) => (f.q === urlQ ? f : { ...f, q: urlQ, page: 1 }))
+	}
 	const [view, setView] = useState<ViewMode>(readStoredView)
 	const debouncedQ = useDebouncedValue(filters.q, 350)
 	const query = useMemo<CatalogQuery>(() => ({ ...filters, q: debouncedQ }), [filters, debouncedQ])
