@@ -23,6 +23,7 @@ export interface ReaderIconOption<T> extends ReaderOption<T> {
 export interface Bookmark {
 	id: string
 	label: string
+	secondary?: string // contexto (capítulo · % lido) sob o trecho
 	cfi: string
 	createdAt: number
 }

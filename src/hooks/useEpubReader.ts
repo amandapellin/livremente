@@ -114,7 +114,16 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 
 		rendition.hooks.content.register((contents: { document: Document }) => {
 			const style = contents.document.createElement('style')
-			style.textContent = `@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-regular.woff2') format('woff2');font-weight:400;font-display:swap}@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-bold.woff2') format('woff2');font-weight:700;font-display:swap}`
+			const fontFaces = `@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-regular.woff2') format('woff2');font-weight:400;font-display:swap}@font-face{font-family:'OpenDyslexic';src:url('${location.origin}/fonts/opendyslexic-bold.woff2') format('woff2');font-weight:700;font-display:swap}`
+			// O tema controla a cor do texto. Vários EPUBs do Gutenberg trazem âncoras
+			// vazias auto-fechadas (`<a id=".."/>`) que, parseadas como HTML (não XML),
+			// abrem e embrulham o capítulo inteiro; como o CSS do livro tem
+			// `a:hover{color:red}` e essas âncoras não têm `href` (logo `a:link` não as
+			// pinta, mas `:hover` pega qualquer `<a>`), passar o mouse deixava o texto
+			// todo vermelho. Forçar a cor dos `<a>` a herdar do tema mata o vermelho (e o
+			// azul dos links), mantendo só os links reais (`a[href]`) sublinhados.
+			const anchorReset = `a,a:link,a:visited,a:hover,a:active{color:inherit !important}a[href]{text-decoration:underline}`
+			style.textContent = fontFaces + anchorReset
 			contents.document.head.appendChild(style)
 		})
 
@@ -291,6 +300,46 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		renditionRef.current?.annotations.remove(cfiRange, 'highlight')
 	}
 
+	// Trecho de texto no início da página atual, para nomear a página marcada
+	// (RF21) de forma reconhecível em vez de só pelo capítulo. Resolve o CFI do
+	// topo visível em um Range e coleta ~72 caracteres a partir dele. Qualquer
+	// falha → string vazia (quem chama cai para capítulo/percentual).
+	const getSnippet = (): string => {
+		const r = renditionRef.current
+		if (!r) return ''
+		try {
+			const rawContents = r.getContents() as unknown
+			const contents = (Array.isArray(rawContents) ? rawContents[0] : rawContents) as
+				| { document: Document; range: (cfi: string) => Range }
+				| undefined
+			const loc = r.currentLocation() as unknown as RelocatedLocation | undefined
+			const cfi = loc?.start?.cfi
+			if (!contents || !cfi) return ''
+			const range = contents.range(cfi)
+			const start = range?.startContainer
+			if (!start) return ''
+			const walker = contents.document.createTreeWalker(contents.document.body, NodeFilter.SHOW_TEXT)
+			walker.currentNode = start
+			let text =
+				start.nodeType === Node.TEXT_NODE
+					? (start.textContent ?? '').slice(range.startOffset)
+					: (start.textContent ?? '')
+			// A coluna pode quebrar no meio de uma palavra (ex.: "th|e tiny"): se o
+			// caractere anterior ao corte for letra/dígito, descarta o fragmento.
+			if (start.nodeType === Node.TEXT_NODE && range.startOffset > 0) {
+				const prev = (start.textContent ?? '')[range.startOffset - 1]
+				if (prev && /[\p{L}\p{N}]/u.test(prev)) text = text.replace(/^\S+\s*/, '')
+			}
+			while (text.replace(/\s+/g, ' ').trim().length < 60 && walker.nextNode()) {
+				text += ' ' + (walker.currentNode.textContent ?? '')
+			}
+			const clean = text.replace(/\s+/g, ' ').trim()
+			return clean.length > 72 ? clean.slice(0, 72).trimEnd() + '…' : clean
+		} catch {
+			return ''
+		}
+	}
+
 	return {
 		containerRef,
 		chapter,
@@ -306,6 +355,7 @@ export const useEpubReader = (url: string | undefined | null, bookId?: string) =
 		clearActiveMark: () => setActiveMark(null),
 		addHighlight,
 		removeHighlight,
+		getSnippet,
 		next: () => renditionRef.current?.next(),
 		prev: () => renditionRef.current?.prev(),
 		display: (cfi: string) => {
