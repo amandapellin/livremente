@@ -66,6 +66,8 @@ export interface WordHistoryItem {
 	consultedAt: string
 	publicationId: number
 	publicationTitle: string
+	/** Definição consultada (#27); null em consultas antigas, anteriores à migração. */
+	definition?: string | null
 }
 
 // RF08 (#31): histórico de palavras consultadas, com a obra de origem.

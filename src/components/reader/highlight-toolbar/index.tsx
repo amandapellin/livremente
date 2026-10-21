@@ -29,7 +29,7 @@ export default function HighlightToolbar({ top, left, onPick, onClose, activeCol
 					left,
 					transform: 'translateX(-50%)',
 					zIndex: (t) => t.zIndex.tooltip,
-					p: 0.5,
+					p: 1,
 					borderRadius: 2,
 				}}
 			>
@@ -67,18 +67,18 @@ export default function HighlightToolbar({ top, left, onPick, onClose, activeCol
 					))}
 					{(onLookup || onAnnotate || onRemove) && <Divider orientation="vertical" flexItem sx={{ mx: 0.25 }} />}
 					{onLookup && (
-						<IconButton size="small" aria-label="Consultar no dicionário" onClick={onLookup}>
-							<DictionaryIcon fontSize="small" />
+						<IconButton size="medium" aria-label="Consultar no dicionário" onClick={onLookup}>
+							<DictionaryIcon fontSize="medium" />
 						</IconButton>
 					)}
 					{onAnnotate && (
-						<IconButton size="small" aria-label={note ? 'Editar anotação' : 'Anotar'} onClick={onAnnotate}>
-							<EditNoteIcon fontSize="small" />
+						<IconButton size="medium" aria-label={note ? 'Editar anotação' : 'Anotar'} onClick={onAnnotate}>
+							<EditNoteIcon fontSize="medium" />
 						</IconButton>
 					)}
 					{onRemove && (
-						<IconButton size="small" aria-label="Remover grifo" onClick={onRemove}>
-							<DeleteOutlineIcon fontSize="small" />
+						<IconButton size="medium" aria-label="Remover grifo" onClick={onRemove}>
+							<DeleteOutlineIcon fontSize="medium" />
 						</IconButton>
 					)}
 				</Stack>

@@ -5,11 +5,15 @@ const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 // Item da estante (RF05): o card da publicação + estado + progresso (espelha o
 // ShelfItemDto do back-end). Usa o mesmo PublicationCard do catálogo.
+// `readingTimeMinutes` (RF20, tempo de leitura ativa em minutos; null se nunca leu)
+// e `format` ("epub"/"pdf"; null se não há arquivo) alimentam o card da visão Lista (#27).
 export interface ShelfItem {
 	publication: PublicationCard
 	status: ReadingStatus
 	readPercentage: number | null
 	lastPageRead: number | null
+	readingTimeMinutes: number | null
+	format: string | null
 }
 
 const authHeaders = (): Record<string, string> => {
