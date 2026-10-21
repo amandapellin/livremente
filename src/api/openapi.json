@@ -1104,6 +1104,15 @@
             "type": "string",
             "nullable": true,
             "description": "Caminho para buscar a imagem (/api/users/{id}/avatar); null quando não há avatar (o front exibe as iniciais)."
+          },
+          "gender": {
+            "type": "string",
+            "description": "Gênero (female, male, non_binary, other, prefer_not_to_say)."
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de nascimento (yyyy-MM-dd); o front calcula a idade."
           }
         }
       },

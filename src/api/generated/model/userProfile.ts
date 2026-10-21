@@ -14,4 +14,8 @@ export interface UserProfile {
      * @nullable
      */
   avatarUrl?: string | null;
+  /** Gênero (female, male, non_binary, other, prefer_not_to_say). */
+  gender?: string;
+  /** Data de nascimento (yyyy-MM-dd); o front calcula a idade. */
+  birthDate?: string;
 }
