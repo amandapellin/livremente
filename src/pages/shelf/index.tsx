@@ -6,6 +6,7 @@ import { readingStatusMap, readingStatusOptions } from '@/schemas/reading-status
 import ShelfDictionaryHistory from '@/components/shelf/shelf-dictionary-history'
 import ShelfUserCard from '@/components/shelf/shelf-user-card'
 import ShelfPreferencesCard from '@/components/shelf/shelf-preferences-card'
+import ShelfReadingCalendar from '@/components/shelf/shelf-reading-calendar'
 import ShelfStatusTabs from '@/components/shelf/shelf-status-tabs'
 import SegmentedToggle from '@/components/shelf/segmented-toggle'
 import ShelfBookCard from '@/components/shelf/shelf-book-card'
@@ -72,6 +73,7 @@ export default function EstantePage() {
 				<Stack sx={{ gap: 3 }}>
 					<ShelfUserCard />
 					<ShelfPreferencesCard />
+					<ShelfReadingCalendar />
 				</Stack>
 
 				{/* Conteúdo */}
