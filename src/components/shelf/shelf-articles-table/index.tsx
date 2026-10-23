@@ -25,6 +25,7 @@ import type { ReadingStatus } from '@/api/generated/model'
 import type { ShelfItem } from '@/utils/shelf'
 import { areasArtigos } from '@/schemas/category-schemas'
 import { readingStatusOptions } from '@/schemas/reading-status-schemas'
+import { formatPersonName } from '@/utils/format-name'
 
 interface Props {
 	items: ShelfItem[]
@@ -190,7 +191,7 @@ export default function ShelfArticlesTable({ items, onSelectStatus, onRemove }: 
 									</TableCell>
 									<TableCell>
 										<Typography variant="body2" noWrap>
-											{pub.authors.join(', ') || '—'}
+											{pub.authors.map(formatPersonName).join(', ') || '—'}
 										</Typography>
 									</TableCell>
 									<TableCell>

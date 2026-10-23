@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { Add } from '@mui/icons-material'
-import { Box, Stack, Tooltip, Typography } from '@mui/material'
+import { Add, AutoStories, BookmarkRemoveOutlined, Check, InfoOutlined } from '@mui/icons-material'
+import { Box, Button, Divider, ListItemIcon, MenuItem, MenuList, Popover, Stack, Tooltip, Typography } from '@mui/material'
+import type { ReadingStatus } from '@/api/generated/model'
 import type { ShelfItem } from '@/utils/shelf'
+import { readingStatusOptions } from '@/schemas/reading-status-schemas'
+import { formatPersonName } from '@/utils/format-name'
 
 interface Props {
 	items: ShelfItem[]
 	statusLabel: string
+	onSelectStatus: (publicationId: string, status: ReadingStatus) => void
+	onRemove: (publicationId: string) => void
 }
 
 type SpineColor = { bg: string; fg: string }
@@ -76,12 +81,15 @@ const hashOf = (s: string): number => {
 
 /**
  * Visão Prateleira da estante (#27, RF05): lombadas dos livros sobre uma placa de
- * madeira, com título girado e % de leitura na base. Cada lombada abre os detalhes
- * da obra; o "+" leva ao catálogo.
+ * madeira, com título girado e % de leitura na base. Clicar numa lombada abre um
+ * popover com as ações da obra (Ler agora, alterar estado — RF06/#28 —, ver
+ * detalhes, remover); o "+" leva ao catálogo.
  */
-export default function ShelfBookshelf({ items, statusLabel }: Props) {
+export default function ShelfBookshelf({ items, statusLabel, onSelectStatus, onRemove }: Props) {
 	const navigate = useNavigate()
 	const [coverColors, setCoverColors] = useState<Record<string, SpineColor>>({})
+	const [menu, setMenu] = useState<{ anchor: HTMLElement; item: ShelfItem } | null>(null)
+	const closeMenu = () => setMenu(null)
 
 	// Para cada obra com capa, amostra a cor e guarda por id (uma vez; o navegador
 	// cacheia a imagem e o setState dedup por chave). Sem capa → fallback na paleta.
@@ -129,9 +137,13 @@ export default function ShelfBookshelf({ items, statusLabel }: Props) {
 							<Box
 								role="button"
 								tabIndex={0}
-								onClick={() => navigate(`/obra/${it.publication.id}`)}
+								aria-haspopup="menu"
+								onClick={(e) => setMenu({ anchor: e.currentTarget, item: it })}
 								onKeyDown={(e) => {
-									if (e.key === 'Enter' || e.key === ' ') navigate(`/obra/${it.publication.id}`)
+									if (e.key === 'Enter' || e.key === ' ') {
+										e.preventDefault()
+										setMenu({ anchor: e.currentTarget, item: it })
+									}
 								}}
 								sx={{
 									position: 'relative',
@@ -211,6 +223,95 @@ export default function ShelfBookshelf({ items, statusLabel }: Props) {
 					{items.length} {items.length === 1 ? 'obra' : 'obras'}
 				</Typography>
 			</Stack>
+
+			{/* Popover de ações da obra (RF06/#28): aberto ao clicar na lombada. */}
+			<Popover
+				open={Boolean(menu)}
+				anchorEl={menu?.anchor ?? null}
+				onClose={closeMenu}
+				anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+				transformOrigin={{ vertical: 'center', horizontal: 'left' }}
+				marginThreshold={16}
+				slotProps={{
+					paper: { sx: { ml: 1, boxShadow: 8 } },
+					backdrop: { invisible: false, sx: { backgroundColor: 'rgba(0,0,0,0.5)' } },
+				}}
+			>
+				{menu ? (
+					<Box sx={{ width: 248, p: 2 }}>
+						<Box sx={{pb:1}}>
+							<Typography variant="subtitle2" noWrap title={menu.item.publication.title}>
+								{menu.item.publication.title}
+							</Typography>
+							<Typography variant="caption" sx={{ color: 'text.secondary', display: 'block' }} noWrap>
+								{menu.item.publication.authors.map(formatPersonName).join(', ')}
+							</Typography>
+						</Box>
+
+						<Button
+							fullWidth
+							variant="contained"
+							color="primary"
+							size="small"
+							startIcon={<AutoStories />}
+							sx={{ mt: 1 }}
+							onClick={() => {
+								navigate(`/leitura/${menu.item.publication.id}`)
+								closeMenu()
+							}}
+						>
+							Ler agora
+						</Button>
+
+						<Divider sx={{ my: 1 }} />
+						<Typography variant="overline" sx={{ color: 'text.secondary', px: 1 }}>
+							Estado na estante
+						</Typography>
+						<MenuList dense sx={{ py: 0 }}>
+							{readingStatusOptions.map((o) => (
+								<MenuItem
+									key={o.value}
+									selected={o.value === menu.item.status}
+									onClick={() => {
+										onSelectStatus(menu.item.publication.id, o.value)
+										closeMenu()
+									}}
+								>
+									<ListItemIcon>{o.value === menu.item.status ? <Check fontSize="small" /> : null}</ListItemIcon>
+									{o.label}
+								</MenuItem>
+							))}
+						</MenuList>
+
+						<Divider sx={{ my: 0.5 }} />
+						<MenuList dense sx={{ py: 0 }}>
+							<MenuItem
+								onClick={() => {
+									navigate(`/obra/${menu.item.publication.id}`)
+									closeMenu()
+								}}
+							>
+								<ListItemIcon>
+									<InfoOutlined fontSize="small" />
+								</ListItemIcon>
+								Ver detalhes
+							</MenuItem>
+							<MenuItem
+								sx={{ color: 'error.main' }}
+								onClick={() => {
+									onRemove(menu.item.publication.id)
+									closeMenu()
+								}}
+							>
+								<ListItemIcon>
+									<BookmarkRemoveOutlined fontSize="small" color="error" />
+								</ListItemIcon>
+								Remover da estante
+							</MenuItem>
+						</MenuList>
+					</Box>
+				) : null}
+			</Popover>
 		</Box>
 	)
 }
