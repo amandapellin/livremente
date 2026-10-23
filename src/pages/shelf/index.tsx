@@ -139,7 +139,12 @@ export default function EstantePage() {
 					) : type === 'scientific_article' ? (
 						<ShelfArticlesTable items={items} onSelectStatus={onSelectStatus} onRemove={onRemove} />
 					) : view === 'prateleira' ? (
-						<ShelfBookshelf items={items} statusLabel={statusLabel} />
+						<ShelfBookshelf
+							items={items}
+							statusLabel={statusLabel}
+							onSelectStatus={onSelectStatus}
+							onRemove={onRemove}
+						/>
 					) : (
 						<Box sx={CARD_GRID}>
 							{items.map((it) => (

@@ -6,6 +6,7 @@ import type { ShelfItem } from '@/utils/shelf'
 import PublicationCover from '@/components/catalog/publication-card/publication-cover'
 import ShelfStatusMenu from '@/components/shelf/shelf-status-menu'
 import { formatReadingTime } from '@/utils/format-reading-time'
+import { formatPersonName } from '@/utils/format-name'
 import { colors, radii } from '@/theme/tokens'
 
 interface Props {
@@ -28,7 +29,7 @@ export default function ShelfBookCard({ item, onSelectStatus, onRemove }: Props)
 	const percent = readPercentage ?? 0
 	const time = formatReadingTime(readingTimeMinutes)
 	const isArticle = pub.type === 'scientific_article'
-	const meta = [pub.authors.join(', '), formatLabel(format), isArticle ? sourceLabel(pub.source) : null]
+	const meta = [pub.authors.map(formatPersonName).join(', '), formatLabel(format), isArticle ? sourceLabel(pub.source) : null]
 		.filter(Boolean)
 		.join(' · ')
 
@@ -69,7 +70,7 @@ export default function ShelfBookCard({ item, onSelectStatus, onRemove }: Props)
 					/>
 				</Stack>
 
-				<Stack direction="row" sx={{ gap: 1, alignItems: 'center', pt: 1, flexWrap: 'wrap' }}>
+				<Stack direction="row" sx={{ gap: 1, alignItems: 'center', pt: 1, flexWrap: 'nowrap' }}>
 					<Button
 						component={NavLink}
 						to={`/leitura/${pub.id}`}

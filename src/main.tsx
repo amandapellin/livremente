@@ -9,6 +9,7 @@ import './index.css'
 import { theme } from './theme/theme'
 import { queryClient } from './api/queryClient'
 import { router } from './routes/router'
+import { ToastProvider } from './providers/toast'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -16,7 +17,9 @@ createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
           <ThemeProvider theme={theme} defaultMode="system">
               <CssBaseline enableColorScheme/>
-              <RouterProvider router={router} />
+              <ToastProvider>
+                  <RouterProvider router={router} />
+              </ToastProvider>
           </ThemeProvider>
       </QueryClientProvider>
   </StrictMode>,
