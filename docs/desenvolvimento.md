@@ -68,7 +68,11 @@ ferramenta **orval** gera automaticamente os tipos, os *hooks* de requisição e
 esquemas de validação correspondentes, mantendo front-end e back-end alinhados e
 reduzindo divergências de contrato. Sobre o cliente gerado há um *fetcher*
 próprio, que centraliza o tratamento de respostas, a injeção do token de
-autenticação e o tratamento uniforme de erros HTTP.
+autenticação e o tratamento uniforme de erros HTTP. Para alguns recursos mais
+recentes — leitor, estante e recomendações —, utiliza-se, ao lado do cliente
+gerado, uma **camada de requisição autenticada manual** (com a mesma injeção do
+*token*), empregada onde o contrato curado não inclui o *endpoint* ou onde uma
+chamada direta é suficiente.
 
 ### 3.1.6 Autenticação no cliente
 
@@ -85,6 +89,28 @@ A padronização e a análise estática do código são asseguradas pelo **ESLin
 **TypeScript**. O gerenciador de pacotes é o **pnpm**. O versionamento utiliza
 **Git** com hospedagem no **GitHub**, e o trabalho é acompanhado por *issues*
 vinculadas a um quadro de projeto.
+
+### 3.1.8 Leitura no navegador e técnicas específicas
+
+A leitura das obras ocorre inteiramente no navegador. Os arquivos **EPUB** são
+renderizados pela biblioteca **epub.js**, que oferece paginação, navegação por
+capítulos e **refluxo** responsivo do conteúdo, além de referências canônicas de
+posição (*CFI*) usadas para retomada, grifos e anotações. Os arquivos **PDF** são
+exibidos pelo **visualizador nativo** do navegador, embutido por um quadro
+(*iframe*), aproveitando recursos prontos como zoom, busca e impressão.
+
+Como os *endpoints* de arquivo exigem autenticação e nem o leitor de EPUB nem o
+quadro de PDF enviam o cabeçalho de autorização, os arquivos são obtidos por
+requisição autenticada e entregues ao leitor como **URLs locais (*blob*)** de
+mesma origem. Na tela de estante, a visualização em prateleira amostra a **cor
+predominante da capa** por meio da API **Canvas** do navegador — possível porque
+as capas são servidas pela mesma origem (por *proxy* do back-end) —, pintando a
+lombada de cada obra; na ausência de capa, recai sobre uma paleta determinística.
+
+Para não depender de disponibilidade da rede a cada interação, o progresso de
+leitura (posição, percentual, marcações) é mantido no **armazenamento local**
+(*localStorage*) do navegador como *cache* e *fallback*, e sincronizado com o
+back-end por envios com *debounce* e descarga (*flush*) ao sair da tela.
 
 ---
 
@@ -121,3 +147,13 @@ tecnologias empregadas.*
 | #24 | RF23 — Interface de criação de anotação | Anotar um trecho = **grifo + nota**, **só EPUB** (RN07). O `Highlight` ganhou `note?`; a toolbar flutuante ganhou a ação **"Anotar"** que garante o grifo (cria em `DEFAULT_HIGHLIGHT` se preciso) e abre o **`NoteDialog`** (campo de texto multiline, remontado por `key` para refletir a nota atual). O painel lateral ganhou **abas Todos/Grifos/Anotações** (Grifos = sem nota, Anotações = com nota), exibe a nota no card e permite editar. Persistência/sync reusa `reader-highlights`/`useHighlights` (`setNote` → `updateHighlightNote` + `PATCH { note }`, atrás de flag). Decisões: "Anotar" sempre ancora num grifo; editor em diálogo. Reusa os frames do Figma do #23 |
 | #25 | RF24 — Exibição de grifos/anotações salvos | Incremento enxuto. **Grifos destacados ao reabrir**: já do #23 (reaplicação no load). **Anotações acessíveis do trecho marcado**: ao clicar num trecho com nota, o `HighlightToolbar` exibe o **texto da nota** (leitura) acima das ações (prop `note` via `activeHighlight?.note`); o lápis vira "Editar anotação". Alinhado ao Figma (node 176): o trecho anotado não tem marcador próprio no texto — o grifo é o marcador clicável e o review é no painel lateral (#24). PDF não tem (RN07) |
 | #47 | RF17 — Salvamento automático da última página lida | A posição já era gravada no `localStorage` a cada `relocated` (desde o #19); esta issue adiciona o **envio ao back-end** (RN08, base do RF18). O `useEpubReader` agenda `sendReadingProgress` com **debounce de 4s** a cada `relocated` e faz **flush ao sair da tela** (`pagehide`/desmontar). `utils/reader-progress.ts` faz `PUT /api/users/me/reading-progress/{id}` (`{ cfi, percent }`) *best-effort* com `keepalive`, atrás do flag `USE_READING_PROGRESS_API`. **Só EPUB** (PDF não envia). `localStorage` (`reader:position:<id>`) segue como fonte/fallback |
+| — | RF10 / RF13 — Integração do catálogo | Listagem e detalhes **repontados para os *endpoints* reais** (`GET /api/publications`, `/{id}`), com remoção dos *mocks*; correções de exibição (nome do autor na ordem natural, assuntos ocultos, *badge* de tipo legível no tema escuro); busca da *navbar* como campo **expansível** sincronizado ao `?q=` da URL |
+| — | RF15 / RF16 — Leitura via proxy autenticado | EPUB/PDF carregados pelo **proxy** do back-end; como os *endpoints* passaram a exigir JWT, o arquivo é obtido por *fetch* autenticado e entregue ao leitor como **URL local (*blob*)** de mesma origem; *guard* de rota em `/leitura/:id` sem *token* |
+| — | RF17 / RF18 / RF19 — Progresso de leitura (back-end) | Última página, retomada e percentual passam a ser **persistidos no back-end** (`/api/reading/{id}/last-page` e `/percentage`), além do `localStorage` como *cache*/*fallback*; retomada automática só com o *toggle* `resumeAuto` |
+| — | RF20 — Tempo de sessão (back-end) | O `useReadingSession` **abre a sessão** ao entrar no leitor (`POST /api/reading/{id}/session`) e envia *heartbeats* do tempo de tela ativa (`PUT /api/reading/sessions/{id}`) |
+| — | RF22 / RF23 / RF24 — Grifos e anotações (back-end) | Criação e listagem integradas aos *endpoints* reais (`/api/reading/{id}/highlights` e `/annotations`); *snapshot* de reabertura num único GET (`/highlights-annotations`); recoloração/edição seguem locais até terem rota própria |
+| RF07 / RF08 | Dicionário integrado e histórico | **Popup** de dicionário no leitor (`reader-dictionary` + `dictionary-popup`): consulta a palavra selecionada sem deslocar a leitura, com *dedup* do duplo efeito do *StrictMode*; ícone de dicionário na barra de seleção; seção **"Histórico do dicionário"** no perfil com a obra de origem, a definição e **paginação** |
+| RF25 | Download do arquivo | Ação de **baixar** o arquivo (EPUB/PDF) da obra a partir dos detalhes |
+| RF05 / RF06 | Estante do usuário | Tela **"Minha Estante"** no modelo do Figma: barra lateral (perfil + preferências), abas por estado com contagem, alternância Livros/Artigos, visões **Prateleira** (lombadas) e **Lista**, e **tabela** de artigos com busca/seleção múltipla e ações em massa; consumo de `GET`/`PUT`/`DELETE /api/shelf` por camada de *fetch* autenticado; confirmação por **toast**; *popover* de ações na lombada; amostragem da **cor da capa** (Canvas) para colorir as lombadas |
+| RF09 | Calendário de frequência | *Heatmap* mensal na estante consumindo `GET /api/reading/calendar`, com navegação entre meses, mapeamento de minutos ativos em níveis de intensidade e preenchimento dos dias sem leitura (lista esparsa) |
+| RF27 | Recomendações | Tela `/recomendacoes` consumindo `GET /api/recommendations`: cabeçalho em *card* com **chips** das preferências (mais gêneros que idiomas, com *chip* "+N" expansível) e "Ajustar preferências"; **cartões de estatística** (tempo de leitura ativo, frequência/sequência com mini-*heatmap* e "lendo agora", de `GET /api/reading/stats`); **seções por gênero** com "Ver tudo" que abre a busca já filtrada (`/catalogo?genero=`); tratamento de *cold start* e vazio |
