@@ -4,6 +4,7 @@ import { EditOutlined, TipsAndUpdatesOutlined } from '@mui/icons-material'
 import { Alert, Box, Button, Skeleton, Stack, Typography } from '@mui/material'
 import type { Publication, PublicationCard as PublicationCardApi, ReadingLanguage } from '@/api/generated/model'
 import PublicationGridCard from '@/components/catalog/publication-grid-card'
+import ReadingStatsCards from '@/components/recommendations/reading-stats-cards'
 import { fetchRecommendations, type Recommendations } from '@/utils/recommendations'
 
 // Mesmo adaptador do catálogo/estante: card do back-end → Publication do front
@@ -56,6 +57,10 @@ export default function RecomendacoesPage() {
 					Montadas a partir das preferências do seu cadastro e das obras que você leu na plataforma.
 				</Typography>
 			</Stack>
+
+			<Box sx={{ mb: 3 }}>
+				<ReadingStatsCards />
+			</Box>
 
 			{loading ? (
 				<Box sx={GRID_SX}>
