@@ -25,7 +25,7 @@ export const router = createBrowserRouter([
 			{ path: 'obra/:id', lazy: page(() => import('../pages/details')) },
 			{ path: 'leitura/:id', loader: requireAuth, lazy: page(() => import('../pages/reader')) },
 			{ path: 'estante', loader: requireAuth, lazy: page(() => import('../pages/shelf')) },
-			{ path: 'recomendacoes', lazy: page(() => import('../pages/recomendations')) },
+			{ path: 'recomendacoes', loader: requireAuth, lazy: page(() => import('../pages/recomendations')) },
 			{ path: '*', lazy: page(() => import('../pages/not-found')) },
 		],
 	},
