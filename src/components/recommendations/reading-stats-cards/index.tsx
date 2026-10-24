@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink } from 'react-router'
 import { AutoStoriesOutlined, InsightsOutlined, ScheduleOutlined } from '@mui/icons-material'
-import { Box, Button, LinearProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
+import { Box, Button, Divider, LinearProgress, Paper, Skeleton, Stack, Typography } from '@mui/material'
 import { fetchReadingStats, type ReadingStats } from '@/utils/reading-stats'
 import { fetchShelf, type ShelfItem } from '@/utils/shelf'
 import { fetchReadingCalendar, type ReadingCalendar } from '@/utils/reading-calendar'
@@ -74,47 +74,94 @@ export default function ReadingStatsCards() {
 	})
 
 	const nowReading = reading.slice(0, 3)
+	// Obra "em leitura agora" para o card de tempo ativo: a de maior tempo de leitura.
+	const current = reading.length
+		? reading.reduce((a, b) => ((b.readingTimeMinutes ?? 0) > (a.readingTimeMinutes ?? 0) ? b : a))
+		: null
+	// Headline: tempo na obra em leitura (back = fonte da verdade); sem obra, cai no tempo de hoje.
+	const headlineMinutes = current?.readingTimeMinutes ?? stats?.todayMinutes ?? 0
 
 	return (
 		<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
-			{/* 1. Tempo de leitura */}
+			{/* 1. Tempo de leitura ativo */}
 			<Paper variant="section" sx={{ p: 2.5 }}>
 				<Stack sx={{ gap: 2, height: '100%' }}>
 					<Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
 						<ScheduleOutlined sx={{ color: 'text.secondary', fontSize: 22 }} />
 						<Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
-							Tempo de leitura
+							Tempo de leitura ativo
 						</Typography>
 					</Stack>
-					<Stack direction="row" sx={{ gap: 3, flexWrap: 'wrap' }}>
-						{[
-							{ label: 'Hoje', value: fmt(stats?.todayMinutes ?? 0) },
-							{ label: 'Média diária', value: fmt(stats?.dailyAverageMinutes ?? 0) },
-							{ label: 'Total', value: fmt(stats?.totalMinutes ?? 0) },
-						].map((it) => (
-							<Stack key={it.label} sx={{ gap: 0.25 }}>
-								<Typography variant="caption" sx={{ color: 'text.secondary' }}>
-									{it.label}
-								</Typography>
-								<Typography variant="h6" component="p">
-									{it.value}
+
+					<Stack sx={{ gap: 2 }}>
+						<Stack direction="row" sx={{ alignItems: 'baseline', gap: 0.75 }}>
+							<Typography variant="h4" component="p">
+								{fmt(headlineMinutes)}
+							</Typography>
+							<Typography variant="body1" sx={{ color: 'text.secondary' }}>
+								{current ? 'nesta obra' : 'de leitura hoje'}
+							</Typography>
+						</Stack>
+
+						{current && (
+							<Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
+								<Box sx={{ width: 8, height: 8, borderRadius: '50%', bgcolor: '#1E6B3A', flexShrink: 0 }} />
+								<Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
+									Lendo {current.publication.title} agora
 								</Typography>
 							</Stack>
-						))}
+						)}
+
+						<Divider />
+
+						<Stack direction="row" sx={{ gap: 3, flexWrap: 'wrap' }}>
+							{[
+								{ label: 'Hoje', value: fmt(stats?.todayMinutes ?? 0) },
+								{ label: 'Média diária', value: fmt(stats?.dailyAverageMinutes ?? 0) },
+								{ label: 'Total', value: fmt(stats?.totalMinutes ?? 0) },
+							].map((it) => (
+								<Stack key={it.label} sx={{ gap: 0.25 }}>
+									<Typography variant="caption" sx={{ color: 'text.secondary' }}>
+										{it.label}
+									</Typography>
+									<Typography variant="h6" component="p">
+										{it.value}
+									</Typography>
+								</Stack>
+							))}
+						</Stack>
 					</Stack>
+
+					<Button
+						component={NavLink}
+						to={current ? `/leitura/${current.publication.id}` : '/estante'}
+						variant="contained"
+						size="small"
+						sx={{
+							alignSelf: 'flex-start',
+							mt: 'auto',
+							textTransform: 'none',
+							borderRadius: 999,
+							bgcolor: colors.gold[600],
+							color: colors.goldContrast,
+							'&:hover': { bgcolor: colors.gold[700] },
+						}}
+					>
+						{current ? 'Voltar à leitura' : 'Ver estante'}
+					</Button>
 				</Stack>
 			</Paper>
 
 			{/* 2. Frequência de leitura */}
 			<Paper variant="section" sx={{ p: 2.5 }}>
-				<Stack sx={{ gap: 1.5 }}>
+				<Stack sx={{ gap: 2 }}>
 					<Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
 						<InsightsOutlined sx={{ color: 'text.secondary', fontSize: 22 }} />
 						<Typography variant="subtitle1" sx={{ color: 'text.secondary' }}>
 							Frequência de leitura
 						</Typography>
 					</Stack>
-					<Box>
+					<Box sx={{ display: 'flex', alignItems: 'baseline', gap: 1 }}>
 						<Typography variant="h4" component="p" sx={{ lineHeight: 1 }}>
 							{stats?.currentStreakDays ?? 0}
 						</Typography>
@@ -127,13 +174,13 @@ export default function ReadingStatsCards() {
 						{(stats?.longestStreakDays ?? 0) === 1 ? 'dia' : 'dias'} · {stats?.daysThisMonth ?? 0}{' '}
 						{(stats?.daysThisMonth ?? 0) === 1 ? 'dia' : 'dias'} de leitura neste mês
 					</Typography>
-					<Box>
+					<Box sx={{display: 'flex', flexDirection: 'column', gap: 1, mt: 1 }}>
 						<Stack direction="row" sx={{ gap: 0.5 }}>
 							{strip.map((m, i) => (
 								<Box
 									key={i}
 									title={m > 0 ? `${m} min` : 'sem leitura'}
-									sx={{ width: 24, height: 24, borderRadius: '3px', bgcolor: LEVEL_COLORS[levelOf(m)] }}
+									sx={{ width: 32, height: 32, borderRadius: '3px', bgcolor: LEVEL_COLORS[levelOf(m)] }}
 								/>
 							))}
 						</Stack>

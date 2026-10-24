@@ -23,10 +23,20 @@ function readStoredView(): ViewMode {
 
 export default function CatalogoPage() {
 	const [searchParams] = useSearchParams()
-	// Semeia a busca a partir do ?q= da URL (usado pela lupa da navbar).
+	// Semeia a busca a partir da URL: ?q= (lupa da navbar) e ?genero=/?idioma=
+	// (atalhos "Ver tudo" das seções de recomendações, que já chegam filtrados).
 	const [filters, setFilters] = useState<CatalogQuery>(() => {
 		const q = searchParams.get("q")
-		return q ? { ...emptyCatalogQuery, q } : emptyCatalogQuery
+		const genero = searchParams.get("genero")
+		const idioma = searchParams.get("idioma")
+		const seeded: CatalogQuery = { ...emptyCatalogQuery }
+		if (q) seeded.q = q
+		if (genero) {
+			seeded.type = "book"
+			seeded.genres = [genero]
+		}
+		if (idioma) seeded.languages = [idioma as CatalogQuery["languages"][number]]
+		return seeded
 	})
 	// O initializer acima só roda na montagem. Quando a lupa da navbar navega com
 	// um novo ?q= estando JÁ no catálogo, a rota não remonta — então sincronizamos
