@@ -26,16 +26,18 @@ export default function PublicationCover({ title, coverUrl, variant = 'thumb' }:
     return (
         <Stack sx={{
             ...box,
+            minWidth: 0,
             p: 1,
             borderRadius: 0.5,
             justifyContent: 'space-between',
+            overflow: 'hidden',
             bgcolor: colors.papel[800],
             color: colors.papel[200],
             borderLeft: `4px solid ${colors.leitura.surfaceEscuro}`,
         }}
         >
-            <Typography sx={{ fontSize: 11, lineHeight: 1.2 }}>{title}</Typography>
-            <Typography sx={{ fontSize: 8, opacity: 0.7 }}>capa · placeholder</Typography>
+            <Typography sx={{ fontSize: 11, lineHeight: 1.2, overflow: 'hidden', overflowWrap: 'anywhere' }}>{title}</Typography>
+            <Typography sx={{ fontSize: 8, opacity: 0.7, flexShrink: 0 }}>capa · placeholder</Typography>
         </Stack>
     )
 }

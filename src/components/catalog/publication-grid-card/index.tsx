@@ -12,7 +12,7 @@ interface Props {
 
 export default function PublicationGridCard({ publication }: Props) {
     return (
-        <Card variant="outlined" sx={{ borderRadius: radii.card, overflow: 'hidden', height: '100%' }}>
+        <Card variant="outlined" sx={{ borderRadius: radii.card, overflow: 'hidden', height: '100%', minWidth: 0 }}>
             <CardActionArea
                 component={NavLink}
                 to={`/obra/${publication.id}`}
@@ -24,7 +24,13 @@ export default function PublicationGridCard({ publication }: Props) {
                 </Box>
                 <Typography
                     variant="subtitle2"
-                    sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                    sx={{
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        overflowWrap: 'anywhere',
+                    }}
                 >
                     {publication.title}
                 </Typography>
