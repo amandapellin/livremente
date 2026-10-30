@@ -19,4 +19,12 @@ export default defineConfig([
 			globals: globals.browser,
 		},
 	},
+	{
+		// Arquivos de teste e utilitários de teste: a regra de fast refresh (HMR) não
+		// se aplica (helpers de render exportam funções, não só componentes).
+		files: ['**/*.{test,spec}.{ts,tsx}', 'src/test/**/*.{ts,tsx}'],
+		rules: {
+			'react-refresh/only-export-components': 'off',
+		},
+	},
 ])
