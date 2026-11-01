@@ -1,10 +1,11 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import { MenuItem, Stack, TextField, Typography } from '@mui/material'
 import { generoOptions } from '@/schemas/category-schemas'
-import type { CadastroForm } from '@/schemas/register-schemas'
+import { birthDateBounds, type CadastroForm } from '@/schemas/register-schemas'
 
 export default function DadosStep() {
 	const { control } = useFormContext<CadastroForm>()
+	const birthBounds = birthDateBounds()
 
 	return (
 		<Stack sx={{ gap: 4, width: '100%' }}>
@@ -46,7 +47,7 @@ export default function DadosStep() {
 								fullWidth
 								error={Boolean(fieldState.error)}
 								helperText={fieldState.error?.message}
-								slotProps={{ inputLabel: { shrink: true } }}
+								slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: birthBounds.min, max: birthBounds.max } }}
 							/>
 						)}
 					/>
