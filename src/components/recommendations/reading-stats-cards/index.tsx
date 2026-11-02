@@ -180,11 +180,18 @@ export default function ReadingStatsCards() {
 								<Box
 									key={i}
 									title={m > 0 ? `${m} min` : 'sem leitura'}
-									sx={{ width: 32, height: 32, borderRadius: '3px', bgcolor: LEVEL_COLORS[levelOf(m)] }}
+									sx={(theme) => ({
+										width: 32,
+										height: 32,
+										borderRadius: '3px',
+										bgcolor: LEVEL_COLORS[levelOf(m)],
+										// Tema escuro: dia sem leitura escuro (o papel/200 claro destoava do fundo).
+										...(levelOf(m) === 0 && theme.applyStyles('dark', { bgcolor: 'rgba(255,255,255,0.08)' })),
+									})}
 								/>
 							))}
 						</Stack>
-						<Typography variant="caption" sx={{ color: colors.papel[600], display: 'block', mt: 0.5 }}>
+						<Typography variant="caption" sx={{ color: 'text.secondary', display: 'block', mt: 0.5 }}>
 							Últimos {STRIP_DAYS} dias
 						</Typography>
 					</Box>
