@@ -32,13 +32,15 @@ export default function LgpdStep() {
 			</Stack>
 
 			<Box
-				sx={{
+				sx={(theme) => ({
 					bgcolor: colors.papel[50],
 					border: 1,
 					borderColor: 'divider',
 					borderRadius: radii.card,
 					p: 3,
-				}}
+					// Tema escuro: superfície escura em vez do papel claro fixo.
+					...theme.applyStyles('dark', { bgcolor: 'rgba(255, 255, 255, 0.04)' }),
+				})}
 			>
 				<Stack sx={{ gap: 1 }}>
 					{LGPD_CONSENT_PARAGRAPHS.map((text) => (
@@ -79,7 +81,7 @@ export default function LgpdStep() {
 
 			<Stack
 				direction="row"
-				sx={{
+				sx={(theme) => ({
 					alignItems: 'center',
 					gap: 1.5,
 					bgcolor: colors.primary[50],
@@ -87,7 +89,12 @@ export default function LgpdStep() {
 					borderColor: colors.primary[300],
 					borderRadius: radii.card,
 					p: 2,
-				}}
+					// Tema escuro: fundo/borda escuros para o texto (branco) ter contraste.
+					...theme.applyStyles('dark', {
+						bgcolor: 'rgba(30, 58, 138, 0.28)',
+						borderColor: colors.primary[800],
+					}),
+				})}
 			>
 				<MailOutlineIcon sx={{ fontSize: 20, color: 'primary.main' }} />
 				<Typography variant="caption" sx={{ color: 'text.primary' }}>
