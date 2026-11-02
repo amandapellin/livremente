@@ -1,9 +1,17 @@
 import type { ReactNode } from 'react'
-import { Container, Divider, Stack, Typography } from '@mui/material'
+import { Box, Container, Divider, Stack, Typography } from '@mui/material'
+
+export interface InfoBullet {
+	/** Rótulo opcional (exibido em negrito, seguido de ":"). Sem rótulo = item simples. */
+	label?: string
+	text: string
+}
 
 export interface InfoSection {
 	heading?: string
-	paragraphs: string[]
+	paragraphs?: string[]
+	/** Itens em lista com rótulo em destaque (ex.: "Nossa proposta"). */
+	bullets?: InfoBullet[]
 }
 
 interface Props {
@@ -29,7 +37,7 @@ export default function InfoPage({ title, intro, sections, children, footer }: P
 					{title}
 				</Typography>
 				{intro && (
-					<Typography variant="body1" sx={{ color: 'text.secondary' }}>
+					<Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.8 }}>
 						{intro}
 					</Typography>
 				)}
@@ -45,11 +53,30 @@ export default function InfoPage({ title, intro, sections, children, footer }: P
 								{s.heading}
 							</Typography>
 						)}
-						{s.paragraphs.map((p, j) => (
+						{s.paragraphs?.map((p, j) => (
 							<Typography key={j} variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
 								{p}
 							</Typography>
 						))}
+						{s.bullets && (
+							<Stack component="ul" sx={{ m: 0, pl: 3, gap: 1 }}>
+								{s.bullets.map((b, j) => (
+									<Typography
+										key={j}
+										component="li"
+										variant="body1"
+										sx={{ color: 'text.secondary', lineHeight: 1.7 }}
+									>
+										{b.label && (
+											<Box component="strong" sx={{ color: 'text.primary', fontWeight: 600 }}>
+												{b.label}:{' '}
+											</Box>
+										)}
+										{b.text}
+									</Typography>
+								))}
+							</Stack>
+						)}
 					</Stack>
 				))}
 			</Stack>

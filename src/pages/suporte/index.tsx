@@ -6,61 +6,62 @@ import InfoPage from '@/components/layout/info-page'
 // Ajuste para o e-mail de suporte real do projeto quando houver.
 const SUPPORT_EMAIL = 'suporte@livremente.com.br'
 
-// Perguntas frequentes (RF/#83): respostas alinhadas às funcionalidades da plataforma.
+// Perguntas frequentes (#83): respostas alinhadas às funcionalidades da plataforma.
 const FAQ: { q: string; a: string }[] = [
 	{
-		q: 'Preciso de uma conta para usar o LivreMente?',
-		a: 'Você pode explorar e buscar o acervo sem conta. Para ler as obras, salvar na estante, grifar, anotar, acompanhar o progresso e receber recomendações, é necessário criar uma conta gratuita.',
+		q: 'Preciso ter uma conta para usar o LivreMente?',
+		a: 'Não para explorar o catálogo. Você pode buscar títulos, filtrar materiais e visualizar a sinopse e detalhes das publicações livremente. Contudo, para ler as obras, salvar na estante pessoal, utilizar grifos e anotações, salvar o histórico e receber recomendações algorítmicas, é necessário criar uma conta gratuita.',
 	},
 	{
-		q: 'O acervo é gratuito?',
-		a: 'Sim. Todas as obras provêm de fontes abertas: livros de domínio público do Project Gutenberg e artigos de acesso aberto do repositório arXiv.',
+		q: 'O acervo é realmente 100% gratuito?',
+		a: 'Sim. Todas as publicações são integradas de repositórios abertos mundiais: livros livres de direitos patrimoniais (Project Gutenberg via Gutendex) e pré-prints e artigos científicos de acesso aberto (arXiv).',
 	},
 	{
-		q: 'Em quais formatos posso ler?',
-		a: 'Livros em EPUB e artigos em PDF, lidos diretamente no navegador, sem precisar instalar nada.',
+		q: 'Posso baixar qualquer material para ler offline?',
+		a: 'Livros digitais em formato EPUB podem ser baixados livremente. Já os artigos científicos do repositório arXiv não podem ser armazenados diretamente em nossos servidores nem baixados pela plataforma por restrição de licença; nesses casos, o LivreMente redireciona você para o arquivo original mantido pelo arXiv.',
 	},
 	{
-		q: 'Por que preciso confirmar o e-mail?',
-		a: 'A confirmação ativa a sua conta e garante que o e-mail é válido para recuperação de acesso e avisos. Enviamos um link de confirmação logo após o cadastro.',
+		q: 'Por que os grifos e anotações funcionam apenas em livros (EPUB)?',
+		a: 'A tecnologia de marcação e notas ativas exige manipulação da estrutura semântica do documento em fluxo contínuo (reflow), viabilizada pela biblioteca do leitor EPUB. Documentos em PDF contam com visualização direta no navegador, sem o recurso de grifo integrado nesta versão do sistema.',
 	},
 	{
-		q: 'Esqueci minha senha. O que faço?',
-		a: 'Na tela de login, use a opção "Esqueci a senha" para redefini-la. Se precisar de ajuda, fale com o suporte.',
+		q: 'Por que é obrigatório confirmar meu e-mail no cadastro?',
+		a: 'A confirmação protege seu perfil contra cadastros indevidos e garante um endereço válido caso você precise redefinir sua senha. O link de ativação expira após um determinado período de segurança.',
 	},
 	{
-		q: 'Como funcionam as recomendações?',
-		a: 'São geradas a partir das preferências informadas no cadastro e do seu histórico de leitura, destacando obras parecidas com o seu interesse.',
+		q: 'Esqueci minha senha. Como recupero o acesso?',
+		a: 'Na tela de login, clique em "Esqueci minha senha". Você receberá um e-mail com instruções e um link seguro para cadastrar uma nova credencial.',
 	},
 	{
-		q: 'Como exporto ou excluo meus dados?',
-		a: 'Na tela de perfil você pode exportar seus dados ou excluir a conta a qualquer momento. Veja a Política de Privacidade para mais detalhes.',
+		q: 'Como a plataforma calcula as recomendações na página inicial?',
+		a: 'Nosso motor de recomendação combina as preferências que você declarou (idiomas, gêneros e áreas do conhecimento) com os títulos que você adiciona e lê na sua estante. Se você for um usuário novo, a plataforma destacará inicialmente as obras de maior relevância e popularidade no acervo.',
+	},
+	{
+		q: 'Como exporto ou excluo meus dados do sistema?',
+		a: 'Basta acessar o seu Perfil e rolar até a seção Dados e privacidade. Lá você encontra as opções para baixar o arquivo completo com seus registros de leitura ou solicitar a exclusão imediata e definitiva da sua conta.',
 	},
 ]
 
 export default function SuportePage() {
 	return (
 		<InfoPage
-			title="Suporte"
+			title="Suporte e Ajuda"
 			intro="Precisa de ajuda? Veja as perguntas frequentes abaixo ou fale com a gente."
-			sections={[
-				{
-					heading: 'Como obter ajuda',
-					paragraphs: [
-						'Antes de nos contatar, confira as perguntas frequentes. Se não resolver, descreva o ocorrido com o máximo de detalhes (tela, passos e, se possível, o horário) para agilizarmos o atendimento.',
-					],
-				},
-			]}
+			sections={[]}
 			footer={
 				<Stack sx={{ gap: 1, alignItems: 'flex-start' }}>
-					<Typography variant="body2" sx={{ color: 'text.secondary' }}>
-						Não encontrou o que procurava? Envie sua mensagem para {SUPPORT_EMAIL}.
+					<Typography variant="h6" component="h2">
+						Ainda precisa de ajuda?
+					</Typography>
+					<Typography variant="body1" sx={{ color: 'text.secondary' }}>
+						Envie uma mensagem para: {SUPPORT_EMAIL}
 					</Typography>
 					<Button
 						component={Link}
 						href={`mailto:${SUPPORT_EMAIL}`}
 						variant="contained"
 						startIcon={<MailOutlineIcon />}
+						sx={{ mt: 1 }}
 					>
 						Falar com o suporte
 					</Button>
