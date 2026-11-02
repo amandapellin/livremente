@@ -41,7 +41,7 @@ export default function SegmentedToggle<T extends string>({
 		<Box
 			role="group"
 			aria-label={ariaLabel}
-			sx={{
+			sx={(theme) => ({
 				display: 'inline-flex',
 				gap: size === 'sm' ? 0 : 0.5,
 				p: 0.5,
@@ -49,7 +49,13 @@ export default function SegmentedToggle<T extends string>({
 				border: `1px solid ${colors.papel[200]}`,
 				bgcolor: colors.papel[50],
 				boxShadow: 'inset 2px 4px 4px rgba(0,0,0,0.15)',
-			}}
+				// Tema escuro: contêiner escuro translúcido em vez do papel claro fixo.
+				...theme.applyStyles('dark', {
+					border: '1px solid rgba(255,255,255,0.12)',
+					bgcolor: 'rgba(255,255,255,0.06)',
+					boxShadow: 'inset 2px 4px 4px rgba(0,0,0,0.4)',
+				}),
+			})}
 		>
 			{options.map((o) => {
 				const selected = o.value === value
@@ -59,7 +65,7 @@ export default function SegmentedToggle<T extends string>({
 						onClick={() => onChange(o.value)}
 						aria-pressed={selected}
 						disableRipple
-						sx={{
+						sx={(theme) => ({
 							borderRadius: '4px',
 							px: dims.px,
 							minHeight: dims.minHeight,
@@ -72,7 +78,13 @@ export default function SegmentedToggle<T extends string>({
 							bgcolor: selected ? active.bgcolor : 'transparent',
 							transition: 'background-color 120ms, color 120ms',
 							'&:hover': { bgcolor: selected ? active.bgcolor : colors.papel[100] },
-						}}
+							// Tema escuro: só o segmento inativo muda (o ativo é pílula de alto contraste).
+							...(!selected &&
+								theme.applyStyles('dark', {
+									color: colors.papel[300],
+									'&:hover': { bgcolor: 'rgba(255,255,255,0.08)' },
+								})),
+						})}
 					>
 						{o.label}
 					</ButtonBase>
