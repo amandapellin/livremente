@@ -1,10 +1,7 @@
-import { Accordion, AccordionDetails, AccordionSummary, Button, Link, Stack, Typography } from '@mui/material'
+import { Accordion, AccordionDetails, AccordionSummary, Stack, Typography } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import MailOutlineIcon from '@mui/icons-material/MailOutlined'
 import InfoPage from '@/components/layout/info-page'
-
-// Ajuste para o e-mail de suporte real do projeto quando houver.
-const SUPPORT_EMAIL = 'suporte@livremente.com.br'
+import SupportContactForm from '@/components/support/contact-form'
 
 // Perguntas frequentes (#83): respostas alinhadas às funcionalidades da plataforma.
 const FAQ: { q: string; a: string }[] = [
@@ -48,25 +45,7 @@ export default function SuportePage() {
 			title="Suporte e Ajuda"
 			intro="Precisa de ajuda? Veja as perguntas frequentes abaixo ou fale com a gente."
 			sections={[]}
-			footer={
-				<Stack sx={{ gap: 1, alignItems: 'flex-start' }}>
-					<Typography variant="h6" component="h2">
-						Ainda precisa de ajuda?
-					</Typography>
-					<Typography variant="body1" sx={{ color: 'text.secondary' }}>
-						Envie uma mensagem para: {SUPPORT_EMAIL}
-					</Typography>
-					<Button
-						component={Link}
-						href={`mailto:${SUPPORT_EMAIL}`}
-						variant="contained"
-						startIcon={<MailOutlineIcon />}
-						sx={{ mt: 1 }}
-					>
-						Falar com o suporte
-					</Button>
-				</Stack>
-			}
+			footer={<SupportContactForm />}
 		>
 			<Stack sx={{ gap: 1 }}>
 				<Typography variant="h6" component="h2">
