@@ -2,6 +2,7 @@ import { Alert, Box, Button, Checkbox, Divider, FormControlLabel, Link, Stack, T
 import { Controller, type Control, type UseFormHandleSubmit, type FieldErrors } from "react-hook-form";
 import { NavLink } from "react-router";
 import { type LoginForm } from '@/schemas/login-schemas'
+import { colors } from '@/theme/tokens'
 
 interface LoginFormProps {
     control: Control<LoginForm>;
@@ -97,7 +98,13 @@ export default function LoginFormComponent({ control, handleSubmit, onSubmit, er
                             component="button"
                             type="button"
                             underline="always"
-                            sx={{ color: 'acao.dark', fontSize: 14, whiteSpace: 'nowrap' }}
+                            sx={(theme) => ({
+                                color: 'acao.dark',
+                                fontSize: 14,
+                                whiteSpace: 'nowrap',
+                                // Tema escuro: azul claro, senão o link fica escuro demais.
+                                ...theme.applyStyles('dark', { color: colors.acao[200] }),
+                            })}
                         >
                             Esqueci a senha
                         </Link>

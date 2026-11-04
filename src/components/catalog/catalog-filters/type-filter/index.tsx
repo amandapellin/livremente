@@ -2,6 +2,7 @@ import type { CatalogCounts } from "@/api/generated/model";
 import { typeChips, type CatalogQuery } from "@/schemas/catalog-schemas";
 import FilterSection from "../filter-section";
 import { Box, Typography } from "@mui/material";
+import { colors } from "@/theme/tokens";
 
 interface Props {
     value: CatalogQuery['type']
@@ -24,7 +25,7 @@ export default function TypeFilter({ value, counts, onChange }: Props) {
                         tabIndex={0}
                         onClick = {() => onChange(opt.value)}
                         onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && onChange(opt.value)}
-                        sx={{
+                        sx={(theme) => ({
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
@@ -37,7 +38,9 @@ export default function TypeFilter({ value, counts, onChange }: Props) {
                             borderColor: selected ? 'acao.light' : 'divider',
                             backgroundColor: selected ? 'rgba(var(--mui-palette-acao-mainChannel) / 0.12)' : 'transparent',
                             color: selected ? 'acao.dark' : 'text.primary',
-                        }}
+                            // Tema escuro: rótulo selecionado em azul claro (acao.dark fica escuro demais).
+                            ...(selected && theme.applyStyles('dark', { color: colors.acao[200] })),
+                        })}
                     >
                         <Typography variant="caption">{opt.label}</Typography>
                         <Typography variant="overline" sx={{color: 'text.secondary'}}>{countFor(opt.value) ?? '-'}</Typography>
