@@ -72,7 +72,16 @@ export default function ShelfReadingCalendar() {
 			<Stack sx={{ gap: 1.5 }}>
 				<Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
 					<Stack direction="row" sx={{ alignItems: 'center', gap: 1, minWidth: 0 }}>
-						<CalendarMonthOutlined sx={{ fontSize: 18, color: 'text.secondary' }} />
+						<CalendarMonthOutlined
+							sx={(theme) => ({
+								fontSize: 18,
+								// Explícito por tema para o ícone não ficar escuro no modo escuro.
+								// No escuro usa quase-branco (papel/100 = text.primary) para
+								// destacar; no claro acompanha o título (papel/700).
+								color: colors.papel[700],
+								...theme.applyStyles('dark', { color: colors.papel[100] }),
+							})}
+						/>
 						<Typography variant="overline" sx={{ color: 'text.secondary' }} noWrap>
 							Calendário de leitura
 						</Typography>
