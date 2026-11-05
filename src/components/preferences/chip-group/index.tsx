@@ -21,7 +21,7 @@ const SelectionChip = styled(Chip, {
 			? {
 					backgroundColor: colors.acao[50],
 					borderColor: (theme.vars ?? theme).palette.acao.light,
-					color: (theme.vars ?? theme).palette.acao.main,
+					color: colors.acao[700], // azul escuro fixo: chip selecionado tem fundo claro nos dois temas
 					boxShadow:
 						'0px 1px 3px rgba(0,0,0,0.12), 0px 1px 1px rgba(0,0,0,0.14), 0px 2px 1px -1px rgba(0,0,0,0.2)',
 					'&:hover': { backgroundColor: colors.acao[50] },
