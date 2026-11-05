@@ -1,15 +1,17 @@
-import { BookmarkAddOutlined } from "@mui/icons-material"
+import { BookmarkAddedOutlined, BookmarkAddOutlined } from "@mui/icons-material"
 import { Button, Stack } from "@mui/material"
 import { NavLink } from "react-router"
 
 interface Props {
     to: string
     onAddToShelf?: () => void
+    /** A obra já está na estante → o botão vira confirmação ("Na estante"). */
+    inShelf?: boolean
 }
 
-export default function PublicationActions({ to, onAddToShelf }: Props) {
+export default function PublicationActions({ to, onAddToShelf, inShelf }: Props) {
     return (
-        <Stack 
+        <Stack
             sx={{
                 gap: 1.5,
                 justifyContent: 'center',
@@ -20,14 +22,15 @@ export default function PublicationActions({ to, onAddToShelf }: Props) {
             <Button component={NavLink} to={to} variant="contained" color="secondary" fullWidth>
                 Detalhes
             </Button>
-            <Button 
-                variant="outlined" 
-                color="inherit" 
-                fullWidth 
-                startIcon={<BookmarkAddOutlined />}
+            <Button
+                variant={inShelf ? "contained" : "outlined"}
+                color={inShelf ? "primary" : "inherit"}
+                fullWidth
+                startIcon={inShelf ? <BookmarkAddedOutlined /> : <BookmarkAddOutlined />}
                 onClick={onAddToShelf}
+                disabled={inShelf}
             >
-                Estante
+                {inShelf ? "Na estante" : "Estante"}
             </Button>
         </Stack>
     )

@@ -1,12 +1,16 @@
 import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { GridView, Search, SearchOff, ViewList } from "@mui/icons-material";
 import { Alert, Box, Button, Container, InputAdornment, MenuItem, Pagination, Paper, Select, Skeleton, Stack, TextField, ToggleButton, ToggleButtonGroup, Typography } from "@mui/material";
+import type { Publication } from "@/api/generated/model";
 import CatalogFilters from "@/components/catalog/catalog-filters";
 import PublicationCard from "@/components/catalog/publication-card";
 import PublicationGridCard from "@/components/catalog/publication-grid-card";
 import { useCatalogSearch } from "@/hooks/useCatalogSearch";
 import { useDebouncedValue } from "@/hooks/useDebouncedValue";
+import { useIsAuthenticated } from "@/hooks/useAuth";
+import { useShelfActions } from "@/hooks/useShelf";
+import { useToast } from "@/providers/toast-context";
 import { emptyCatalogQuery, sortOptions, type CatalogQuery, type CatalogSort } from "@/schemas/catalog-schemas";
 
 type ViewMode = 'list' | 'grid'
@@ -66,6 +70,27 @@ export default function CatalogoPage() {
 
 	const items = data?.items ?? []
 	const totalPages = data?.totalPages ?? 1
+
+	// RF06 (#84): "Estante" adiciona a obra à estante como "Quero ler". O hook
+	// já invalida o cache e dispara o toast de confirmação; guardamos os ids
+	// adicionados nesta sessão para o botão virar "Na estante" (resposta visual).
+	const navigate = useNavigate()
+	const toast = useToast()
+	const isAuth = useIsAuthenticated()
+	const { setStatus } = useShelfActions()
+	const [addedIds, setAddedIds] = useState<ReadonlySet<string>>(new Set())
+
+	const handleAddToShelf = (publication: Publication) => {
+		if (!isAuth) {
+			toast('Entre na sua conta para usar a estante.', 'info')
+			navigate('/login')
+			return
+		}
+		setStatus.mutate(
+			{ id: publication.id, status: 'want_to_read' },
+			{ onSuccess: (ok) => { if (ok) setAddedIds((prev) => new Set(prev).add(publication.id)) } },
+		)
+	}
 
 	return (
 		<Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
@@ -143,7 +168,14 @@ export default function CatalogoPage() {
 								</Box>
 							) : (
 								<Stack sx={{ gap: 2, opacity: isPlaceholderData ? 0.6 : 1, transition: 'opacity .15s' }}>
-									{items.map((it) => <PublicationCard key={it.id} publication={it} />)}
+									{items.map((it) => (
+										<PublicationCard
+											key={it.id}
+											publication={it}
+											onAddToShelf={handleAddToShelf}
+											inShelf={addedIds.has(it.id)}
+										/>
+									))}
 								</Stack>
 							)}
 							{totalPages > 1 && (

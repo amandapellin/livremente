@@ -42,7 +42,7 @@ export default function ShelfStatusTabs({ value, onChange, counts }: Props) {
 					icon={
 						<Box
 							component="span"
-							sx={{
+							sx={(theme) => ({
 								ml: 0.75,
 								px: 1,
 								py: 0.25,
@@ -52,8 +52,16 @@ export default function ShelfStatusTabs({ value, onChange, counts }: Props) {
 								minWidth: 22,
 								textAlign: 'center',
 								bgcolor: value === o.value ? colors.gold[500] : colors.papel[200],
-								color: value === o.value ? colors.goldContrast : 'text.secondary',
-							}}
+								color: value === o.value ? colors.goldContrast : colors.papel[700],
+								// Tema escuro: só o badge inativo precisa mudar (o ativo é
+								// dourado de alto contraste). Fundo claro translúcido + texto
+								// claro, senão o número some sobre o papel claro fixo.
+								...(value !== o.value &&
+									theme.applyStyles('dark', {
+										bgcolor: 'rgba(255,255,255,0.12)',
+										color: colors.papel[200],
+									})),
+							})}
 						>
 							{counts[o.value] ?? 0}
 						</Box>
