@@ -405,8 +405,8 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   (`GET /reading-progress/{id}`) com fallback local. Ao implementar: `openapi.json` →
   `pnpm gen:api` → trocar o `fetch` manual pela função gerada.
 
-**Refatorações (aguardando merge):**
-- **Fetch autenticado centralizado** (branch `refactor/unifica-fetch-autenticado`):
+**Refatorações:**
+- **Fetch autenticado centralizado — mergeado (PR #94):** (branch `refactor/unifica-fetch-autenticado`):
   os ~10 `utils/*.ts` escritos à mão repetiam a base da API, a montagem do header
   `Authorization` e o tratamento de erro — e, por não passarem pelo `customFetch`
   do orval, **não** tinham refresh de token no 401. Novo **`src/api/authed-fetch.ts`**
@@ -417,18 +417,37 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   de `baseURL`, ~20 headers `Bearer` inline e 2 `authHeaders()` locais. Comportamento
   preservado (cada util mantém `null`/`[]`/`throw`/`bool`). `tsc`, `eslint` e `build`
   verdes; SPA sobe sem erro de console. _Happy-path logado a confirmar no app._
-- **Cor de link no tema escuro centralizada** (branch
-  `refactor/centraliza-cor-link-tema-escuro`): quatro pontos (login "Esqueci a
-  senha", filtros "Limpar", rótulo selecionado do filtro de tipo e "Ver tudo" das
-  recomendações) repetiam `color: 'acao.dark'`/`colors.info` + um override manual
-  `applyStyles('dark', { color: colors.acao[200] })`. Passam a usar o slot semântico
-  **`info.main`** da paleta, que já é *theme-aware* (`acao[600]` no claro, `acao[200]`
-  no escuro) e já era usado pelo tema (`MuiStepIcon`). Um override global `MuiLink`
-  foi **descartado** por mudar links de outra intenção (footer usa `primary[50]`;
-  profile/detalhes). Removidos os overrides por tema e os imports de `colors` que
-  ficaram sem uso. Verificado nos dois temas (links legíveis; footer inalterado);
-  `tsc`, `lint` e `build` verdes. _Nota: no claro o azul passou de `acao[700]` para
-  `acao[600]` nesses pontos — sutil e mais consistente._
+- **Tema escuro + layout do perfil + responsividade (aguardando merge)** — branch
+  `refactor/centraliza-cor-link-tema-escuro` (3 commits):
+  1. **Cor de link no tema escuro centralizada:** quatro pontos (login "Esqueci a
+     senha", filtros "Limpar", rótulo selecionado do filtro de tipo e "Ver tudo" das
+     recomendações) repetiam `color: 'acao.dark'`/`colors.info` + override manual
+     `applyStyles('dark', { color: colors.acao[200] })`. Passam a usar o slot
+     semântico **`info.main`** da paleta, já *theme-aware* (`acao[600]` claro /
+     `acao[200]` escuro) e já usado pelo tema (`MuiStepIcon`). Override global
+     `MuiLink` **descartado** (mudaria links de outra intenção — footer usa
+     `primary[50]`). _No claro o azul passou de `acao[700]` para `acao[600]` nesses
+     pontos — sutil e mais consistente._
+  2. **Layout da página de perfil:** `Dados e privacidade` saiu do card monolítico
+     para **card próprio** (`PrivacySection` sem o `borderTop`), deixando a coluna
+     esquerda como Stack de 2 cards (igual à direita) e **aproximando o baseline**; o
+     **Histórico do dicionário** virou **faixa full-width** no rodapé (`gridColumn
+     1/-1`) e **grade de 2 colunas** (`sm+`), cortando scroll.
+  3. **Responsividade / breakpoints (pass mobile + tablet):** grids de layout trocados
+     de `1fr` para **`minmax(0, 1fr)`** (catálogo, estante, perfil, cards de
+     estatística, landing, histórico) — a track `1fr` expandia até o `min-content` de
+     texto `noWrap` e **estourava** no mobile. Layouts de 2 colunas (catálogo/estante/
+     perfil) passam a **2 colunas já no `sm` (600px)** com **sidebar responsivo**
+     (`240px` no `sm`, cheio no `md`) para não apertar na borda. **Header:** wordmark
+     escondido no `xs` (só ícone — colidia com as ações). **Detalhes:** `publication-
+     header` empilha no mobile (capa em cima, centralizada). **Leitor:** Anterior/
+     Próxima viram **`IconButton` só-seta** no `xs`; **popover de Configurações**
+     empilha as 2 colunas no `xs` (não corta mais) e as linhas de cartões quebram.
+     **Recomendações:** card de preferências (chips não cortam mais — Box full-width
+     e encolhível no mobile) e **mini-heatmap** com quadrados que flexionam (10×32px
+     estouravam). Verificado no navegador a 375/600/768 (públicas; `scrollWidth ===
+     viewport`); autenticadas revisadas por código + validadas por `tsc`/`lint`/`build`
+     (a confirmar logado). _`tsc`, `eslint` e `build` verdes._
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
