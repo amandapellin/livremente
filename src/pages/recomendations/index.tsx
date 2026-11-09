@@ -109,14 +109,13 @@ export default function RecomendacoesPage() {
 				component={NavLink}
 				to={to}
 				variant="subtitle2"
-				sx={(theme) => ({
-					color: colors.info,
+				// `info.main` é theme-aware (azul de ação no claro, azul claro no escuro).
+				sx={{
+					color: 'info.main',
 					textDecoration: 'underline',
 					whiteSpace: 'nowrap',
 					fontWeight: 500,
-					// Tema escuro: azul claro, senão o link fica escuro demais no fundo escuro.
-					...theme.applyStyles('dark', { color: colors.acao[200] }),
-				})}
+				}}
 			>
 				Ver tudo
 			</Typography>

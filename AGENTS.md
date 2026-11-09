@@ -417,6 +417,18 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   de `baseURL`, ~20 headers `Bearer` inline e 2 `authHeaders()` locais. Comportamento
   preservado (cada util mantém `null`/`[]`/`throw`/`bool`). `tsc`, `eslint` e `build`
   verdes; SPA sobe sem erro de console. _Happy-path logado a confirmar no app._
+- **Cor de link no tema escuro centralizada** (branch
+  `refactor/centraliza-cor-link-tema-escuro`): quatro pontos (login "Esqueci a
+  senha", filtros "Limpar", rótulo selecionado do filtro de tipo e "Ver tudo" das
+  recomendações) repetiam `color: 'acao.dark'`/`colors.info` + um override manual
+  `applyStyles('dark', { color: colors.acao[200] })`. Passam a usar o slot semântico
+  **`info.main`** da paleta, que já é *theme-aware* (`acao[600]` no claro, `acao[200]`
+  no escuro) e já era usado pelo tema (`MuiStepIcon`). Um override global `MuiLink`
+  foi **descartado** por mudar links de outra intenção (footer usa `primary[50]`;
+  profile/detalhes). Removidos os overrides por tema e os imports de `colors` que
+  ficaram sem uso. Verificado nos dois temas (links legíveis; footer inalterado);
+  `tsc`, `lint` e `build` verdes. _Nota: no claro o azul passou de `acao[700]` para
+  `acao[600]` nesses pontos — sutil e mais consistente._
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.
