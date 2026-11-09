@@ -134,7 +134,9 @@ export default function Header() {
 							<Typography
 								variant="h5"
 								component="span"
-								sx={{ whiteSpace: "nowrap" }}
+								// No mobile mostramos só o ícone (o texto não cabe ao lado do
+								// hamburguer e das ações); a partir de sm o nome volta.
+								sx={{ whiteSpace: "nowrap", display: { xs: "none", sm: "inline" } }}
 							>
 								<Box component="span" sx={{ color: colors.gold[600] }}>
 									Livre

@@ -12,7 +12,7 @@ interface Props {
 export default function PageTypeField({ value, onChange }: Props) {
 	return (
 		<SettingsSection title="Tipo de página">
-			<Stack direction="row" sx={{ gap: 1.5, flexWrap: 'nowrap' }}>
+			<Stack direction="row" sx={{ gap: 1.5, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
 				{PAGE_TYPES.map((o) => (
 					<SettingsOptionCard
 						key={o.value}

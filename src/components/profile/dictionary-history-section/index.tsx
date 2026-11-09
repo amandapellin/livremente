@@ -47,7 +47,7 @@ export default function DictionaryHistorySection() {
 						<Box
 							sx={{
 								display: 'grid',
-								gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
+								gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'repeat(2, minmax(0, 1fr))' },
 								columnGap: 3,
 							}}
 						>

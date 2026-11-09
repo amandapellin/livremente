@@ -64,7 +64,7 @@ export default function PerfilPage() {
 					sx={{
 						mt: 3,
 						display: 'grid',
-						gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1.2fr)' },
+						gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) minmax(0, 1.2fr)' },
 						gap: 3,
 						alignItems: 'start',
 					}}
@@ -104,7 +104,7 @@ export default function PerfilPage() {
 					</Stack>
 
 					{/* Faixa full-width (ambas as colunas): histórico do dicionário no rodapé. */}
-					<Box sx={{ gridColumn: { md: '1 / -1' } }}>
+					<Box sx={{ gridColumn: { sm: '1 / -1' } }}>
 						<DictionaryHistorySection />
 					</Box>
 				</Box>

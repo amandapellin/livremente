@@ -80,8 +80,9 @@ export default function ReaderSettings({
 						<CloseIcon />
 					</IconButton>
 				</DialogTitle>
-				<DialogContent sx={{ px: 3, py: 3 }}>
-					<Stack direction="row" sx={{ gap: 4 }}>
+				<DialogContent sx={{ px: { xs: 2, sm: 3 }, py: 3 }}>
+					{/* No mobile as duas colunas empilham (senão a 2ª é cortada no popover estreito). */}
+					<Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: { xs: 3, sm: 4 } }}>
 						<Stack sx={{ gap: 3 }}>
 							<FontField value={fontFamily} onChange={onFontFamilyChange} />
 							<SettingsSection title="Tamanho do texto">
@@ -106,7 +107,8 @@ export default function ReaderSettings({
 							</SettingsSection>
 						</Stack>
 
-						<Divider orientation="vertical" flexItem />
+						{/* Divisor vertical só no layout de 2 colunas; no mobile o gap separa. */}
+						<Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
 
 						<Stack sx={{ gap: 3 }}>
 							<AlignField value={textAlign} onChange={onTextAlignChange} />
