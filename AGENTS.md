@@ -52,9 +52,20 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
 - **`src/api/fetcher.ts`** (`customFetch`) envolve o cliente gerado: injeta o
   token JWT, intercepta **401 → refresh** automático, e lança **`HttpError`**
   (com `status` e `data`) para a UI tratar casos específicos (ex.: 409 no cadastro).
-- **Base URL:** `import.meta.env.VITE_API_URL ?? ''`. Em dev, usa-se o **proxy do
-  Vite**: `/api` → `http://localhost:5091` (configurado em `vite.config.ts`), então
-  a base fica vazia (mesma origem, sem CORS). Alternativa: definir `VITE_API_URL`
+- **`src/api/authed-fetch.ts`** é o helper para as chamadas **fora** do cliente
+  gerado (os `utils/*.ts` escritos à mão — estante, leitor, dicionário, etc.):
+  - `API_BASE` — **fonte única** da base da API (não redeclarar `import.meta.env.VITE_API_URL`).
+  - `authHeaders(extra?)` — monta os headers com `Authorization: Bearer` quando há sessão.
+  - `authedFetch(path, init?)` — `fetch` autenticado com **401 → refresh** (mesmo
+    *single-flight* do `customFetch`, via `refreshAuthToken` compartilhado — evita
+    refresh duplo/logout) e **sem** redirect; devolve a `Response` crua (o chamador
+    decide `null`/`[]`/`throw`/`bool`). **Use nas chamadas aguardadas.**
+  - Disparos *fire-and-forget* com `keepalive` (salvar página/percentual, *heartbeat*
+    de sessão) **não** usam `authedFetch` (o await do refresh anularia o keepalive):
+    usam `fetch` + `authHeaders` direto.
+- **Base URL:** `API_BASE` = `import.meta.env.VITE_API_URL ?? ''`. Em dev, usa-se o
+  **proxy do Vite**: `/api` → `http://localhost:5091` (configurado em `vite.config.ts`),
+  então a base fica vazia (mesma origem, sem CORS). Alternativa: definir `VITE_API_URL`
   num `.env.local` para chamar o back-end diretamente.
 
 ## 5. Contrato front ↔ back (pontos que já causaram atrito)
@@ -393,6 +404,19 @@ servidor) · **orval 8** (gera o cliente HTTP a partir do OpenAPI) · ESLint ·
   a rota existir, o `useEpubReader` pode ler o CFI do back-end no load
   (`GET /reading-progress/{id}`) com fallback local. Ao implementar: `openapi.json` →
   `pnpm gen:api` → trocar o `fetch` manual pela função gerada.
+
+**Refatorações (aguardando merge):**
+- **Fetch autenticado centralizado** (branch `refactor/unifica-fetch-autenticado`):
+  os ~10 `utils/*.ts` escritos à mão repetiam a base da API, a montagem do header
+  `Authorization` e o tratamento de erro — e, por não passarem pelo `customFetch`
+  do orval, **não** tinham refresh de token no 401. Novo **`src/api/authed-fetch.ts`**
+  (`API_BASE` + `authHeaders` + `authedFetch`); o `fetcher.ts` do orval passou a
+  **reusar o mesmo `refreshAuthToken`** (um único *single-flight* — evita refresh
+  duplo/logout). GETs/mutações aguardadas usam `authedFetch` (ganham o refresh);
+  *fire-and-forget* com `keepalive` usa `fetch` + `authHeaders`. Removidas 11 cópias
+  de `baseURL`, ~20 headers `Bearer` inline e 2 `authHeaders()` locais. Comportamento
+  preservado (cada util mantém `null`/`[]`/`throw`/`bool`). `tsc`, `eslint` e `build`
+  verdes; SPA sobe sem erro de console. _Happy-path logado a confirmar no app._
 
 **Em andamento / próximas:**
 - Telas de estante e recomendações.

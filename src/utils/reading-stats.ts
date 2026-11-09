@@ -1,6 +1,5 @@
 import { getAuthToken } from '@/api/auth-storage'
-
-const baseURL = import.meta.env.VITE_API_URL ?? ''
+import { authedFetch } from '@/api/authed-fetch'
 
 // Métricas agregadas de leitura (RF27, #37) — espelha o ReadingStatsDto do back.
 export interface ReadingStats {
@@ -14,14 +13,10 @@ export interface ReadingStats {
 }
 
 export const fetchReadingStats = async (): Promise<ReadingStats | null> => {
-	const token = getAuthToken()
-	if (!token) return null
+	if (!getAuthToken()) return null
 	try {
-		const res = await fetch(`${baseURL}/api/reading/stats`, {
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (!res.ok) return null
-		return (await res.json()) as ReadingStats
+		const res = await authedFetch('/api/reading/stats')
+		return res.ok ? ((await res.json()) as ReadingStats) : null
 	} catch {
 		return null
 	}

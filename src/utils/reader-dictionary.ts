@@ -1,6 +1,5 @@
 import { getAuthToken } from '@/api/auth-storage'
-
-const baseURL = import.meta.env.VITE_API_URL ?? ''
+import { authedFetch } from '@/api/authed-fetch'
 
 export interface DictionaryDefinition {
 	definition: string
@@ -25,12 +24,10 @@ export type LookupResult =
 	| { status: 'unauthorized' }
 
 const doLookup = async (bookId: string, word: string): Promise<LookupResult> => {
-	const token = getAuthToken()
-	if (!token) return { status: 'unauthorized' }
+	if (!getAuthToken()) return { status: 'unauthorized' }
 	try {
-		const res = await fetch(`${baseURL}/api/dictionary/lookup`, {
+		const res = await authedFetch('/api/dictionary/lookup', {
 			method: 'POST',
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
 			body: JSON.stringify({ word, publicationId: Number(bookId) }),
 		})
 		if (res.status === 401) return { status: 'unauthorized' }
@@ -72,12 +69,9 @@ export interface WordHistoryItem {
 
 // RF08 (#31): histórico de palavras consultadas, com a obra de origem.
 export const fetchWordHistory = async (order: 'recent' | 'oldest' = 'recent'): Promise<WordHistoryItem[]> => {
-	const token = getAuthToken()
-	if (!token) return []
+	if (!getAuthToken()) return []
 	try {
-		const res = await fetch(`${baseURL}/api/dictionary/history?order=${order}`, {
-			headers: { Authorization: `Bearer ${token}` },
-		})
+		const res = await authedFetch(`/api/dictionary/history?order=${order}`)
 		if (!res.ok) return []
 		const rows = (await res.json()) as WordHistoryItem[]
 		return Array.isArray(rows) ? rows : []

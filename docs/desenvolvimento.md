@@ -70,9 +70,12 @@ reduzindo divergências de contrato. Sobre o cliente gerado há um *fetcher*
 próprio, que centraliza o tratamento de respostas, a injeção do token de
 autenticação e o tratamento uniforme de erros HTTP. Para alguns recursos mais
 recentes — leitor, estante e recomendações —, utiliza-se, ao lado do cliente
-gerado, uma **camada de requisição autenticada manual** (com a mesma injeção do
-*token*), empregada onde o contrato curado não inclui o *endpoint* ou onde uma
-chamada direta é suficiente.
+gerado, uma **camada de requisição autenticada manual centralizada num único
+módulo**, empregada onde o contrato curado não inclui o *endpoint* ou onde uma
+chamada direta é suficiente. Esse módulo concentra a base única da API, a injeção
+do *token* e a renovação por *refresh*, **compartilhada com o cliente gerado** por
+um mesmo mecanismo de execução única (*single-flight*), de modo a não disparar
+renovações duplicadas.
 
 ### 3.1.6 Autenticação no cliente
 
@@ -157,3 +160,4 @@ tecnologias empregadas.*
 | RF05 / RF06 | Estante do usuário | Tela **"Minha Estante"** no modelo do Figma: barra lateral (perfil + preferências), abas por estado com contagem, alternância Livros/Artigos, visões **Prateleira** (lombadas) e **Lista**, e **tabela** de artigos com busca/seleção múltipla e ações em massa; consumo de `GET`/`PUT`/`DELETE /api/shelf` por camada de *fetch* autenticado; confirmação por **toast**; *popover* de ações na lombada; amostragem da **cor da capa** (Canvas) para colorir as lombadas |
 | RF09 | Calendário de frequência | *Heatmap* mensal na estante consumindo `GET /api/reading/calendar`, com navegação entre meses, mapeamento de minutos ativos em níveis de intensidade e preenchimento dos dias sem leitura (lista esparsa) |
 | RF27 | Recomendações | Tela `/recomendacoes` consumindo `GET /api/recommendations`: cabeçalho em *card* com **chips** das preferências (mais gêneros que idiomas, com *chip* "+N" expansível) e "Ajustar preferências"; **cartões de estatística** (tempo de leitura ativo, frequência/sequência com mini-*heatmap* e "lendo agora", de `GET /api/reading/stats`); **seções por gênero** com "Ver tudo" que abre a busca já filtrada (`/catalogo?genero=`); tratamento de *cold start* e vazio |
+| — | Refatoração — camada de requisição autenticada | Consolidação dos ~10 *utils* de *fetch* manual (estante, leitor, dicionário, recomendações) num único módulo (`authed-fetch`): base única da API, injeção do *token* e renovação por *refresh* **compartilhada** com o cliente gerado (mesmo *single-flight*, evitando renovação duplicada); as chamadas manuais passam a herdar o *refresh* no 401. Remoção de duplicação (base/*header*/tratamento de erro); comportamento preservado; verificação por tipos, *lint* e *build* |

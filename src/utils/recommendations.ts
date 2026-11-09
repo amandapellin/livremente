@@ -1,7 +1,6 @@
 import { getAuthToken } from '@/api/auth-storage'
+import { authedFetch } from '@/api/authed-fetch'
 import type { PublicationCard } from '@/api/generated/model'
-
-const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 // Recomendações personalizadas (RF27, #36). Espelha o RecommendationsDto do back:
 // `coldStart` = true quando a pessoa não tem perfil (lista cai em popularidade);
@@ -12,14 +11,10 @@ export interface Recommendations {
 }
 
 export const fetchRecommendations = async (limit = 12): Promise<Recommendations | null> => {
-	const token = getAuthToken()
-	if (!token) return null
+	if (!getAuthToken()) return null
 	try {
-		const res = await fetch(`${baseURL}/api/recommendations?limit=${limit}`, {
-			headers: { Authorization: `Bearer ${token}` },
-		})
-		if (!res.ok) return null
-		return (await res.json()) as Recommendations
+		const res = await authedFetch(`/api/recommendations?limit=${limit}`)
+		return res.ok ? ((await res.json()) as Recommendations) : null
 	} catch {
 		return null
 	}

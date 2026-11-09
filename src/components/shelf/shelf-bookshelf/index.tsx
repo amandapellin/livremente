@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router'
 import { Add, AutoStories, BookmarkRemoveOutlined, Check, InfoOutlined } from '@mui/icons-material'
 import { Box, Button, Divider, ListItemIcon, MenuItem, MenuList, Popover, Stack, Tooltip, Typography } from '@mui/material'
 import type { ReadingStatus } from '@/api/generated/model'
+import { API_BASE } from '@/api/authed-fetch'
 import type { ShelfItem } from '@/utils/shelf'
 import { readingStatusOptions } from '@/schemas/reading-status-schemas'
 import { formatPersonName } from '@/utils/format-name'
@@ -15,8 +16,6 @@ interface Props {
 }
 
 type SpineColor = { bg: string; fg: string }
-
-const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 // Amostra a cor dominante (média) da capa proxiada (mesma origem → canvas não é
 // "tainted"), escurecida para dar cara de lombada; a cor do texto vem da luminância.
@@ -58,7 +57,7 @@ const sampleCoverColor = (publicationId: string): Promise<SpineColor | null> =>
 			}
 		}
 		img.onerror = () => resolve(null)
-		img.src = `${baseURL}/api/publications/${publicationId}/cover`
+		img.src = `${API_BASE}/api/publications/${publicationId}/cover`
 	})
 
 // Paleta determinística de lombadas (tons profundos do acervo). Texto claro em todas.
