@@ -23,9 +23,9 @@ export default function PasswordSection({ control, errors, disabled }: PasswordS
 			<Typography variant="caption" sx={{ color: 'text.secondary' }}>
 				Deixe em branco para manter a senha atual.
 			</Typography>
-			<Stack sx={{ gap: 1.5, pt: 1 }}>
+			<Stack sx={{ gap: 2, pt: 1 }}>
 				{fields.map((f) => (
-					<Stack key={f.name} sx={{ gap: 0.75, maxWidth: 320 }}>
+					<Stack key={f.name} sx={{ gap: 1, maxWidth: 320 }}>
 						<Typography variant="caption" component="label" sx={{ color: 'text.secondary' }}>
 							{f.label}
 						</Typography>

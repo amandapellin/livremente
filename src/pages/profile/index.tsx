@@ -69,33 +69,44 @@ export default function PerfilPage() {
 						alignItems: 'start',
 					}}
 				>
-					<Paper variant="section" sx={{ p: 3 }}>
-						<Stack component="form" onSubmit={onSubmit} noValidate sx={{ gap: 2 }}>
-							<IdentitySection
-								control={control}
-								errors={errors}
-								email={profile?.email ?? ''}
-								avatar={avatar}
-								disabled={isSaving}
-							/>
-							<PasswordSection control={control} errors={errors} disabled={isSaving} />
-							<Stack sx={{ gap: 1.5 }}>
-								{submitError && <Alert severity="error">{submitError}</Alert>}
-								<Box>
-									<Button type="submit" variant="contained" disabled={isSaving || !canSave}>
-										{isSaving ? 'Salvando…' : 'Salvar alterações'}
-									</Button>
-								</Box>
+					{/* Coluna esquerda: conta (identificação + senha) e privacidade, cada um em seu card. */}
+					<Stack sx={{ gap: 3 }}>
+						<Paper variant="section" sx={{ p: 3 }}>
+							<Stack component="form" onSubmit={onSubmit} noValidate sx={{ gap: 2 }}>
+								<IdentitySection
+									control={control}
+									errors={errors}
+									email={profile?.email ?? ''}
+									avatar={avatar}
+									disabled={isSaving}
+								/>
+								<PasswordSection control={control} errors={errors} disabled={isSaving} />
+								<Stack sx={{ gap: 2 }}>
+									{submitError && <Alert severity="error">{submitError}</Alert>}
+									<Box>
+										<Button type="submit" variant="contained" disabled={isSaving || !canSave}>
+											{isSaving ? 'Salvando…' : 'Salvar alterações'}
+										</Button>
+									</Box>
+								</Stack>
 							</Stack>
-							<PrivacySection email={profile?.email ?? ''} />
-						</Stack>
-					</Paper>
+						</Paper>
 
+						<Paper variant="section" sx={{ p: 3 }}>
+							<PrivacySection email={profile?.email ?? ''} />
+						</Paper>
+					</Stack>
+
+					{/* Coluna direita: leitor e interface + preferências de leitura. */}
 					<Stack sx={{ gap: 3 }}>
 						<ReaderSection />
 						<ReadingPreferencesSection />
-						<DictionaryHistorySection />
 					</Stack>
+
+					{/* Faixa full-width (ambas as colunas): histórico do dicionário no rodapé. */}
+					<Box sx={{ gridColumn: { md: '1 / -1' } }}>
+						<DictionaryHistorySection />
+					</Box>
 				</Box>
 			)}
 

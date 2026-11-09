@@ -38,12 +38,12 @@ export default function IdentitySection({ control, errors, email, avatar, disabl
 	}
 
 	return (
-		<Stack sx={{ gap: 2 }}>
+		<Stack sx={{ gap: 2, pb: 2 }}>
 			<Typography variant="h6" component="h2">
 				Identificação
 			</Typography>
 
-			<Stack direction="row" sx={{ gap: 2.25, alignItems: 'center', flexWrap: 'wrap' }}>
+			<Stack direction="row" sx={{ gap: 2.25, alignItems: 'center', flexWrap: 'wrap', pt: 1.5, pb: 1.5 }}>
 				<Avatar src={avatar.src}>{initialsFromName(avatar.displayName)}</Avatar>
 				<Stack sx={{ gap: 1 }}>
 					<input
@@ -53,7 +53,7 @@ export default function IdentitySection({ control, errors, email, avatar, disabl
 						hidden
 						onChange={onFileChange}
 					/>
-					<Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap' }}>
+					<Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap' }}>
 						<Button
 							variant="outlined"
 							color="inherit"
@@ -75,14 +75,14 @@ export default function IdentitySection({ control, errors, email, avatar, disabl
 					</Stack>
 					<Typography
 						variant="caption"
-						sx={{ color: avatar.error ? 'error.main' : 'text.secondary' }}
+						sx={{ color: avatar.error ? 'error.main' : 'text.secondary', pt: 0.25 }}
 					>
 						{avatar.error ?? 'PNG ou JPG de até 2 MB. Sem imagem, exibimos suas iniciais.'}
 					</Typography>
 				</Stack>
 			</Stack>
 
-			<Stack sx={{ gap: 0.75 }}>
+			<Stack sx={{ gap: 1 }}>
 				<Typography variant="caption" component="label" sx={{ color: 'text.secondary' }}>
 					Nome completo
 				</Typography>
@@ -102,7 +102,7 @@ export default function IdentitySection({ control, errors, email, avatar, disabl
 				/>
 			</Stack>
 
-			<Stack sx={{ gap: 0.75 }}>
+			<Stack sx={{ gap: 1 }}>
 				<Typography variant="caption" component="label" sx={{ color: 'text.secondary' }}>
 					E-mail
 				</Typography>
