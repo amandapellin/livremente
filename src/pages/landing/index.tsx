@@ -18,7 +18,7 @@ export default function LandingPage() {
 			<Box
 				sx={{
 					maxWidth: 1100, mx: 'auto', px: 2, mt: { xs: -8, md: -12 }, position: 'relative',
-					display: 'grid', gap: 4.5, gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
+					display: 'grid', gap: 4.5, gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(3, minmax(0, 1fr))' },
 				}}
 			>
 				{features.map((f) => (

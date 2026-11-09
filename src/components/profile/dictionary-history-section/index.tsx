@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Box, CircularProgress, Divider, Paper, Stack, TablePagination, Typography } from '@mui/material'
+import { Box, CircularProgress, Paper, Stack, TablePagination, Typography } from '@mui/material'
 import { fetchWordHistory, type WordHistoryItem } from '@/utils/reader-dictionary'
 
 const formatDate = (iso: string): string => {
@@ -44,12 +44,25 @@ export default function DictionaryHistorySection() {
 					</Typography>
 				) : (
 					<>
-						<Stack divider={<Divider flexItem />}>
+						<Box
+							sx={{
+								display: 'grid',
+								gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'repeat(2, minmax(0, 1fr))' },
+								columnGap: 3,
+							}}
+						>
 							{pageItems.map((it, i) => (
 								<Stack
 									key={`${it.word}-${it.consultedAt}-${i}`}
 									direction="row"
-									sx={{ justifyContent: 'space-between', alignItems: 'baseline', gap: 2, py: 1 }}
+									sx={{
+										justifyContent: 'space-between',
+										alignItems: 'baseline',
+										gap: 2,
+										py: 1,
+										borderBottom: 1,
+										borderColor: 'divider',
+									}}
 								>
 									<Box sx={{ minWidth: 0 }}>
 										<Typography variant="body1" sx={{ fontWeight: 600 }}>
@@ -67,7 +80,7 @@ export default function DictionaryHistorySection() {
 									</Typography>
 								</Stack>
 							))}
-						</Stack>
+						</Box>
 
 						<TablePagination
 							component="div"

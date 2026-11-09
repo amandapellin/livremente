@@ -109,14 +109,13 @@ export default function RecomendacoesPage() {
 				component={NavLink}
 				to={to}
 				variant="subtitle2"
-				sx={(theme) => ({
-					color: colors.info,
+				// `info.main` é theme-aware (azul de ação no claro, azul claro no escuro).
+				sx={{
+					color: 'info.main',
 					textDecoration: 'underline',
 					whiteSpace: 'nowrap',
 					fontWeight: 500,
-					// Tema escuro: azul claro, senão o link fica escuro demais no fundo escuro.
-					...theme.applyStyles('dark', { color: colors.acao[200] }),
-				})}
+				}}
 			>
 				Ver tudo
 			</Typography>
@@ -146,7 +145,7 @@ export default function RecomendacoesPage() {
 					justifyContent: 'space-between',
 				}}
 			>
-				<Stack sx={{ gap: 1, flex: '1 1 340px', minWidth: 260 }}>
+				<Stack sx={{ gap: 1, flex: '1 1 340px', minWidth: { xs: 0, sm: 260 } }}>
 					<Typography variant="overline" sx={{ color: 'text.secondary' }}>
 						Para você
 					</Typography>
@@ -164,9 +163,12 @@ export default function RecomendacoesPage() {
 						flexWrap: 'wrap',
 						gap: 1,
 						alignItems: 'center',
-						justifyContent: 'flex-end',
-						flexShrink: 0,
-						maxWidth: 360,
+						// No mobile ocupa a largura toda e pode encolher (os chips quebram
+						// dentro do card); no sm+ fica capado à direita, ao lado do título.
+						justifyContent: { xs: 'flex-start', sm: 'flex-end' },
+						width: { xs: '100%', sm: 'auto' },
+						flexShrink: { xs: 1, sm: 0 },
+						maxWidth: { xs: '100%', sm: 360 },
 					}}
 				>
 					{langChips.map((slug) => (

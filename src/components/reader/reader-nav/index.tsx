@@ -1,4 +1,4 @@
-import { Stack } from '@mui/material'
+import { IconButton, Stack } from '@mui/material'
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft'
 import ChevronRightIcon from '@mui/icons-material/ChevronRight'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
@@ -19,6 +19,10 @@ interface Props {
 }
 
 const navButtonSx = { px: 2, py: 1 }
+// No mobile os controles de página viram só o ícone (seta); a partir de sm voltam
+// a mostrar o rótulo. Alternância por `display` (um dos dois fica oculto por vez).
+const iconOnly = { display: { xs: 'inline-flex', sm: 'none' } }
+const labelled = { ...navButtonSx, display: { xs: 'none', sm: 'inline-flex' } }
 
 
 export default function ReaderNav({
@@ -37,8 +41,8 @@ export default function ReaderNav({
 			sx={{
 				justifyContent: 'space-between',
 				alignItems: 'center',
-				gap: 2,
-				px: 3,
+				gap: { xs: 1, sm: 2 },
+				px: { xs: 1.5, sm: 3 },
 				py: 1.5,
 				flexShrink: 0,
 				borderTop: `1px solid ${surface.border}`,
@@ -46,7 +50,15 @@ export default function ReaderNav({
 				color: surface.text,
 			}}
 		>
-			<ReaderButton borderColor={surface.border} startIcon={<ChevronLeftIcon />} onClick={onPrev} sx={navButtonSx}>
+			<IconButton
+				aria-label="Página anterior"
+				onClick={onPrev}
+				size="small"
+				sx={{ ...iconOnly, border: `1px solid ${surface.border}`, color: surface.text, borderRadius: 1.5 }}
+			>
+				<ChevronLeftIcon />
+			</IconButton>
+			<ReaderButton borderColor={surface.border} startIcon={<ChevronLeftIcon />} onClick={onPrev} sx={labelled}>
 				Anterior
 			</ReaderButton>
 
@@ -68,9 +80,17 @@ export default function ReaderNav({
 				/>
 			</Stack>
 
-			<ReaderButton borderColor={surface.border} endIcon={<ChevronRightIcon />} onClick={onNext} sx={navButtonSx}>
+			<ReaderButton borderColor={surface.border} endIcon={<ChevronRightIcon />} onClick={onNext} sx={labelled}>
 				Próxima
 			</ReaderButton>
+			<IconButton
+				aria-label="Próxima página"
+				onClick={onNext}
+				size="small"
+				sx={{ ...iconOnly, border: `1px solid ${surface.border}`, color: surface.text, borderRadius: 1.5 }}
+			>
+				<ChevronRightIcon />
+			</IconButton>
 		</Stack>
 	)
 }

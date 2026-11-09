@@ -22,14 +22,14 @@ export default function PublicationHeader({ publication, onSelectStatus, onReadN
 			sx={{
 				p: 3,
 				display: 'flex',
-				gap: 4,
-				flexWrap: {
-					xs: 'wrap',
-					sm: 'nowrap'
-				}
+				gap: { xs: 3, sm: 4 },
+				// No mobile a capa fica em cima (centralizada) e o texto ocupa a largura
+				// toda; a partir de sm volta a ser capa à esquerda + texto à direita.
+				flexDirection: { xs: 'column', sm: 'row' },
+				alignItems: { xs: 'center', sm: 'stretch' },
 			}}
 		>
-			<Box sx={{ width: 180, flexShrink: 0 }}>
+			<Box sx={{ width: { xs: 160, sm: 180 }, flexShrink: 0 }}>
 				<PublicationCover title={publication.title} coverUrl={publication.coverUrl} variant="full"/>
 			</Box>
 			<Stack sx={{ gap: 2, flex: 1, minWidth: 0 }}>

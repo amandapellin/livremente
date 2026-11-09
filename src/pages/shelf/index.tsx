@@ -68,7 +68,7 @@ export default function EstantePage() {
 
 	return (
 		<Box sx={{ maxWidth: 1400, mx: 'auto', px: { xs: 2, md: 5 }, py: { xs: 3, md: 4 } }}>
-			<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '288px 1fr' }, gap: 3, alignItems: 'start' }}>
+			<Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: '240px minmax(0, 1fr)', md: '288px minmax(0, 1fr)' }, gap: 3, alignItems: 'start' }}>
 				{/* Sidebar */}
 				<Stack sx={{ gap: 3 }}>
 					<ShelfUserCard />

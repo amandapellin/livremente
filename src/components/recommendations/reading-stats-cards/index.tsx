@@ -57,7 +57,7 @@ export default function ReadingStatsCards() {
 
 	if (loading) {
 		return (
-			<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+			<Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
 				{Array.from({ length: 3 }).map((_, i) => (
 					<Skeleton key={i} variant="rounded" height={190} />
 				))}
@@ -82,7 +82,7 @@ export default function ReadingStatsCards() {
 	const headlineMinutes = current?.readingTimeMinutes ?? stats?.todayMinutes ?? 0
 
 	return (
-		<Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' }, gap: 2 }}>
+		<Box sx={{ display: 'grid', gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(3, minmax(0, 1fr))' }, gap: 2 }}>
 			{/* 1. Tempo de leitura ativo */}
 			<Paper variant="section" sx={{ p: 2.5 }}>
 				<Stack sx={{ gap: 2, height: '100%' }}>
@@ -181,8 +181,12 @@ export default function ReadingStatsCards() {
 									key={i}
 									title={m > 0 ? `${m} min` : 'sem leitura'}
 									sx={(theme) => ({
-										width: 32,
-										height: 32,
+										// Flexiona para caber na largura do card (10 dias × 32px
+										// estouravam no mobile); quadrado via aspectRatio, cap em 32.
+										flex: '1 1 0',
+										minWidth: 0,
+										maxWidth: 32,
+										aspectRatio: '1',
 										borderRadius: '3px',
 										bgcolor: LEVEL_COLORS[levelOf(m)],
 										// Tema escuro: dia sem leitura escuro (o papel/200 claro destoava do fundo).

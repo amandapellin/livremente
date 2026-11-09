@@ -36,14 +36,14 @@ export default function PrivacySection({ email }: Props) {
 	}
 
 	return (
-		<Stack sx={{ gap: 1, borderTop: 1, borderColor: 'divider', pt: 2 }}>
+		<Stack sx={{ gap: 1 }}>
 			<Typography variant="h6" component="h2">
 				Dados e privacidade
 			</Typography>
 			<Typography variant="caption" sx={{ color: 'text.secondary' }}>
 				Consentimento LGPD registrado em {formatDate(consent?.consentedAt)}.
 			</Typography>
-			<Stack direction="row" sx={{ gap: 1, flexWrap: 'wrap', pt: 1 }}>
+			<Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap', pt: 1 }}>
 				<Button variant="outlined" color="inherit" size="small" onClick={handleExport} disabled={isExporting}>
 					{isExporting ? 'Exportando…' : 'Exportar meus dados'}
 				</Button>

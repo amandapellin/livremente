@@ -114,7 +114,7 @@ export default function CatalogoPage() {
 				<Typography variant="caption" sx={{ color: 'text.secondary' }}>Catálogo unificado: Project Gutenberg (livros) e arXiv (artigos científicos).</Typography>
 			</Stack>
 
-			<Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: '1fr', md: '305px 1fr' }, alignItems: 'start' }}>
+			<Box sx={{ display: 'grid', gap: 3, gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: '240px minmax(0, 1fr)', md: '305px minmax(0, 1fr)' }, alignItems: 'start' }}>
 				<CatalogFilters query={filters} counts={data?.counts} onChange={patch} onClear={clearFilters} />
 				<Stack sx={{ gap: 2 }}>
 					<Stack direction="row" sx={{ gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>

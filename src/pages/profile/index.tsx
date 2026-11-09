@@ -64,38 +64,49 @@ export default function PerfilPage() {
 					sx={{
 						mt: 3,
 						display: 'grid',
-						gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1.2fr)' },
+						gridTemplateColumns: { xs: 'minmax(0, 1fr)', sm: 'minmax(0, 1fr) minmax(0, 1.2fr)' },
 						gap: 3,
 						alignItems: 'start',
 					}}
 				>
-					<Paper variant="section" sx={{ p: 3 }}>
-						<Stack component="form" onSubmit={onSubmit} noValidate sx={{ gap: 2 }}>
-							<IdentitySection
-								control={control}
-								errors={errors}
-								email={profile?.email ?? ''}
-								avatar={avatar}
-								disabled={isSaving}
-							/>
-							<PasswordSection control={control} errors={errors} disabled={isSaving} />
-							<Stack sx={{ gap: 1.5 }}>
-								{submitError && <Alert severity="error">{submitError}</Alert>}
-								<Box>
-									<Button type="submit" variant="contained" disabled={isSaving || !canSave}>
-										{isSaving ? 'Salvando…' : 'Salvar alterações'}
-									</Button>
-								</Box>
+					{/* Coluna esquerda: conta (identificação + senha) e privacidade, cada um em seu card. */}
+					<Stack sx={{ gap: 3 }}>
+						<Paper variant="section" sx={{ p: 3 }}>
+							<Stack component="form" onSubmit={onSubmit} noValidate sx={{ gap: 2 }}>
+								<IdentitySection
+									control={control}
+									errors={errors}
+									email={profile?.email ?? ''}
+									avatar={avatar}
+									disabled={isSaving}
+								/>
+								<PasswordSection control={control} errors={errors} disabled={isSaving} />
+								<Stack sx={{ gap: 2 }}>
+									{submitError && <Alert severity="error">{submitError}</Alert>}
+									<Box>
+										<Button type="submit" variant="contained" disabled={isSaving || !canSave}>
+											{isSaving ? 'Salvando…' : 'Salvar alterações'}
+										</Button>
+									</Box>
+								</Stack>
 							</Stack>
-							<PrivacySection email={profile?.email ?? ''} />
-						</Stack>
-					</Paper>
+						</Paper>
 
+						<Paper variant="section" sx={{ p: 3 }}>
+							<PrivacySection email={profile?.email ?? ''} />
+						</Paper>
+					</Stack>
+
+					{/* Coluna direita: leitor e interface + preferências de leitura. */}
 					<Stack sx={{ gap: 3 }}>
 						<ReaderSection />
 						<ReadingPreferencesSection />
-						<DictionaryHistorySection />
 					</Stack>
+
+					{/* Faixa full-width (ambas as colunas): histórico do dicionário no rodapé. */}
+					<Box sx={{ gridColumn: { sm: '1 / -1' } }}>
+						<DictionaryHistorySection />
+					</Box>
 				</Box>
 			)}
 

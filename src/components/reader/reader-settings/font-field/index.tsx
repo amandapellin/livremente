@@ -13,7 +13,7 @@ interface Props {
 export default function FontField({ value, onChange }: Props) {
 	return (
 		<SettingsSection title="Fonte">
-			<Stack direction="row" sx={{ gap: 1.5, flexWrap: 'nowrap' }}>
+			<Stack direction="row" sx={{ gap: 1.5, flexWrap: { xs: 'wrap', sm: 'nowrap' } }}>
 				{FONT_OPTIONS.map((o) => (
 					<SettingsOptionCard
 						key={o.value}
