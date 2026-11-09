@@ -72,7 +72,16 @@ export default function ShelfReadingCalendar() {
 			<Stack sx={{ gap: 1.5 }}>
 				<Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
 					<Stack direction="row" sx={{ alignItems: 'center', gap: 1, minWidth: 0 }}>
-						<CalendarMonthOutlined sx={{ fontSize: 18, color: 'text.secondary' }} />
+						<CalendarMonthOutlined
+							sx={(theme) => ({
+								fontSize: 18,
+								// Explícito por tema para o ícone não ficar escuro no modo escuro.
+								// No escuro usa quase-branco (papel/100 = text.primary) para
+								// destacar; no claro acompanha o título (papel/700).
+								color: colors.papel[700],
+								...theme.applyStyles('dark', { color: colors.papel[100] }),
+							})}
+						/>
 						<Typography variant="overline" sx={{ color: 'text.secondary' }} noWrap>
 							Calendário de leitura
 						</Typography>
@@ -121,13 +130,16 @@ export default function ShelfReadingCalendar() {
 									title={minutes > 0 ? `${day}: ${minutes} min de leitura` : `${day}: sem leitura`}
 								>
 									<Box
-										sx={{
+										sx={(theme) => ({
 											aspectRatio: '1 / 1',
 											borderRadius: '2px',
 											bgcolor: LEVEL_COLORS[levelOf(minutes)],
-											outline: isToday ? `2px solid ${colors.primary[800]}` : 'none',
+											outline: isToday ? `2px solid ${theme.palette.primary.main}` : 'none',
 											outlineOffset: '-1px',
-										}}
+											// Tema escuro: célula sem leitura escura (o papel/200 claro destoava do fundo).
+											...(levelOf(minutes) === 0 &&
+												theme.applyStyles('dark', { bgcolor: 'rgba(255,255,255,0.08)' })),
+										})}
 									/>
 								</Tooltip>
 							)
@@ -137,7 +149,7 @@ export default function ShelfReadingCalendar() {
 
 				{/* Legenda Menos → Mais */}
 				<Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
-					<Typography variant="caption" sx={{ color: colors.papel[600] }}>
+					<Typography variant="caption" sx={{ color: 'text.secondary' }}>
 						Menos
 					</Typography>
 					<Stack direction="row" sx={{ gap: 0.5 }}>
@@ -145,7 +157,7 @@ export default function ShelfReadingCalendar() {
 							<Box key={c} sx={{ width: 12, height: 12, borderRadius: '2px', bgcolor: c }} />
 						))}
 					</Stack>
-					<Typography variant="caption" sx={{ color: colors.papel[600] }}>
+					<Typography variant="caption" sx={{ color: 'text.secondary' }}>
 						Mais
 					</Typography>
 				</Stack>

@@ -1,12 +1,13 @@
 import { Box, Link, Stack, Typography } from '@mui/material'
+import { NavLink } from 'react-router'
 import AutoStoriesIcon from '@mui/icons-material/AutoStories'
 import { colors } from '@/theme/tokens'
 
 const footerLinks = [
-    { label: 'Institucional', href: '#' },
-    { label: 'Privacidade', href: '#' },
-    { label: 'Termos', href: '#' },
-    { label: 'Suporte', href: '#' },
+    { label: 'Institucional', to: '/institucional' },
+    { label: 'Privacidade', to: '/privacidade' },
+    { label: 'Termos', to: '/termos' },
+    { label: 'Suporte', to: '/suporte' },
 ]
 
 export default function Footer() {
@@ -39,7 +40,7 @@ export default function Footer() {
 
                 <Stack direction="row" sx={{ gap: 2, flexWrap: 'wrap', justifyContent: 'center' }}>
                     {footerLinks.map((l) => (
-                        <Link key={l.label} href={l.href} underline="hover" sx={linkSx}>
+                        <Link key={l.label} component={NavLink} to={l.to} underline="hover" sx={linkSx}>
                             {l.label}
                         </Link>
                     ))}

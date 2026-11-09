@@ -1,7 +1,10 @@
 import { NavLink } from 'react-router'
 import { Box, Button, Stack, Typography } from '@mui/material'
 import { colors, heroBackground } from '@/theme/tokens'
+import { useIsAuthenticated } from '@/hooks/useAuth'
 export default function Hero(){
+    // Já logado: o CTA secundário leva à estante em vez de reenviar ao login.
+    const isAuthenticated = useIsAuthenticated()
     return (
         <Box
             sx={{
@@ -37,12 +40,12 @@ export default function Hero(){
                     </Button>
                     <Button
                         component={NavLink}
-                        to="/login"
+                        to={isAuthenticated ? '/estante' : '/login'}
                         variant="outlined"
                         size="large"
                         sx={{ color: colors.primary[50], borderColor: colors.primary[50], '&:hover': { borderColor: colors.primary[50], bgcolor: 'rgba(255,255,255,0.08)' } }}
                     >
-                        Acessar Conta
+                        {isAuthenticated ? 'Minha Estante' : 'Acessar Conta'}
                     </Button>
                 </Stack>
             </Stack>

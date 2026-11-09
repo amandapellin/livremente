@@ -109,7 +109,14 @@ export default function RecomendacoesPage() {
 				component={NavLink}
 				to={to}
 				variant="subtitle2"
-				sx={{ color: colors.info, textDecoration: 'underline', whiteSpace: 'nowrap', fontWeight: 500 }}
+				sx={(theme) => ({
+					color: colors.info,
+					textDecoration: 'underline',
+					whiteSpace: 'nowrap',
+					fontWeight: 500,
+					// Tema escuro: azul claro, senão o link fica escuro demais no fundo escuro.
+					...theme.applyStyles('dark', { color: colors.acao[200] }),
+				})}
 			>
 				Ver tudo
 			</Typography>
@@ -176,7 +183,7 @@ export default function RecomendacoesPage() {
 							clickable
 							onClick={() => setChipsExpanded((v) => !v)}
 							aria-expanded={chipsExpanded}
-							sx={{ color: 'primary.main', borderColor: colors.papel[300], fontWeight: 600 }}
+							sx={{ color: 'primary.main', borderColor: 'divider', fontWeight: 600 }}
 						/>
 					)}
 					<Chip
@@ -188,10 +195,9 @@ export default function RecomendacoesPage() {
 						component={NavLink}
 						to="/perfil"
 						sx={{
-							bgcolor: colors.papel[50],
-							borderColor: colors.papel[300],
+							borderColor: 'divider',
 							color: 'text.secondary',
-							'&:hover': { bgcolor: colors.papel[100] },
+							'&:hover': { bgcolor: 'action.hover' },
 						}}
 					/>
 				</Box>

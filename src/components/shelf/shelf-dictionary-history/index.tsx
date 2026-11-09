@@ -67,13 +67,19 @@ export default function ShelfDictionaryHistory() {
 							{pageItems.map((it, i) => (
 								<Stack
 									key={`${it.word}-${it.consultedAt}-${i}`}
-									sx={{
+									sx={(theme) => ({
 										gap: 0.5,
 										p: 1.5,
 										borderRadius: 2,
 										bgcolor: colors.papel[50],
 										border: `1px solid ${colors.papel[300]}`,
-									}}
+										// Tema escuro: cartão escuro translúcido em vez do papel
+										// quase branco (que destoava e dificultava a leitura).
+										...theme.applyStyles('dark', {
+											bgcolor: 'rgba(255,255,255,0.04)',
+											border: '1px solid rgba(255,255,255,0.12)',
+										}),
+									})}
 								>
 									<Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'flex-start', gap: 1 }}>
 										<Typography sx={{ fontWeight: 500, color: 'primary.main', fontSize: 14 }}>{it.word}</Typography>

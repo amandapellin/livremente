@@ -9,9 +9,11 @@ import PublicationActions from "./publication-actions";
 interface Props {
     publication: Publication;
     onAddToShelf?: (publication: Publication) => void;
+    /** A obra já foi adicionada à estante nesta sessão → botão de confirmação. */
+    inShelf?: boolean;
 }
 
-export default function PublicationCard({ publication, onAddToShelf }: Props) {
+export default function PublicationCard({ publication, onAddToShelf, inShelf }: Props) {
     const meta = [
         formatPersonName(publication.author),
         publication.year, 
@@ -47,9 +49,10 @@ export default function PublicationCard({ publication, onAddToShelf }: Props) {
                     </Typography>
                 )}
             </Stack>
-            <PublicationActions 
+            <PublicationActions
                 to={`/obra/${publication.id}`}
-                onAddToShelf={onAddToShelf ? () => onAddToShelf(publication) : undefined} 
+                onAddToShelf={onAddToShelf ? () => onAddToShelf(publication) : undefined}
+                inShelf={inShelf}
             />
         </Paper>
     )

@@ -1,6 +1,7 @@
 import type { CatalogCounts } from "@/api/generated/model";
 import type { CatalogQuery } from "@/schemas/catalog-schemas";
 import { Link, Paper, Stack, Typography } from "@mui/material";
+import { colors } from "@/theme/tokens";
 import TypeFilter from "./type-filter";
 import LanguageFilter from "./language-filter";
 import GenreFilter from "./genre-filter";
@@ -22,7 +23,19 @@ export default function CatalogFilters({ query, counts, onChange, onClear }: Pro
             <Stack sx={{ gap: 2 }}>
                 <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography variant="subtitle1">Filtros</Typography>
-                    <Link component="button" type="button" onClick={onClear} sx={{ color: 'acao.dark', fontSize: 14 }}>Limpar</Link>
+                    <Link
+                        component="button"
+                        type="button"
+                        onClick={onClear}
+                        sx={(theme) => ({
+                            color: 'acao.dark',
+                            fontSize: 14,
+                            // Tema escuro: azul claro, senão fica escuro demais no fundo escuro.
+                            ...theme.applyStyles('dark', { color: colors.acao[200] }),
+                        })}
+                    >
+                        Limpar
+                    </Link>
                 </Stack>
                 <TypeFilter value={query.type} counts={counts} onChange={handleType} />
                 {
