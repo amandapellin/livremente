@@ -1,5 +1,14 @@
 # `src/utils` — utilitários
 
+> **Acesso à API nos *utils*:** as chamadas autenticadas feitas à mão (estante,
+> leitor, dicionário, recomendações) passam pela camada central
+> **`src/api/authed-fetch.ts`** (ver `docs/api.md`), não por `fetch` + token
+> duplicado. Regra: chamadas **aguardadas** (GET/mutação cujo resultado é lido)
+> usam **`authedFetch`** (ganham o *refresh* no 401); disparos **fire-and-forget**
+> com `keepalive` (salvar página/percentual, *heartbeat*) usam `fetch` +
+> **`authHeaders`** direto (o `await` do refresh anularia o `keepalive`). A base da
+> API é sempre **`API_BASE`** — não redeclarar `import.meta.env.VITE_API_URL`.
+
 ## `reader-preferences.ts` — preferências do leitor (localStorage)
 
 Persistência **por dispositivo** (localStorage) das preferências do leitor. O tema
@@ -39,47 +48,64 @@ Restrito a EPUB (o viewer nativo de PDF não expõe a página atual). Ver `useBo
 ## `reader-highlights.ts` — grifos (RF22, EPUB)
 
 Persistência **por obra** dos grifos em `localStorage` (`reader:highlights:<bookId>`,
-lista de `Highlight` em JSON; `id = cfiRange` do epub.js) + envio *best-effort* ao
-back-end atrás do flag `USE_HIGHLIGHTS_API` (hoje `false`). Ver `useHighlights`
-(estado reativo) e, no leitor, `useEpubReader` (seleção/overlay via `annotations`).
+lista de `Highlight` em JSON; `id = cfiRange` do epub.js). **Criação e listagem**
+são integradas ao back-end (`/api/reading/{id}/highlights`, #27) atrás de
+`USE_HIGHLIGHTS_API` (hoje `true`); **recolorir/nota/excluir** seguem **locais**
+atrás de `USE_HIGHLIGHT_MUTATIONS_API` (hoje `false`, sem rota no back). Ver
+`useHighlights` (estado reativo) e, no leitor, `useEpubReader` (seleção/overlay via
+`annotations`).
 
 - **`getHighlights(bookId)`** / **`saveHighlight(bookId, h)`** / **`deleteHighlight(bookId, id)`**
   / **`updateHighlightColor(bookId, id, color)`** / **`updateHighlightNote(bookId, id, note)`**
   — leitura, inserção idempotente (por `id`), remoção, troca de cor e de **nota**
   (RF23; `note` vazio volta a `undefined`) no `localStorage`.
-- **`sendHighlight(bookId, h)`** — `POST /api/users/me/reading-progress/{id}/highlights`
-  (`{ cfiRange, text, color, note }`), proposto pelo front; no-op com o flag desligado.
+- **`sendHighlight(bookId, h)`** — `POST /api/reading/{id}/highlights`
+  (`{ excerpt, epubPosition, color }`, onde `epubPosition = cfiRange`); integrado
+  (atrás de `USE_HIGHLIGHTS_API`). *Fire-and-forget*.
 - **`updateHighlightRemote(bookId, id, color)`** / **`updateHighlightNoteRemote(bookId, id, note)`**
-  — `PATCH .../highlights/{cfiRange}` (`{ color }` ou `{ note }`).
-- **`removeHighlightRemote(bookId, id)`** — `DELETE .../highlights/{cfiRange}`.
+  — `PATCH /api/reading/{id}/highlights/{id}` (`{ color }` ou `{ note }`); **proposto**,
+  no-op até existir a rota (atrás de `USE_HIGHLIGHT_MUTATIONS_API`).
+- **`removeHighlightRemote(bookId, id)`** — `DELETE /api/reading/{id}/highlights/{id}`;
+  idem (proposto, atrás de `USE_HIGHLIGHT_MUTATIONS_API`).
 
-## `reader-progress.ts` — sincronização da posição ao back-end (RF17)
+## `reader-progress.ts` — progresso de leitura no back-end (RF17/RF18/RF19)
 
-- **`sendReadingProgress(bookId, cfi, percent)`** — envia a última posição lida ao
-  contrato proposto `PUT /api/users/me/reading-progress/{id}` (`{ cfi, percent }`).
-  *Best-effort* e com `keepalive: true` (sobrevive ao fechamento da aba — flush em
-  `pagehide`); por isso usa `fetch` + token manual. Atrás do flag
-  `USE_READING_PROGRESS_API` (hoje `false`, no-op). O `useEpubReader` chama com
-  **debounce** (4s) a cada `relocated` e faz **flush ao sair da tela**. Só EPUB (PDF
-  não passa pelo hook). O `localStorage` (`reader:position:<id>`) segue como fonte
-  local/fallback (RF18).
+Sincroniza a última página e o percentual com o back-end (*cross-device*),
+**autenticado** e integrado (sem flag). As **escritas** são *fire-and-forget* com
+`keepalive: true` (sobrevivem ao fechamento da aba — *flush* em `pagehide`); por
+isso usam `fetch` + `authHeaders` (de `authed-fetch`), não `authedFetch` (o `await`
+do refresh anularia o keepalive). Chamadas pelo `useEpubReader` durante a leitura e
+no *flush* ao sair; o back-end restringe a EPUB (422 fora disso). O `localStorage`
+dos *reader-preferences* (`reader:position:<id>`, `reader:percent:<id>`) segue como
+cache/fallback local.
 
-## `reading-session.ts` — tempo de leitura da sessão (RF20)
+- **`saveLastPage(bookId, lastPageRead)`** — `PUT /api/reading/{id}/last-page`
+  (`{ lastPageRead }`). `lastPageRead` é o **índice de *location*** do epub.js
+  (inteiro ≥ 0), **não** CFI. No-op sem sessão ou com valor negativo (RF17/RN08).
+- **`savePercentage(bookId, readPercentage)`** — `PUT /api/reading/{id}/percentage`
+  (`{ readPercentage }`, 0–100). No-op sem sessão ou fora da faixa (RF19).
+- **`fetchLastPage(bookId)`** — `GET /api/reading/{id}/last-page` (via `authedFetch`,
+  ganha o *refresh* no 401) → `number | null` (lê `lastPageRead`; null se nunca leu /
+  anônimo / erro). Base da retomada (RF18).
 
-Acumula o **tempo de tela ativa** por obra e envia ao back-end. O envio fica atrás
-de `USE_READING_SESSION_API` (hoje `false`): enquanto a rota não existe, só acumula
-em `localStorage` (chave `reader:time:<bookId>`, em **segundos**). Ver
-`useReadingSession`, que orquestra pausa/retomada e os *flushes*.
+## `reading-session.ts` — sessão e tempo de leitura (RF20)
+
+Mede o **tempo de tela ativa** por obra: acumula em `localStorage`
+(`reader:time:<bookId>`, em **segundos**) e registra a sessão no back-end
+(**autenticado** e integrado — sem flag; EPUB e PDF). Ver `useReadingSession`, que
+orquestra pausa/retomada e os *flushes*.
 
 - **`getStoredReadingTime(bookId)` / `addStoredReadingTime(bookId, seconds)`** —
-  total acumulado por obra (incrementa; alimenta o `ReadingProgress.readingTimeMinutes`
-  da estante/detalhes). Protegido com `try/catch`.
+  total acumulado por obra (incrementa; alimenta o `readingTimeMinutes` da
+  estante/detalhes). Protegido com `try/catch`.
 - **`formatDuration(totalSeconds)`** — formata `m:ss` (ou `h:mm:ss` a partir de 1h).
-- **`sendReadingTime(bookId, seconds)`** — envia o **delta** ao contrato proposto
-  `POST /api/users/me/reading-progress/{id}/session` (`{ seconds }`). *Best-effort* e
-  com `keepalive: true` para sobreviver ao fechamento da aba (*flush* em `pagehide`);
-  por isso usa `fetch` + token manual em vez do cliente gerado. No-op com o flag
-  desligado. Ao ligar: atualizar `openapi.json` → `pnpm gen:api`.
+- **`startSession(bookId)`** — `POST /api/reading/{id}/session` (via `authedFetch`,
+  ganha o *refresh* no 401) → `sessionId | null` (null sem sessão / erro). Abre a
+  sessão ao entrar no leitor.
+- **`updateSession(sessionId, activeSeconds)`** — `PUT /api/reading/sessions/{sessionId}`
+  (`{ activeSeconds }`, total de segundos da sessão): *heartbeat*/encerramento.
+  *Fire-and-forget* com `keepalive`; por isso usa `fetch` + `authHeaders` (de
+  `authed-fetch`), não `authedFetch`. No-op sem sessão ou com `activeSeconds < 0`.
 
 ## `register-utils.ts`
 

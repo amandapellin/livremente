@@ -1,6 +1,5 @@
-import { getAuthToken, getAuthTokens, saveAuthTokens, clearAuthTokens } from './auth-storage'
-
-const baseURL = import.meta.env.VITE_API_URL ?? ''
+import { getAuthToken, clearAuthTokens } from './auth-storage'
+import { API_BASE as baseURL, refreshAuthToken } from './authed-fetch'
 
 export class HttpError extends Error {
   readonly status: number
@@ -11,34 +10,6 @@ export class HttpError extends Error {
     this.name = 'HttpError'
     this.status = status
     this.data = data
-  }
-}
-
-let refreshPromise: Promise<boolean> | null = null
-
-async function performTokenRefresh(): Promise<boolean> {
-  const { refreshToken, storage } = getAuthTokens()
-  if (!refreshToken || !storage) return false
-
-  try {
-    const response = await fetch(`${baseURL}/api/auth/refresh`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    })
-
-    if (!response.ok) {
-      throw new Error('Refresh failed')
-    }
-
-    const data = await response.json()
-    saveAuthTokens(data.token, data.refreshToken, storage === 'local')
-    return true
-  } catch {
-    clearAuthTokens()
-    return false
-  } finally {
-    refreshPromise = null
   }
 }
 
@@ -55,11 +26,7 @@ export const customFetch = async <T>(url: string, options: RequestInit = {}): Pr
   let response = await fetch(`${baseURL}${url}`, { ...options, headers })
 
   if (response.status === 401 && !url.includes('/api/auth/login') && !url.includes('/api/auth/refresh')) {
-    if (!refreshPromise) {
-      refreshPromise = performTokenRefresh()
-    }
-
-    const refreshed = await refreshPromise
+    const refreshed = await refreshAuthToken()
 
     if (refreshed) {
       token = getAuthToken()

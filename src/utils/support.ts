@@ -1,6 +1,5 @@
+import { API_BASE } from '@/api/authed-fetch'
 import type { ContactForm } from '@/schemas/support-schemas'
-
-const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 // Resultado do envio do formulário de contato do Suporte (#84). O endpoint
 // `POST /api/support/contact` é público (não exige JWT).
@@ -20,7 +19,7 @@ const MESSAGES: Record<ContactErrorKind, string> = {
 export const sendContactMessage = async (values: ContactForm): Promise<ContactResult> => {
 	let res: Response
 	try {
-		res = await fetch(`${baseURL}/api/support/contact`, {
+		res = await fetch(`${API_BASE}/api/support/contact`, {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({

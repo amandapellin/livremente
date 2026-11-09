@@ -1,7 +1,7 @@
 import { getAuthToken } from '@/api/auth-storage'
+import { API_BASE, authHeaders, authedFetch } from '@/api/authed-fetch'
 
 const TIME_PREFIX = 'reader:time:'
-const baseURL = import.meta.env.VITE_API_URL ?? ''
 
 export const getStoredReadingTime = (bookId: string): number => {
 	try {
@@ -35,13 +35,9 @@ export const formatDuration = (totalSeconds: number): string => {
  * houver sessão (endpoint autenticado) / erro. EPUB e PDF.
  */
 export const startSession = async (bookId: string): Promise<number | null> => {
-	const token = getAuthToken()
-	if (!token) return null
+	if (!getAuthToken()) return null
 	try {
-		const res = await fetch(`${baseURL}/api/reading/${bookId}/session`, {
-			method: 'POST',
-			headers: { Authorization: `Bearer ${token}` },
-		})
+		const res = await authedFetch(`/api/reading/${bookId}/session`, { method: 'POST' })
 		if (!res.ok) return null
 		const data = await res.json()
 		return typeof data?.sessionId === 'number' ? data.sessionId : null
@@ -55,12 +51,11 @@ export const startSession = async (bookId: string): Promise<number | null> => {
  * (segundos) da sessão. Fire-and-forget, keepalive; só com sessão.
  */
 export const updateSession = (sessionId: number, activeSeconds: number): void => {
-	const token = getAuthToken()
-	if (!token || activeSeconds < 0) return
+	if (!getAuthToken() || activeSeconds < 0) return
 	try {
-		fetch(`${baseURL}/api/reading/sessions/${sessionId}`, {
+		fetch(`${API_BASE}/api/reading/sessions/${sessionId}`, {
 			method: 'PUT',
-			headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+			headers: authHeaders({ 'Content-Type': 'application/json' }),
 			body: JSON.stringify({ activeSeconds }),
 			keepalive: true,
 		}).catch(() => undefined)

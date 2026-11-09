@@ -14,15 +14,16 @@ Documentação dos arquivos **não gerados** de `src/api`. O diretório
 Envolve o cliente gerado (orval, `httpClient: 'fetch'`), centralizando
 autenticação e tratamento de resposta.
 
-- **`baseURL`** — `import.meta.env.VITE_API_URL ?? ''`. Em dev fica vazia (mesma
-  origem, via proxy do Vite); em produção, a URL pública da API.
+- **`baseURL`** — `API_BASE`, reexportado de `authed-fetch.ts` (ver abaixo):
+  `import.meta.env.VITE_API_URL ?? ''`. Em dev fica vazia (mesma origem, via proxy
+  do Vite); em produção, a URL pública da API.
 - **`HttpError`** (classe exportada) — lançado quando o backend responde com
   status não-ok. Carrega `status` e `data` (corpo já desserializado, quando
   houver) para a UI reagir a casos específicos — ex.: tratar um **409** no
   cadastro como "e-mail já cadastrado".
-- **`performTokenRefresh()`** (interna) — tenta renovar o token chamando
-  `POST /api/auth/refresh`. Em falha, limpa a sessão. Deduplicada por
-  `refreshPromise` (um refresh em andamento por vez).
+- O **refresh** não vive mais aqui: o `customFetch` reusa o
+  **`refreshAuthToken`** de `authed-fetch.ts`, de modo que o cliente gerado e os
+  *utils* manuais compartilhem o **mesmo** *single-flight* (sem refresh duplo).
 - **`customFetch<T>(url, options)`** (exportada) — o fetch usado pelo cliente
   gerado. Comportamento:
   - Define `Content-Type: application/json` **só quando há corpo** (evita
@@ -30,9 +31,35 @@ autenticação e tratamento de resposta.
     define o `multipart` boundary — upload de avatar).
   - Injeta o **JWT** (`Authorization: Bearer`) quando há sessão — ponto único de
     autenticação.
-  - Intercepta **401** (fora das rotas de login/refresh), dispara um refresh e
-    **reexecuta** a requisição; se o 401 persistir, limpa a sessão e redireciona
-    para `/login` (RF02).
+  - Intercepta **401** (fora das rotas de login/refresh), dispara um refresh
+    (`refreshAuthToken`) e **reexecuta** a requisição; se o 401 persistir, limpa a
+    sessão e redireciona para `/login` (RF02).
+
+## `authed-fetch.ts` — base e fetch autenticado para chamadas manuais
+
+Helper para as chamadas **fora** do cliente gerado — os `utils/*.ts` escritos à
+mão (estante, leitor, dicionário, recomendações), que acessam *endpoints* ainda
+não incluídos no contrato curado ou onde uma chamada direta basta. Centraliza o
+que antes cada *util* duplicava (base da API, header de auth, tratamento de erro).
+
+- **`API_BASE`** (exportada) — **fonte única** da base da API
+  (`import.meta.env.VITE_API_URL ?? ''`). Reusada pelo `fetcher.ts` e por qualquer
+  *util*/componente que monte uma URL da API — não redeclarar.
+- **`authHeaders(extra?)`** (exportada) — monta um `Headers` injetando
+  `Authorization: Bearer` quando há sessão, mesclando com `extra` (ex.:
+  `Content-Type`) sem sobrescrever um `Authorization` já presente.
+- **`refreshAuthToken()`** (exportada) — refresh do *access token* com
+  *single-flight* (`refreshPromise` — um refresh por vez). **Compartilhado** com o
+  `customFetch` do orval: dois *locks* independentes causariam refresh duplo e,
+  como o refresh rotaciona/revoga o token, logout espúrio.
+- **`authedFetch(path, init?)`** (exportada) — `fetch` autenticado: resolve a
+  `API_BASE`, injeta o Bearer, define `Content-Type` JSON quando há corpo e, no
+  **401 com sessão**, tenta **um** refresh e repete. Devolve a `Response` crua —
+  cada chamador decide a política (`null`/`[]`/`throw`/`bool`). Ao contrário do
+  `customFetch`, **não** redireciona (usado por chamadas que toleram deslogado).
+  `path` é relativo (prefixado por `API_BASE`). **Não** use em disparos
+  *fire-and-forget* com `keepalive` (o `await` do refresh anula o keepalive) —
+  nesses casos use `fetch` + `authHeaders` direto.
 
 ## `auth-storage.ts` — persistência e reatividade de sessão (RF02)
 

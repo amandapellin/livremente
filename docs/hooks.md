@@ -73,19 +73,24 @@ Query sobre o cliente gerado). Todas as funções são arrow (convenção do pro
 - **`useReadingSession.ts` → `useReadingSession(bookId?)`** — tempo de tela ativa da
   sessão de leitura (RF20). Mede por timestamps (não por contador que atrasa em aba
   inativa); **só avança com a aba visível e a janela focada** (`visibilitychange`,
-  `blur`/`focus`). Faz *flush* do **delta** acumulado a cada 30s, ao perder o foco, no
-  `pagehide` e ao desmontar (sair da tela) — via `addStoredReadingTime` +
-  `sendReadingTime`. Retorna `{ seconds, label }` da sessão atual (zera ao reabrir).
+  `blur`/`focus`). Ao entrar, **abre a sessão** no back-end (`startSession`, cacheada
+  por `bookId` para não abrir duas no StrictMode); faz *flush* do tempo acumulado a
+  cada 30s, ao perder o foco, no `pagehide` e ao desmontar (sair da tela) — via
+  `addStoredReadingTime` (cache local) + `updateSession(sessionId, segundos)`
+  (*heartbeat*/encerramento). Retorna `{ seconds, label }` da sessão atual (zera ao
+  reabrir).
 - **`useEpubReader.ts` → `useEpubReader(url, bookId?)`** — ciclo de vida do epub.js
   (RF15): render, navegação (botões/teclado), **reflow** (`ResizeObserver`), capítulo
   (TOC) e progresso. Ajustes de leitura via `themes.override` (fonte, entrelinha,
   alinhamento, tipo de página) e **tema** (RF26, `applyTheme` — `override` em vez de
   `themes.select`, que não reverte de forma confiável). **Retomada** (RF18): salva a
   posição como CFI (`setStoredPosition`) e retoma no `display(cfi)` quando `resumeAuto`
-  está ligado, com fallback para o início. **Salvamento da posição** (RF17): a cada
-  `relocated` grava o CFI no `localStorage` e **envia ao back-end com debounce (4s)**
-  via `sendReadingProgress`, com **flush ao sair da tela** (`pagehide`/desmontar,
-  `keepalive`); só EPUB. **Percentual** (RF19): `updateProgress`
+  está ligado, com fallback para o início. **Salvamento da posição** (RF17/RN08): a cada
+  `relocated` grava o CFI no `localStorage` (retomada local) e, com **debounce (4s)**,
+  envia ao back-end o **índice de *location*** via `saveLastPage` e o percentual via
+  `savePercentage` (*fire-and-forget*, `keepalive`), com **flush ao sair da tela**
+  (`pagehide`/desmontar); só EPUB. **Retomada cross-device** (RF18): ao abrir,
+  `fetchLastPage` lê a última página salva no back-end. **Percentual** (RF19): `updateProgress`
   calcula via `book.locations.percentageFromCfi` no `relocated` **e** assim que as
   *locations* são geradas (evita 0% travado no load), persistindo em
   `setStoredPercentage`. Expõe também `currentCfi` (posição atual) e `display(cfi)`

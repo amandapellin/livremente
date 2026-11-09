@@ -1,9 +1,9 @@
 import { getAuthToken } from '@/api/auth-storage'
+import { API_BASE, authHeaders, authedFetch } from '@/api/authed-fetch'
 import type { Highlight, HighlightColor } from '@/types/reader-types'
 import { reduceRemoteAnnotations, type AnnotationSeed } from '@/utils/reader-annotations'
 
 const PREFIX = 'reader:highlights:'
-const baseURL = import.meta.env.VITE_API_URL ?? ''
 // Back-end (#27): criação e listagem de grifos já existem em /api/reading/{id}/highlights.
 const USE_HIGHLIGHTS_API = true
 // Recolorir/nota/excluir ainda NÃO têm endpoint no back (issues futuras; nota = annotation
@@ -44,12 +44,8 @@ export const updateHighlightColor = (bookId: string, id: string, color: Highligh
 export const updateHighlightNote = (bookId: string, id: string, note: string): Highlight[] =>
 	persist(bookId, getHighlights(bookId).map((h) => (h.id === id ? { ...h, note: note || undefined } : h)))
 
-const authHeaders = () => {
-	const headers: Record<string, string> = { 'Content-Type': 'application/json' }
-	const token = getAuthToken()
-	if (token) headers.Authorization = `Bearer ${token}`
-	return headers
-}
+// Headers JSON + Bearer para as mutações fire-and-forget (POST/PATCH/DELETE).
+const jsonAuthHeaders = () => authHeaders({ 'Content-Type': 'application/json' })
 
 // Linha do grifo como vem do back-end (#27). `id` é inteiro; a unidade de posição
 // é o CFI range (epub_position). O front, porém, chaveia tudo pelo cfiRange.
@@ -75,12 +71,9 @@ const toHighlight = (r: RemoteHighlight): Highlight => ({
 // RF22: carrega os grifos do back-end (cross-device).
 export const fetchHighlightsRemote = async (bookId: string): Promise<Highlight[]> => {
 	if (!USE_HIGHLIGHTS_API) return []
-	const token = getAuthToken()
-	if (!token) return []
+	if (!getAuthToken()) return []
 	try {
-		const res = await fetch(`${baseURL}/api/reading/${bookId}/highlights`, {
-			headers: { Authorization: `Bearer ${token}` },
-		})
+		const res = await authedFetch(`/api/reading/${bookId}/highlights`)
 		if (!res.ok) return []
 		const rows = (await res.json()) as RemoteHighlight[]
 		if (!Array.isArray(rows)) return []
@@ -102,12 +95,9 @@ export const fetchReadingNotesRemote = async (
 ): Promise<{ highlights: Highlight[]; notes: AnnotationSeed[] }> => {
 	const empty = { highlights: [], notes: [] }
 	if (!USE_HIGHLIGHTS_API) return empty
-	const token = getAuthToken()
-	if (!token) return empty
+	if (!getAuthToken()) return empty
 	try {
-		const res = await fetch(`${baseURL}/api/reading/${bookId}/highlights-annotations`, {
-			headers: { Authorization: `Bearer ${token}` },
-		})
+		const res = await authedFetch(`/api/reading/${bookId}/highlights-annotations`)
 		if (!res.ok) return empty
 		const data = (await res.json()) as ReadingNotesResponse
 		return {
@@ -122,35 +112,35 @@ export const fetchReadingNotesRemote = async (
 export const sendHighlight = (bookId: string, highlight: Highlight): void => {
 	if (!USE_HIGHLIGHTS_API) return
 	// Back (#27): só EPUB. Corpo { excerpt, epubPosition, color } — nota/capítulo não entram.
-	fetch(`${baseURL}/api/reading/${bookId}/highlights`, {
+	fetch(`${API_BASE}/api/reading/${bookId}/highlights`, {
 		method: 'POST',
-		headers: authHeaders(),
+		headers: jsonAuthHeaders(),
 		body: JSON.stringify({ excerpt: highlight.text, epubPosition: highlight.cfiRange, color: highlight.color }),
 	}).catch(() => undefined)
 }
 
 export const updateHighlightRemote = (bookId: string, id: string, color: HighlightColor): void => {
 	if (!USE_HIGHLIGHT_MUTATIONS_API) return
-	fetch(`${baseURL}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
+	fetch(`${API_BASE}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
 		method: 'PATCH',
-		headers: authHeaders(),
+		headers: jsonAuthHeaders(),
 		body: JSON.stringify({ color }),
 	}).catch(() => undefined)
 }
 
 export const updateHighlightNoteRemote = (bookId: string, id: string, note: string): void => {
 	if (!USE_HIGHLIGHT_MUTATIONS_API) return
-	fetch(`${baseURL}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
+	fetch(`${API_BASE}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
 		method: 'PATCH',
-		headers: authHeaders(),
+		headers: jsonAuthHeaders(),
 		body: JSON.stringify({ note }),
 	}).catch(() => undefined)
 }
 
 export const removeHighlightRemote = (bookId: string, id: string): void => {
 	if (!USE_HIGHLIGHT_MUTATIONS_API) return
-	fetch(`${baseURL}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
+	fetch(`${API_BASE}/api/reading/${bookId}/highlights/${encodeURIComponent(id)}`, {
 		method: 'DELETE',
-		headers: authHeaders(),
+		headers: jsonAuthHeaders(),
 	}).catch(() => undefined)
 }
