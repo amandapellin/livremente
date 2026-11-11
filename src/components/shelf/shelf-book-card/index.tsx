@@ -70,7 +70,7 @@ export default function ShelfBookCard({ item, onSelectStatus, onRemove }: Props)
 					/>
 				</Stack>
 
-				<Stack direction="row" sx={{ gap: 1, alignItems: 'center', pt: 1, flexWrap: 'nowrap' }}>
+				<Stack sx={{ gap: 1, pt: 1 }}>
 					<Button
 						component={NavLink}
 						to={`/leitura/${pub.id}`}
@@ -78,10 +78,11 @@ export default function ShelfBookCard({ item, onSelectStatus, onRemove }: Props)
 						color="primary"
 						size="small"
 						startIcon={<AutoStories />}
+						fullWidth
 					>
 						Retomar
 					</Button>
-					<ShelfStatusMenu status={item.status} onSelect={onSelectStatus} onRemove={onRemove} />
+					<ShelfStatusMenu status={item.status} onSelect={onSelectStatus} onRemove={onRemove} fullWidth />
 				</Stack>
 			</Stack>
 		</Card>
