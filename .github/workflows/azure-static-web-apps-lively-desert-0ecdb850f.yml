@@ -22,6 +22,10 @@ jobs:
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
+        env:
+          # URL pública do backend (App Service). O Vite lê VITE_API_URL em build
+          # e o front passa a chamar a API nessa origem (CORS liberado no backend).
+          VITE_API_URL: https://livremente-api-g9f4b6hngddyadb7.brazilsouth-01.azurewebsites.net
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_LIVELY_DESERT_0ECDB850F }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
