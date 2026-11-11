@@ -1,0 +1,65 @@
+import { getAuthToken } from '@/api/auth-storage'
+import { API_BASE, authHeaders, authedFetch } from '@/api/authed-fetch'
+
+const TIME_PREFIX = 'reader:time:'
+
+export const getStoredReadingTime = (bookId: string): number => {
+	try {
+		const v = localStorage.getItem(TIME_PREFIX + bookId)
+		const n = v == null ? 0 : Number(v)
+		return Number.isFinite(n) ? n : 0
+	} catch {
+		return 0
+	}
+}
+
+export const addStoredReadingTime = (bookId: string, seconds: number) => {
+	try {
+		localStorage.setItem(TIME_PREFIX + bookId, String(getStoredReadingTime(bookId) + seconds))
+	} catch {
+		/* storage indisponível — ignora */
+	}
+}
+
+export const formatDuration = (totalSeconds: number): string => {
+	const s = Math.max(0, Math.floor(totalSeconds))
+	const h = Math.floor(s / 3600)
+	const m = Math.floor((s % 3600) / 60)
+	const sec = s % 60
+	const pad = (n: number) => String(n).padStart(2, '0')
+	return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`
+}
+
+/**
+ * Abre uma sessão de leitura no back-end (RF20) e retorna o id, ou null se não
+ * houver sessão (endpoint autenticado) / erro. EPUB e PDF.
+ */
+export const startSession = async (bookId: string): Promise<number | null> => {
+	if (!getAuthToken()) return null
+	try {
+		const res = await authedFetch(`/api/reading/${bookId}/session`, { method: 'POST' })
+		if (!res.ok) return null
+		const data = await res.json()
+		return typeof data?.sessionId === 'number' ? data.sessionId : null
+	} catch {
+		return null
+	}
+}
+
+/**
+ * Heartbeat/encerramento da sessão (RF20): grava o tempo de tela ativa TOTAL
+ * (segundos) da sessão. Fire-and-forget, keepalive; só com sessão.
+ */
+export const updateSession = (sessionId: number, activeSeconds: number): void => {
+	if (!getAuthToken() || activeSeconds < 0) return
+	try {
+		fetch(`${API_BASE}/api/reading/sessions/${sessionId}`, {
+			method: 'PUT',
+			headers: authHeaders({ 'Content-Type': 'application/json' }),
+			body: JSON.stringify({ activeSeconds }),
+			keepalive: true,
+		}).catch(() => undefined)
+	} catch {
+		/* ignora */
+	}
+}

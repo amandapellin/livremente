@@ -1,0 +1,166 @@
+<!--
+Documento de apoio à redação do artigo (seção de Metodologia/Desenvolvimento).
+Escopo: subtópico "3.1 Tecnologias Utilizadas", parte FRONT-END. A parte de
+back-end é descrita no documento equivalente do repositório livremente_backend
+(docs/desenvolvimento.md); no artigo, ambos compõem um único tópico 3.1.
+Documento VIVO: a cada issue implementada, atualizar a subseção correspondente
+e registrar a evolução no apêndice ao final.
+-->
+
+# 3. DESENVOLVIMENTO
+
+Esta seção apresenta o aplicativo desenvolvido, sua interface e as tecnologias
+empregadas. O presente documento detalha as tecnologias de **front-end** do
+subtópico **3.1 Tecnologias Utilizadas**; a interface do aplicativo e o
+repositório são descritos em material próprio, e as tecnologias de back-end no
+documento correspondente do repositório do servidor.
+
+## 3.1 Tecnologias Utilizadas (front-end)
+
+O front-end do LivreMente é uma **aplicação de página única (SPA)** responsável
+pela interface com que o usuário se cadastra, informa preferências, navega pelo
+acervo (livros do Project Gutenberg e artigos do arXiv) e realiza a leitura. A
+aplicação comunica-se com a API REST do projeto por meio de um contrato
+**OpenAPI**, a partir do qual o cliente de acesso é gerado automaticamente. As
+subseções descrevem cada tecnologia adotada e o modo como foi empregada.
+
+### 3.1.1 Biblioteca de interface, linguagem e empacotador
+
+A interface foi construída com a biblioteca **React** (versão 19), utilizando a
+linguagem **TypeScript** para tipagem estática, o que reduz erros em tempo de
+desenvolvimento. O empacotamento e o servidor de desenvolvimento são providos
+pelo **Vite**, escolhido pela rapidez de recarga e pela simplicidade de
+configuração. A organização do código segue uma separação por responsabilidade:
+páginas (`pages/`), componentes reutilizáveis (`components/`), *hooks*
+customizados (`hooks/`), esquemas de validação (`schemas/`) e utilitários
+(`utils/`).
+
+### 3.1.2 Sistema de componentes e tema visual
+
+A composição visual utiliza a biblioteca de componentes **Material UI (MUI)**,
+apoiada no motor de estilização **Emotion**. Um **tema** centraliza cores,
+tipografia e *tokens* de design, garantindo consistência entre as telas; as
+fontes são carregadas localmente via **Fontsource**. Componentes recorrentes —
+como o *stepper* do cadastro e os grupos de seleção de preferências — foram
+encapsulados como componentes próprios, priorizando reuso e acessibilidade.
+
+### 3.1.3 Roteamento e navegação
+
+A navegação entre telas (landing, cadastro, login, catálogo, detalhes, leitura,
+estante, recomendações e perfil) é gerenciada pelo **React Router**, com
+carregamento **sob demanda** das páginas (*lazy loading*), o que reduz o tamanho
+inicial da aplicação.
+
+### 3.1.4 Formulários e validação
+
+O tratamento de formulários emprega o **React Hook Form**, e as regras de
+validação são declaradas com a biblioteca **Zod**, integradas por um *resolver*.
+Essa combinação permite validação por etapa (por exemplo, no cadastro em
+múltiplas etapas), mensagens de erro por campo e verificação antes do envio,
+mantendo a lógica de validação separada da apresentação.
+
+### 3.1.5 Comunicação com a API e estado de servidor
+
+As requisições à API e o gerenciamento do estado assíncrono (carregamento, erro,
+cache) são feitos com o **TanStack Query**. Adotou-se a abordagem
+*contract-first*: a partir do contrato **OpenAPI** publicado pelo back-end, a
+ferramenta **orval** gera automaticamente os tipos, os *hooks* de requisição e os
+esquemas de validação correspondentes, mantendo front-end e back-end alinhados e
+reduzindo divergências de contrato. Sobre o cliente gerado há um *fetcher*
+próprio, que centraliza o tratamento de respostas, a injeção do token de
+autenticação e o tratamento uniforme de erros HTTP. Para alguns recursos mais
+recentes — leitor, estante e recomendações —, utiliza-se, ao lado do cliente
+gerado, uma **camada de requisição autenticada manual centralizada num único
+módulo**, empregada onde o contrato curado não inclui o *endpoint* ou onde uma
+chamada direta é suficiente. Esse módulo concentra a base única da API, a injeção
+do *token* e a renovação por *refresh*, **compartilhada com o cliente gerado** por
+um mesmo mecanismo de execução única (*single-flight*), de modo a não disparar
+renovações duplicadas.
+
+### 3.1.6 Autenticação no cliente
+
+O fluxo de autenticação no navegador prevê o armazenamento do token de acesso e a
+sua injeção automática nas requisições, além da renovação transparente por meio
+de *refresh token* quando o token expira. Casos específicos de erro são tratados
+de forma amigável — por exemplo, a sinalização de e-mail já cadastrado no
+cadastro e a exibição do resultado da confirmação de e-mail na tela de login.
+
+### 3.1.7 Qualidade de código e ferramentas de apoio
+
+A padronização e a análise estática do código são asseguradas pelo **ESLint**
+(com regras específicas para React e *hooks*) e pela verificação de tipos do
+**TypeScript**. O gerenciador de pacotes é o **pnpm**. O versionamento utiliza
+**Git** com hospedagem no **GitHub**, e o trabalho é acompanhado por *issues*
+vinculadas a um quadro de projeto.
+
+### 3.1.8 Leitura no navegador e técnicas específicas
+
+A leitura das obras ocorre inteiramente no navegador. Os arquivos **EPUB** são
+renderizados pela biblioteca **epub.js**, que oferece paginação, navegação por
+capítulos e **refluxo** responsivo do conteúdo, além de referências canônicas de
+posição (*CFI*) usadas para retomada, grifos e anotações. Os arquivos **PDF** são
+exibidos pelo **visualizador nativo** do navegador, embutido por um quadro
+(*iframe*), aproveitando recursos prontos como zoom, busca e impressão.
+
+Como os *endpoints* de arquivo exigem autenticação e nem o leitor de EPUB nem o
+quadro de PDF enviam o cabeçalho de autorização, os arquivos são obtidos por
+requisição autenticada e entregues ao leitor como **URLs locais (*blob*)** de
+mesma origem. Na tela de estante, a visualização em prateleira amostra a **cor
+predominante da capa** por meio da API **Canvas** do navegador — possível porque
+as capas são servidas pela mesma origem (por *proxy* do back-end) —, pintando a
+lombada de cada obra; na ausência de capa, recai sobre uma paleta determinística.
+
+Para não depender de disponibilidade da rede a cada interação, o progresso de
+leitura (posição, percentual, marcações) é mantido no **armazenamento local**
+(*localStorage*) do navegador como *cache* e *fallback*, e sincronizado com o
+back-end por envios com *debounce* e descarga (*flush*) ao sair da tela.
+
+---
+
+## Apêndice — Registro de evolução por issue
+
+*Tabela de controle interno (não necessariamente parte do texto final do
+artigo). A cada issue concluída, adicionar uma linha relacionando o requisito às
+tecnologias empregadas.*
+
+| Issue | Requisito | Tecnologias e aspectos de implementação |
+|---|---|---|
+| Setup | — | React 19, TypeScript, Vite, MUI, React Router, ESLint |
+| Landing page | — | Componentização, tema/tokens, MUI |
+| #5 | RF01 — Tela de cadastro | Cadastro em etapas (*stepper*), React Hook Form + Zod, cliente orval (`usePostApiAuthRegister`), tratamento de 409 |
+| #6 | RF02 — Login | React Hook Form + Zod; *fetcher* com injeção do token de acesso |
+| #6 (integração) | RN01 — Confirmação | Leitura de `?confirmed=` no `/login` e exibição de *toast* (MUI Snackbar) |
+| #7 | RF02 — Persistência de sessão | *Refresh token* (armazenamento em local/sessionStorage) e renovação transparente no 401, centralizados no *fetcher* |
+| #8 | RF03 — Edição de perfil | `GET`/`PUT /api/users/me`; pré-preenchimento via `values` do React Hook Form; TanStack Query; *toast* de sucesso e validação por campo. Estende-se à troca de senha (`PATCH /api/users/me/password`, com tratamento de 422) e ao avatar (`PUT`/`DELETE /api/users/me/avatar`, upload *multipart* com *preview*), num único salvar |
+| #9 | RF04 — Preferências de leitura | Componente compartilhado (`PreferencesFields`) reusado no cadastro e no perfil; *chips* de multi-seleção; `GET`/`PUT /api/users/me/preferences` (contrato proposto pelo front) com conversão do array `categories` ⇄ livros/áreas |
+| #10 | RF29 — Logout | Estado de sessão reativo (`useSyncExternalStore` + eventos no *storage*); *popover* de conta com "Editar perfil" e "Sair"; `POST /api/auth/logout` (contrato proposto pelo front, *best-effort*) com limpeza de sessão e redirecionamento à landing (RF28) |
+| #11 | RF10 — Tela de busca/catálogo | Lista de publicações (`PublicationCard`), ordenação e **paginação numerada** (TanStack Query com `keepPreviousData`); estados de carregando/vazio/erro. `GET /api/catalog` proposto pelo front, com **mock trocável** (`USE_CATALOG_MOCK`) até o back-end existir |
+| #12 | RF11 — Busca por palavra-chave | Campo de texto com busca **ao digitar (debounce via `useDebouncedValue`) e ao submeter**; resultados reativos ao termo |
+| #13 | RF12 — Componentes de filtro | Filtros de tipo, idioma e gênero/área em componentes próprios, com **visibilidade condicional por tipo** (idioma/gênero só p/ livro; área só p/ artigo) combinando com a busca (o filtro de ano saiu do critério) |
+| #14 | RF13 — Detalhes da obra/artigo | Metadados completos em `/obra/:id` (`GET /api/catalog/{id}`, contrato proposto pelo front + mock trocável); componentes decompostos (cabeçalho, sinopse, aside); ações "Ler agora" (→ Leitura) e "Adicionar à estante" como *dropdown* do enum `ReadingStatus` (→ Estante); estados carregando/404/erro |
+| #16 | RF15 — Leitor de EPUB | Integração **epub.js** (`useEpubReader`) em `/leitura/:id`: render paginado do `epubFileUrl`, navegação página/capítulo (botões + teclado), **reflow** responsivo (RNF15) e capítulo/progresso; **modal de Configurações** (fonte incl. **OpenDyslexic**, tamanho, entrelinha, alinhamento, cor de página e tipo de página dupla/única/rolagem); rota sem header nem footer globais; UI decomposta em componentes (`reader-settings` e campos, `ReaderButton`) com tipos/constantes em `src/types` e `src/constants` |
+| #17 | RF16 — Leitor de PDF | **Visualizador nativo do navegador** via `<iframe src={pdfFileUrl}>` no mesmo `/leitura/:id`, que vira **dispatcher** (PDF vs EPUB pelo arquivo disponível, leitor keyado por obra); scroll, zoom, navegação, miniaturas, busca e impressão vêm prontos do browser (RF16); topbar enxuta (voltar, título, “Abrir no {source}”). A tentativa com `pdfjs-dist` foi descartada por ficar aquém do nativo; contrato `pdfFileUrl` + `public/sample.pdf` para dev |
+| — | LGPD — Dados e privacidade (perfil) | Bloco "Dados e privacidade" funcional: **exportar** dados (JSON compondo perfil+preferências+gêneros dos endpoints reais; portabilidade), **rever consentimento** (termos + data + alternar o opcional via `PUT /api/users/me/consent`) e **excluir conta** (`DELETE /api/users/me`, confirmação digitando o e-mail; limpa sessão e volta à landing); contrato proposto pelo front + mock trocável (`USE_PRIVACY_MOCK`) |
+| #18 | RF26 — Seletor de tema do leitor | Seletor (claro/sépia/escuro) e aplicação imediata já vinham do #16 (campo "Cor de página" no modal); esta issue adiciona a **persistência** — o `useEpubReader` lê/grava o tema em `localStorage` (`reader:theme`, lazy initializer), então ao reabrir a leitura o tema é mantido sem flash |
+| #19 | RF18 — Retomada automática de leitura | O `useEpubReader` salva a posição a cada `relocated` como **CFI** do epub.js e, ao abrir, retoma com `rendition.display(cfi)` (fallback para o início se inválido); respeita o toggle "retomar na última página" (`resumeAuto`); persistência por obra em `localStorage` (`reader:position:<id>`). Cross-device via endpoint de progresso proposto no back-end |
+| #20 | RF19 — Indicador de percentual lido | O `useEpubReader` calcula o percentual via `book.locations.percentageFromCfi` tanto no `relocated` quanto assim que as *locations* são geradas (evita 0% travado no load) e o persiste por obra (`reader:percent:<id>`, EPUB only — PDF não exibe); a topbar mostra o percentual em **todas as larguras** (barra de `md`+). Junto: **responsividade da topbar** do leitor (gap/padding reduzidos, "Grifos e Anotações" oculto abaixo de `md`, "Configurações" só-ícone no mobile). Cross-device via o mesmo endpoint de progresso do back-end (CFI + percent) |
+| #21 | RF20 — Contador de tempo de sessão | Hook compartilhado `useReadingSession` (EPUB e PDF) mede o **tempo de tela ativa** por *timestamps*, contando **só com a aba visível e focada**; *tick* de 1s **auto-reconciliável** (robusto a eventos de foco perdidos) + listeners `visibilitychange`/`blur`/`focus`/`pagehide`. *Flush* do **delta** a cada 30s, ao perder foco, no `pagehide` e ao sair da tela; acumula por obra em `localStorage` (`reader:time:<id>`) e envia ao back-end (`sendReadingTime`, *best-effort* com `keepalive`, atrás de flag até a rota existir). `SessionTimer` (relógio + `m:ss`) exibe a **sessão atual** na topbar, oculto no mobile. Contrato proposto: `POST /api/users/me/reading-progress/{id}/session` |
+| #22 | RF21 — Marcar página | Marcação manual de páginas, **restrita ao EPUB**. O `useEpubReader` expõe `currentCfi` e `display(cfi)`; no `ReaderNav` o botão "Marcar Página" vira **toggle** (ícone contornado ⇄ cheio = indicação de "página marcada") e um `BookmarksMenu` lista/vai/remove. Persistência por obra em `localStorage` (`reader:bookmarks:<id>`, lista de `Bookmark` por **CFI**) via `reader-bookmarks` + `useBookmarks`. **PDF não tem marcação** (visualizador nativo não expõe a página atual). Cross-device depois via o endpoint de progresso (`bookmarks[]`) |
+| #23 | RF22 — Grifo por seleção de texto | Grifar trechos durante a leitura, **só EPUB** (RN07 — PDF inalterado). O `useEpubReader` ouve `rendition.on('selected')` → `selection` (âncora do toolbar flutuante) e `markClicked` → `activeMark`; `addHighlight`/`removeHighlight` via `rendition.annotations`; grifos reaplicados ao abrir. **Paleta de cores** (`HIGHLIGHT_COLORS` amarelo/verde/azul/rosa) na toolbar, com recoloração de grifo existente (`markClicked` exige reabilitar `pointer-events` em `.epub-highlight` via `GlobalStyles`). **Painel lateral** (`HighlightsPanel`) aberto/fechado pelo botão "Grifos e Anotações" (toggle), listando capítulo + trecho, com ir/remover, seguindo o tema. Persistência por obra em `localStorage` (`reader:highlights:<id>`) via `reader-highlights` + `useHighlights`; envio ao back-end atrás de flag. Visual alinhado ao Figma. Contrato: `POST`/`PATCH`/`DELETE /api/users/me/reading-progress/{id}/highlights` |
+| #24 | RF23 — Interface de criação de anotação | Anotar um trecho = **grifo + nota**, **só EPUB** (RN07). O `Highlight` ganhou `note?`; a toolbar flutuante ganhou a ação **"Anotar"** que garante o grifo (cria em `DEFAULT_HIGHLIGHT` se preciso) e abre o **`NoteDialog`** (campo de texto multiline, remontado por `key` para refletir a nota atual). O painel lateral ganhou **abas Todos/Grifos/Anotações** (Grifos = sem nota, Anotações = com nota), exibe a nota no card e permite editar. Persistência/sync reusa `reader-highlights`/`useHighlights` (`setNote` → `updateHighlightNote` + `PATCH { note }`, atrás de flag). Decisões: "Anotar" sempre ancora num grifo; editor em diálogo. Reusa os frames do Figma do #23 |
+| #25 | RF24 — Exibição de grifos/anotações salvos | Incremento enxuto. **Grifos destacados ao reabrir**: já do #23 (reaplicação no load). **Anotações acessíveis do trecho marcado**: ao clicar num trecho com nota, o `HighlightToolbar` exibe o **texto da nota** (leitura) acima das ações (prop `note` via `activeHighlight?.note`); o lápis vira "Editar anotação". Alinhado ao Figma (node 176): o trecho anotado não tem marcador próprio no texto — o grifo é o marcador clicável e o review é no painel lateral (#24). PDF não tem (RN07) |
+| #47 | RF17 — Salvamento automático da última página lida | A posição já era gravada no `localStorage` a cada `relocated` (desde o #19); esta issue adiciona o **envio ao back-end** (RN08, base do RF18). O `useEpubReader` agenda `sendReadingProgress` com **debounce de 4s** a cada `relocated` e faz **flush ao sair da tela** (`pagehide`/desmontar). `utils/reader-progress.ts` faz `PUT /api/users/me/reading-progress/{id}` (`{ cfi, percent }`) *best-effort* com `keepalive`, atrás do flag `USE_READING_PROGRESS_API`. **Só EPUB** (PDF não envia). `localStorage` (`reader:position:<id>`) segue como fonte/fallback |
+| — | RF10 / RF13 — Integração do catálogo | Listagem e detalhes **repontados para os *endpoints* reais** (`GET /api/publications`, `/{id}`), com remoção dos *mocks*; correções de exibição (nome do autor na ordem natural, assuntos ocultos, *badge* de tipo legível no tema escuro); busca da *navbar* como campo **expansível** sincronizado ao `?q=` da URL |
+| — | RF15 / RF16 — Leitura via proxy autenticado | EPUB/PDF carregados pelo **proxy** do back-end; como os *endpoints* passaram a exigir JWT, o arquivo é obtido por *fetch* autenticado e entregue ao leitor como **URL local (*blob*)** de mesma origem; *guard* de rota em `/leitura/:id` sem *token* |
+| — | RF17 / RF18 / RF19 — Progresso de leitura (back-end) | Última página, retomada e percentual passam a ser **persistidos no back-end** (`/api/reading/{id}/last-page` e `/percentage`), além do `localStorage` como *cache*/*fallback*; retomada automática só com o *toggle* `resumeAuto` |
+| — | RF20 — Tempo de sessão (back-end) | O `useReadingSession` **abre a sessão** ao entrar no leitor (`POST /api/reading/{id}/session`) e envia *heartbeats* do tempo de tela ativa (`PUT /api/reading/sessions/{id}`) |
+| — | RF22 / RF23 / RF24 — Grifos e anotações (back-end) | Criação e listagem integradas aos *endpoints* reais (`/api/reading/{id}/highlights` e `/annotations`); *snapshot* de reabertura num único GET (`/highlights-annotations`); recoloração/edição seguem locais até terem rota própria |
+| RF07 / RF08 | Dicionário integrado e histórico | **Popup** de dicionário no leitor (`reader-dictionary` + `dictionary-popup`): consulta a palavra selecionada sem deslocar a leitura, com *dedup* do duplo efeito do *StrictMode*; ícone de dicionário na barra de seleção; seção **"Histórico do dicionário"** no perfil com a obra de origem, a definição e **paginação** |
+| RF25 | Download do arquivo | Ação de **baixar** o arquivo (EPUB/PDF) da obra a partir dos detalhes |
+| RF05 / RF06 | Estante do usuário | Tela **"Minha Estante"** no modelo do Figma: barra lateral (perfil + preferências), abas por estado com contagem, alternância Livros/Artigos, visões **Prateleira** (lombadas) e **Lista**, e **tabela** de artigos com busca/seleção múltipla e ações em massa; consumo de `GET`/`PUT`/`DELETE /api/shelf` por camada de *fetch* autenticado; confirmação por **toast**; *popover* de ações na lombada; amostragem da **cor da capa** (Canvas) para colorir as lombadas |
+| RF09 | Calendário de frequência | *Heatmap* mensal na estante consumindo `GET /api/reading/calendar`, com navegação entre meses, mapeamento de minutos ativos em níveis de intensidade e preenchimento dos dias sem leitura (lista esparsa) |
+| RF27 | Recomendações | Tela `/recomendacoes` consumindo `GET /api/recommendations`: cabeçalho em *card* com **chips** das preferências (mais gêneros que idiomas, com *chip* "+N" expansível) e "Ajustar preferências"; **cartões de estatística** (tempo de leitura ativo, frequência/sequência com mini-*heatmap* e "lendo agora", de `GET /api/reading/stats`); **seções por gênero** com "Ver tudo" que abre a busca já filtrada (`/catalogo?genero=`); tratamento de *cold start* e vazio |
+| — | Refatoração — camada de requisição autenticada | Consolidação dos ~10 *utils* de *fetch* manual (estante, leitor, dicionário, recomendações) num único módulo (`authed-fetch`): base única da API, injeção do *token* e renovação por *refresh* **compartilhada** com o cliente gerado (mesmo *single-flight*, evitando renovação duplicada); as chamadas manuais passam a herdar o *refresh* no 401. Remoção de duplicação (base/*header*/tratamento de erro); comportamento preservado; verificação por tipos, *lint* e *build* |
+| — | Refatoração — cor de link no tema escuro | Centralização da cor dos links/ações inline que no tema escuro ficavam escuros demais: em vez de repetir um *override* por tema em cada ponto, passam a usar o *token* semântico **`info.main`** da paleta (já *theme-aware*: azul de ação no claro, azul claro no escuro). Descartado um *override* global de `Link` por afetar links de outra intenção; verificação visual nos dois temas |
+| — | Refatoração — layout da página de perfil | Reorganização do grid da edição de perfil: "Dados e privacidade" vira card próprio (coluna esquerda como pilha de cards simétrica à direita, aproximando o *baseline*) e o Histórico do dicionário passa a uma faixa de **largura total** no rodapé, em **grade de 2 colunas**, reduzindo rolagem |
+| — | Refatoração — responsividade e *breakpoints* | *Pass* de mobile e tablet: *grids* de layout trocados de `1fr` para **`minmax(0, 1fr)`** (a *track* `1fr` expandia até o conteúdo sem quebra e estourava em telas estreitas); layouts de 2 colunas (catálogo, estante, perfil) passam a 2 colunas já no *breakpoint* de tablet com barra lateral de largura responsiva; ajustes pontuais no cabeçalho (marca só-ícone no celular), nos detalhes da obra (capa empilhada), no leitor (controles de página como ícones; popover de configurações empilhado) e nas recomendações (chips e *mini-heatmap* que não estouram mais). Verificação no navegador a 375/600/768 px |

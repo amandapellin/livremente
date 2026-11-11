@@ -1,0 +1,106 @@
+# `src/hooks` — lógica de tela e estado de servidor
+
+Hooks de UI (formulários via React Hook Form + Zod) e acesso a dados (TanStack
+Query sobre o cliente gerado). Todas as funções são arrow (convenção do projeto).
+
+> Padrão recorrente: o `customFetch` **só resolve em respostas ok**, então
+> `res.status === 200` carrega o corpo tipado; status fora disso vira `HttpError`.
+
+## Autenticação / sessão
+
+- **`useAuth.ts` → `useIsAuthenticated()`** — estado reativo de autenticação via
+  `useSyncExternalStore` (reflete login/logout na mesma aba e entre abas, sem
+  recarregar). O header alterna visitante ⇄ autenticado a partir daqui.
+- **`useLoginForm.ts` → `useLoginForm()`** — login (RF02): RHF+Zod, chama
+  `POST /api/auth/login`, grava os tokens (`saveAuthTokens`, respeitando "manter
+  conectado") e navega para `/estante`. Trata 401 ("e-mail ou senha inválidos").
+- **`useLogout.ts` → `useLogout()`** — logout (RF29) *best-effort*: chama
+  `POST /api/auth/logout` para revogar o refresh token; em sucesso **ou** erro,
+  limpa a sessão, descarta o cache e vai para a landing (RF28).
+- **`useRegisterForm.ts` → `useRegisterForm()`** — cadastro (RF01): *wizard* de 3
+  etapas (`activeStep`), valida por etapa com `trigger(stepFields)`, monta o payload
+  (`buildPayload`) e chama `POST /api/auth/register`. Trata 409 (e-mail já
+  cadastrado) voltando à etapa 1; em 201 guarda `createdEmail` (tela de sucesso).
+
+## Perfil
+
+- **`useProfileForm.ts` → `useProfileForm()`** — edição de perfil (RF03). Um único
+  "Salvar alterações" orquestra **três recursos independentes**, cada um só chamado
+  quando muda: nome (`PUT /me`), senha (`PATCH /me/password`, trata 422 por campo) e
+  avatar (`PUT`/`DELETE /me/avatar`, upload PNG/JPG ≤2 MB com preview e *cache-bust*).
+  O avatar fica fora do RHF (arquivo binário). Sucesso só quando todas as chamadas
+  necessárias completam.
+- **`useProfilePreferences.ts` → `useProfilePreferences()`** — preferências (RF04):
+  combina **dois recursos** — EAV (`/me/preferences`) e gêneros (`/me/genres`) —
+  buscando ambos para pré-preencher e salvando em paralelo (`Promise.all`). Usa os
+  mapeamentos de `preferences-schemas`.
+- **`useReaderPreferences.ts` → `useReaderPreferences()`** — preferências de interface
+  do leitor (RF26): tema, retomar, dicionário. **Fonte da verdade no back-end**
+  (campos estendidos em `/me/preferences`, merge parcial) com **cache em
+  `localStorage`** (para o leitor ler síncrono, sem flash). A query **só roda
+  autenticada** (`enabled`), hidrata o cache ao abrir perfil/leitor, e grava com
+  `setQueryData` otimista + `PUT`.
+
+## Privacidade (LGPD)
+
+- **`useConsent.ts` → `useConsent()`** — lê (`GET`) e altera o consentimento
+  **opcional** (`PUT /me/consent`); o obrigatório vale enquanto a conta existir.
+- **`useDataExport.ts` → `useDataExport()`** — portabilidade: compõe um JSON com
+  perfil + preferências + gêneros (endpoints já existentes) e baixa
+  `livremente-meus-dados.json`.
+- **`useDeleteAccount.ts` → `useDeleteAccount()`** — exclusão de conta
+  (`DELETE /me`), **irreversível**: em sucesso limpa a sessão, descarta o cache e vai
+  para a landing.
+
+## Catálogo / leitura
+
+- **`useCatalogSearch.ts` → `useCatalogSearch(query)`** — busca do catálogo (RF10)
+  via `useQuery` (`keepPreviousData` para não piscar entre páginas). **Mock trocável**
+  (`USE_CATALOG_MOCK`) enquanto o back-end não expõe `GET /api/catalog`.
+- **`usePublicationDetails.ts` → `usePublicationDetails(id)`** — detalhes da obra
+  (RF13); 404 quando não existe. Também com mock trocável (mesmo flag).
+- **`useDebouncedValue.ts` → `useDebouncedValue(value, delay=350)`** — valor com
+  atraso; usado na busca por palavra-chave (RF11) para não requisitar a cada tecla.
+- **`useBookmarks.ts` → `useBookmarks(bookId?)`** — marcadores de página (RF21, EPUB)
+  como estado reativo sobre `reader-bookmarks` (localStorage). Retorna `{ bookmarks,
+  add, remove, has }`; `has(cfi)` dá a indicação visual de "página já marcada" (toggle).
+  Usado pelo `EpubReader` (id = CFI atual).
+- **`useHighlights.ts` → `useHighlights(bookId?)`** — grifos (RF22, EPUB) como estado
+  reativo sobre `reader-highlights` (localStorage + envio ao back-end). Retorna
+  `{ highlights, add, remove, setColor, setNote }`; usado pelo `EpubReader` para criar,
+  remover, **recolorir** e **anotar** (RF23) grifos e alimentar o painel lateral.
+  `id = cfiRange`.
+- **`useReadingSession.ts` → `useReadingSession(bookId?)`** — tempo de tela ativa da
+  sessão de leitura (RF20). Mede por timestamps (não por contador que atrasa em aba
+  inativa); **só avança com a aba visível e a janela focada** (`visibilitychange`,
+  `blur`/`focus`). Ao entrar, **abre a sessão** no back-end (`startSession`, cacheada
+  por `bookId` para não abrir duas no StrictMode); faz *flush* do tempo acumulado a
+  cada 30s, ao perder o foco, no `pagehide` e ao desmontar (sair da tela) — via
+  `addStoredReadingTime` (cache local) + `updateSession(sessionId, segundos)`
+  (*heartbeat*/encerramento). Retorna `{ seconds, label }` da sessão atual (zera ao
+  reabrir).
+- **`useEpubReader.ts` → `useEpubReader(url, bookId?)`** — ciclo de vida do epub.js
+  (RF15): render, navegação (botões/teclado), **reflow** (`ResizeObserver`), capítulo
+  (TOC) e progresso. Ajustes de leitura via `themes.override` (fonte, entrelinha,
+  alinhamento, tipo de página) e **tema** (RF26, `applyTheme` — `override` em vez de
+  `themes.select`, que não reverte de forma confiável). **Retomada** (RF18): salva a
+  posição como CFI (`setStoredPosition`) e retoma no `display(cfi)` quando `resumeAuto`
+  está ligado, com fallback para o início. **Salvamento da posição** (RF17/RN08): a cada
+  `relocated` grava o CFI no `localStorage` (retomada local) e, com **debounce (4s)**,
+  envia ao back-end o **índice de *location*** via `saveLastPage` e o percentual via
+  `savePercentage` (*fire-and-forget*, `keepalive`), com **flush ao sair da tela**
+  (`pagehide`/desmontar); só EPUB. **Retomada cross-device** (RF18): ao abrir,
+  `fetchLastPage` lê a última página salva no back-end. **Percentual** (RF19): `updateProgress`
+  calcula via `book.locations.percentageFromCfi` no `relocated` **e** assim que as
+  *locations* são geradas (evita 0% travado no load), persistindo em
+  `setStoredPercentage`. Expõe também `currentCfi` (posição atual) e `display(cfi)`
+  (ir a uma posição), usados pela marcação de página (RF21). **Grifos** (RF22): no
+  evento `selected` expõe `selection` (`{ cfiRange, text, top, left }`, âncora do
+  toolbar "Grifar"); no `markClicked`, `activeMark` (toolbar "Remover grifo");
+  `addHighlight(cfiRange, color)`/`removeHighlight` desenham/apagam o overlay via
+  `rendition.annotations` (cor da paleta `HIGHLIGHT_COLORS`; recolorir = remove+add).
+  `anchorFrom` converte o range do iframe para coordenadas da viewport. (O overlay é
+  desenhado no documento TOP com `pointer-events:none`; o `EpubReader` reabilita o
+  clique na classe `.epub-highlight` via `GlobalStyles` para o `markClicked` disparar.)
+  Helpers de módulo: `findTocItem`,
+  `applyTypography`, `applyPageType`, `applyTheme`.

@@ -1,0 +1,228 @@
+import { useState } from "react";
+import { NavLink } from "react-router";
+import { styled } from "@mui/material/styles";
+import {
+	AppBar,
+	Box,
+	Button,
+	Divider,
+	Drawer,
+	IconButton,
+	List,
+	ListItem,
+	ListItemButton,
+	ListItemText,
+	Stack,
+	Toolbar,
+	Tooltip,
+	Typography,
+	useColorScheme,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import AutoStoriesIcon from "@mui/icons-material/AutoStories";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import { colors, fontFamilies } from "@/theme/tokens";
+import { useIsAuthenticated } from "@/hooks/useAuth";
+import { useLogout } from "@/hooks/useLogout";
+import AccountMenu from "@/components/layout/account-menu";
+import HeaderSearch from "@/components/layout/header-search";
+import NotificationsMenu from "@/components/layout/notifications-menu";
+
+const navItems = [
+	{ label: "Início", to: "/" },
+	{ label: "Busca", to: "/catalogo" },
+	{ label: "Minha Estante", to: "/estante" },
+	{ label: "Recomendações", to: "/recomendacoes" },
+];
+
+const NavDrawerItem = styled(ListItemButton)(({ theme }) => ({
+	"&.active .MuiListItemText-primary": {
+		color: (theme.vars ?? theme).palette.info.main,
+		fontWeight: 700,
+	},
+})) as typeof ListItemButton;
+
+const NavItemLink = styled(NavLink)(({ theme }) => ({
+	display: "flex",
+	alignItems: "center",
+	textDecoration: "none",
+	fontFamily: fontFamilies.heading,
+	fontWeight: 700,
+	fontSize: 14,
+	lineHeight: "20px",
+	letterSpacing: "0.1px",
+	color: (theme.vars ?? theme).palette.text.secondary,
+	borderBottom: "2px solid transparent",
+	paddingBottom: 6,
+	transition: "color .15s",
+	"&:hover": { color: (theme.vars ?? theme).palette.text.primary },
+	"&.active": {
+		color: (theme.vars ?? theme).palette.info.main,
+		borderBottomColor: (theme.vars ?? theme).palette.info.main,
+	},
+}));
+
+function ColorModeToggle() {
+	const { mode, systemMode, setMode } = useColorScheme();
+	const isDark = (mode === "system" ? systemMode : mode) === "dark";
+	return (
+		<Tooltip title={isDark ? "Modo claro" : "Modo escuro"}>
+			<IconButton
+				aria-label="Alternar tema claro/escuro"
+				color="contrast"
+				onClick={() => setMode(isDark ? "light" : "dark")}
+			>
+				{isDark ? <LightModeIcon /> : <DarkModeIcon />}
+			</IconButton>
+		</Tooltip>
+	);
+}
+
+export default function Header() {
+	const [menuOpen, setMenuOpen] = useState(false);
+	const isAuthenticated = useIsAuthenticated();
+	const { logout } = useLogout();
+
+	return (
+		<>
+			<AppBar
+				position="sticky"
+				elevation={0}
+				sx={{
+					bgcolor: "background.paper",
+					color: "text.primary",
+					borderBottom: 1,
+					borderColor: "divider",
+				}}
+			>
+				<Toolbar
+					sx={{
+						justifyContent: "space-between",
+						gap: 3,
+						minHeight: { xs: 64, md: 72 },
+						px: { xs: 2, md: 3 },
+					}}
+				>
+					<Stack
+						direction="row"
+						sx={{ alignItems: "center", gap: { xs: 1, md: 3 }, minWidth: 0 }}
+					>
+						<IconButton
+							aria-label="Abrir menu"
+							onClick={() => setMenuOpen(true)}
+							sx={{
+								display: { xs: "inline-flex", md: "none" },
+								color: "text.primary",
+							}}
+						>
+							<MenuIcon />
+						</IconButton>
+
+						<Box
+							component={NavLink}
+							to="/"
+							aria-label="LivreMente — início"
+							sx={{
+								display: "flex",
+								alignItems: "center",
+								gap: 1,
+								textDecoration: "none",
+							}}
+						>
+							<AutoStoriesIcon sx={{ fontSize: 32, color: "primary.main" }} />
+							<Typography
+								variant="h5"
+								component="span"
+								// No mobile mostramos só o ícone (o texto não cabe ao lado do
+								// hamburguer e das ações); a partir de sm o nome volta.
+								sx={{ whiteSpace: "nowrap", display: { xs: "none", sm: "inline" } }}
+							>
+								<Box component="span" sx={{ color: colors.gold[600] }}>
+									Livre
+								</Box>
+								<Box component="span" sx={{ color: "primary.main" }}>
+									Mente
+								</Box>
+							</Typography>
+						</Box>
+
+						<Stack
+							component="nav"
+							direction="row"
+							sx={{
+								display: { xs: "none", md: "flex" },
+								alignItems: "stretch",
+								gap: 2,
+							}}
+						>
+							{navItems.map((item) => (
+								<NavItemLink key={item.to} to={item.to} end={item.to === "/"}>
+									{item.label}
+								</NavItemLink>
+							))}
+						</Stack>
+					</Stack>
+
+					<Stack direction="row" sx={{ alignItems: "center", gap: 1.5 }}>
+						<HeaderSearch />
+						<NotificationsMenu />
+						<ColorModeToggle />
+						{isAuthenticated ? (
+							<AccountMenu />
+						) : (
+							<Button component={NavLink} to="/login" variant="contained" size="small">
+								Entrar
+							</Button>
+						)}
+					</Stack>
+				</Toolbar>
+			</AppBar>
+
+			<Drawer anchor="left" open={menuOpen} onClose={() => setMenuOpen(false)}>
+				<Box
+					sx={{ width: 260 }}
+					role="presentation"
+					onClick={() => setMenuOpen(false)}
+				>
+					<List>
+						{navItems.map((item) => (
+							<ListItem key={item.to} disablePadding>
+								<NavDrawerItem
+									component={NavLink}
+									to={item.to}
+									end={item.to === "/"}
+								>
+									<ListItemText primary={item.label} />
+								</NavDrawerItem>
+							</ListItem>
+						))}
+					</List>
+					<Divider />
+					<List>
+						{isAuthenticated ? (
+							<>
+								<ListItem disablePadding>
+									<NavDrawerItem component={NavLink} to="/perfil">
+										<ListItemText primary="Editar perfil" />
+									</NavDrawerItem>
+								</ListItem>
+								<ListItem disablePadding>
+									<ListItemButton onClick={logout}>
+										<ListItemText primary="Sair" />
+									</ListItemButton>
+								</ListItem>
+							</>
+						) : (
+							<ListItem disablePadding>
+								<NavDrawerItem component={NavLink} to="/login">
+									<ListItemText primary="Entrar" />
+								</NavDrawerItem>
+							</ListItem>
+						)}
+					</List>
+				</Box>
+			</Drawer>
+		</>
+	);
+}

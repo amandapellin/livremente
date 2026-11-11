@@ -1,0 +1,1682 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "LivreMente.Api",
+    "version": "1.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "LivreMente.Api"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Cria uma nova conta de usuário (RF01).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Conta criada. Um e-mail de confirmação é enviado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "E-mail já cadastrado (RN).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Autentica o usuário com e-mail e senha (RF02).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Autenticado. Retorna o token e os dados do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciais inválidas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Renova o token de acesso (RF02).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tokens renovados com sucesso.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Refresh token inválido ou expirado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Encerra a sessão do usuário e revoga o refresh token (RF29).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Sessão encerrada."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna o perfil do usuário autenticado (RF03).",
+        "responses": {
+          "200": {
+            "description": "Perfil do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Atualiza os dados cadastrais do perfil (RF03).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Perfil atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Exclui a conta e todos os dados do usuário autenticado (LGPD, direito à eliminação).",
+        "responses": {
+          "204": {
+            "description": "Conta excluída."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/consent": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna o consentimento LGPD do usuário autenticado.",
+        "responses": {
+          "200": {
+            "description": "Consentimento atual.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConsent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Atualiza o consentimento opcional (avisos) do usuário autenticado.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateConsentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Consentimento atualizado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserConsent"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/password": {
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Altera a senha do usuário autenticado (RF03).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Senha alterada."
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Senha atual incorreta.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/avatar": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Envia ou atualiza o avatar do usuário (PNG ou JPG, até 2 MB).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Avatar atualizado."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Imagem inválida.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Remove o avatar do usuário (volta às iniciais). Idempotente: 204 mesmo sem avatar.",
+        "responses": {
+          "204": {
+            "description": "Avatar removido (ou já inexistente)."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/preferences": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna as preferências de leitura do usuário (RF04).",
+        "responses": {
+          "200": {
+            "description": "Preferências do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferences"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Atualiza as preferências de leitura do usuário (RF04/RF26).",
+        "description": "Atualização parcial (merge): apenas os campos presentes no corpo são alterados; os ausentes são preservados. Permite que o perfil (chips EAV) e a seção 'Leitor e interface' (tema/toggles) gravem independentemente.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserPreferences"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Preferências atualizadas.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPreferences"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/genres": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retorna os gêneros preferidos do usuário como slugs (RF04).",
+        "responses": {
+          "200": {
+            "description": "Gêneros do usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGenres"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Substitui os gêneros preferidos do usuário (RF04).",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserGenres"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gêneros atualizados.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserGenres"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Dados inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/genres/{genreId}": {
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Remove um gênero da preferência do usuário pelo id (RF04).",
+        "parameters": [
+          {
+            "name": "genreId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removido."
+          },
+          "401": {
+            "description": "Não autenticado.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Gênero não associado ao usuário.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/publications": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "Listagem do catálogo com busca e filtros (RF10/RF11/RF12).",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Busca por título ou autor."
+          },
+          {
+            "name": "type",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/PublicationType"
+            }
+          },
+          {
+            "name": "languages",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/ReadingLanguage"
+              }
+            }
+          },
+          {
+            "name": "genres",
+            "in": "query",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Slugs de gênero literário (livros) ou área (artigos)."
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "relevance",
+                "recent",
+                "title",
+                "popularity"
+              ],
+              "default": "relevance"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 10,
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Página do catálogo.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationListPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Parâmetros inválidos.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/publications/{id}": {
+      "get": {
+        "tags": [
+          "Publications"
+        ],
+        "summary": "Detalhes de uma publicação (RF13).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Metadados da publicação.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicationDetailsApi"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Publicação não encontrada.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Gender": {
+        "type": "string",
+        "description": "Gênero informado no cadastro.",
+        "enum": [
+          "female",
+          "male",
+          "non_binary",
+          "other",
+          "prefer_not_to_say"
+        ]
+      },
+      "ReadingLanguage": {
+        "type": "string",
+        "description": "Idioma de leitura de preferência.",
+        "enum": [
+          "pt",
+          "en",
+          "es",
+          "fr",
+          "ru"
+        ]
+      },
+      "PublicationType": {
+        "type": "string",
+        "description": "Tipo de publicação de interesse (obra: livro ou artigo).",
+        "enum": [
+          "book",
+          "scientific_article"
+        ]
+      },
+      "RegisterPreferences": {
+        "type": "object",
+        "description": "Preferências de leitura usadas para gerar recomendações. Opcionais no cadastro.",
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadingLanguage"
+            }
+          },
+          "publications": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationType"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "description": "Categorias de livros e/ou áreas de artigos (slugs).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "literaryGenres": {
+            "type": "array",
+            "description": "Gêneros literários (slugs), aplicáveis a livros.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "password",
+          "birthDate",
+          "gender",
+          "lgpdConsent"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120,
+            "description": "Nome completo."
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de nascimento no formato ISO (YYYY-MM-DD)."
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "preferences": {
+            "$ref": "#/components/schemas/RegisterPreferences"
+          },
+          "lgpdConsent": {
+            "type": "boolean",
+            "description": "Consentimento LGPD (RN03). Obrigatório e deve ser true."
+          },
+          "marketingConsent": {
+            "type": "boolean",
+            "description": "Aceite opcional de avisos sobre novas obras."
+          }
+        }
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": [
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Mensagem amigável para exibição."
+          },
+          "code": {
+            "type": "string",
+            "description": "Código estável do erro (ex.: EMAIL_ALREADY_EXISTS)."
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "maxLength": 254
+          },
+          "password": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "rememberMe": {
+            "type": "boolean",
+            "description": "Mantém o usuário conectado entre sessões (RF02)."
+          }
+        }
+      },
+      "AuthUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "refreshToken",
+          "user"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Token de acesso (JWT) a ser enviado no header Authorization."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Token de atualização (Refresh Token) para renovar a sessão."
+          },
+          "user": {
+            "$ref": "#/components/schemas/AuthUser"
+          }
+        }
+      },
+      "RefreshRequest": {
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Token de atualização (Refresh Token) atual."
+          }
+        }
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "required": [
+          "refreshToken"
+        ],
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token a ser revogado no servidor."
+          }
+        }
+      },
+      "RefreshResponse": {
+        "type": "object",
+        "required": [
+          "token",
+          "refreshToken"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "Novo token de acesso (JWT)."
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Novo token de atualização (Refresh Token)."
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "email"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Caminho para buscar a imagem (/api/users/{id}/avatar); null quando não há avatar (o front exibe as iniciais)."
+          },
+          "gender": {
+            "type": "string",
+            "description": "Gênero (female, male, non_binary, other, prefer_not_to_say)."
+          },
+          "birthDate": {
+            "type": "string",
+            "format": "date",
+            "description": "Data de nascimento (yyyy-MM-dd); o front calcula a idade."
+          }
+        }
+      },
+      "UserConsent": {
+        "type": "object",
+        "required": [
+          "lgpdConsent",
+          "marketingConsent",
+          "consentedAt"
+        ],
+        "properties": {
+          "lgpdConsent": {
+            "type": "boolean",
+            "description": "Consentimento obrigatório do tratamento de dados (RN03); verdadeiro enquanto a conta existe."
+          },
+          "marketingConsent": {
+            "type": "boolean",
+            "description": "Consentimento opcional para avisos de novas obras."
+          },
+          "consentedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Data/hora do registro do consentimento."
+          }
+        }
+      },
+      "UpdateConsentRequest": {
+        "type": "object",
+        "required": [
+          "marketingConsent"
+        ],
+        "properties": {
+          "marketingConsent": {
+            "type": "boolean",
+            "description": "Novo valor do consentimento opcional (avisos)."
+          }
+        }
+      },
+      "UpdateProfileRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 120,
+            "description": "Nome completo."
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ],
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Senha atual."
+          },
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 128,
+            "description": "Nova senha."
+          }
+        }
+      },
+      "UserPreferences": {
+        "type": "object",
+        "description": "Preferências EAV de leitura (idioma, tipo de conteúdo e áreas de conhecimento). Gêneros literários/categorias de livro ficam em UserGenres.",
+        "properties": {
+          "languages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadingLanguage"
+            }
+          },
+          "contentTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationType"
+            }
+          },
+          "knowledgeAreas": {
+            "type": "array",
+            "description": "Áreas de conhecimento (slugs de áreas de artigo).",
+            "items": {
+              "type": "string"
+            }
+          },
+          "theme": {
+            "type": "string",
+            "enum": [
+              "light",
+              "sepia",
+              "dark"
+            ],
+            "nullable": true,
+            "description": "Tema padrão do leitor (RF26)."
+          },
+          "resumeAuto": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Retomar automaticamente na última página."
+          },
+          "saveDictionary": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Salvar palavras consultadas no dicionário."
+          }
+        }
+      },
+      "Publication": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "author",
+          "type",
+          "language"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PublicationType"
+          },
+          "language": {
+            "$ref": "#/components/schemas/ReadingLanguage"
+          },
+          "genre": {
+            "type": "string",
+            "nullable": true,
+            "description": "Slug de gênero (livro) ou área de conhecimento (artigo)."
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "format": {
+            "type": "string",
+            "nullable": true,
+            "description": "EPUB, PDF..."
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "Project Gutemberg | arXiv."
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CatalogCounts": {
+        "type": "object",
+        "required": [
+          "all",
+          "book",
+          "scientific_article"
+        ],
+        "properties": {
+          "all": {
+            "type": "integer"
+          },
+          "book": {
+            "type": "integer"
+          },
+          "scientific_article": {
+            "type": "integer"
+          }
+        }
+      },
+      "CatalogPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total",
+          "totalPages",
+          "counts"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Publication"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CatalogCounts"
+          }
+        }
+      },
+      "Contributor": {
+        "type": "object",
+        "required": [
+          "name",
+          "role"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "description": "author | translator | editor | illustrator"
+          },
+          "lifespan": {
+            "type": "string",
+            "nullable": true,
+            "description": "ex.: 1864–1927"
+          }
+        }
+      },
+      "ReadingStatus": {
+        "type": "string",
+        "enum": [
+          "read",
+          "reading",
+          "want_to_read",
+          "abandoned"
+        ],
+        "description": "Estado de leitura na estante (espelha o enum ReadingStatus do back-end)."
+      },
+      "ReadingProgress": {
+        "type": "object",
+        "required": [
+          "percent"
+        ],
+        "description": "Progresso de leitura do usuário (épico Leitura/Estante).",
+        "properties": {
+          "percent": {
+            "type": "integer",
+            "description": "Percentual lido (0–100)."
+          },
+          "currentPage": {
+            "type": "integer",
+            "nullable": true
+          },
+          "totalPages": {
+            "type": "integer",
+            "nullable": true
+          },
+          "lastSession": {
+            "type": "string",
+            "nullable": true,
+            "description": "Rótulo/descrição da última sessão (ex.: \"ontem\")."
+          },
+          "readingTimeMinutes": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Tempo total de leitura em minutos."
+          },
+          "highlights": {
+            "type": "integer",
+            "nullable": true
+          },
+          "notes": {
+            "type": "integer",
+            "nullable": true
+          },
+          "bookmarks": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "PublicationDetails": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Publication"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "synopsis": {
+                "type": "string",
+                "nullable": true,
+                "description": "Parágrafos separados por linha em branco."
+              },
+              "contributors": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Contributor"
+                }
+              },
+              "subjects": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "  Gêneros/assuntos (rótulos)."
+              },
+              "pages": {
+                "type": "integer",
+                "nullable": true
+              },
+              "rights": {
+                "type": "string",
+                "nullable": true,
+                "description": "ex.: Domínio público"
+              },
+              "publicDomain": {
+                "type": "boolean",
+                "nullable": true
+              },
+              "downloadUrl": {
+                "type": "string",
+                "nullable": true
+              },
+              "readingStatus": {
+                "nullable": true,
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReadingStatus"
+                  }
+                ],
+                "description": "Estado na estante do usuário (épico Estante); null quando não está na estante."
+              },
+              "readingProgress": {
+                "nullable": true,
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ReadingProgress"
+                  }
+                ],
+                "description": "Progresso de leitura; presente quando na estante em leitura/lido/abandonado."
+              },
+              "epubFileUrl": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL do arquivo EPUB para leitura (RF15)."
+              },
+              "pdfFileUrl": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL do arquivo PDF para leitura (RF16)."
+              }
+            }
+          }
+        ]
+      },
+      "UserGenres": {
+        "type": "object",
+        "description": "Gêneros preferidos do usuário como slugs do front (categorias de livro e gêneros literários), mapeados no back-end para a M:N user_genre.",
+        "properties": {
+          "genres": {
+            "type": "array",
+            "description": "Slugs de categorias de livro e gêneros literários.",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PublicationCard": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "type",
+          "authors",
+          "genres"
+        ],
+        "description": "Card de publicação do catálogo (GET /api/publications).",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PublicationType"
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "gutendex | arxiv."
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Slugs de gênero (livro) ou área (artigo)."
+          }
+        }
+      },
+      "PublicationListPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "total",
+          "totalPages",
+          "counts"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationCard"
+            }
+          },
+          "page": {
+            "type": "integer"
+          },
+          "pageSize": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/CatalogCounts"
+          }
+        }
+      },
+      "PublicationDetailsApi": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "type",
+          "authors",
+          "genres",
+          "publicDomain"
+        ],
+        "description": "Detalhes de publicação do back-end (GET /api/publications/{id}).",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/PublicationType"
+          },
+          "source": {
+            "type": "string",
+            "nullable": true,
+            "description": "gutendex | arxiv."
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "year": {
+            "type": "integer",
+            "nullable": true
+          },
+          "synopsis": {
+            "type": "string",
+            "nullable": true
+          },
+          "coverUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "authors": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Slugs de gênero (livro) ou área (artigo)."
+          },
+          "publicDomain": {
+            "type": "boolean"
+          },
+          "epubFileUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "pdfFileUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "downloadUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "readingStatus": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReadingStatus"
+              }
+            ],
+            "description": "Estado da obra na estante do usuário (#20, ciente do usuário). Nulo se anônimo ou fora da estante.",
+            "nullable": true
+          },
+          "readingProgress": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Percentual lido (0–100) da obra na estante do usuário. Nulo se anônimo ou fora da estante.",
+            "nullable": true
+          },
+          "readingTimeMinutes": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Tempo total de leitura ativa (em minutos) da obra pelo usuário, somado das sessões (RF20). Nulo se anônimo ou sem leitura registrada.",
+            "nullable": true
+          }
+        }
+      }
+    }
+  }
+}

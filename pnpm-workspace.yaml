@@ -1,0 +1,7 @@
+packages:
+  - .
+
+allowBuilds:
+  core-js: false
+  es5-ext: false
+  esbuild: false

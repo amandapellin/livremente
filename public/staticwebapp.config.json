@@ -1,0 +1,16 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": [
+      "/assets/*",
+      "/fonts/*",
+      "/*.{css,js,json,txt,xml,ico,png,jpg,jpeg,gif,svg,webp,woff,woff2,ttf,eot,epub,pdf}"
+    ]
+  },
+  "responseOverrides": {
+    "404": {
+      "rewrite": "/index.html",
+      "statusCode": 200
+    }
+  }
+}

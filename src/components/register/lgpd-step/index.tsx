@@ -1,0 +1,110 @@
+import { Controller, useFormContext, useWatch } from 'react-hook-form'
+import {
+	Box,
+	Checkbox,
+	FormControl,
+	FormControlLabel,
+	FormHelperText,
+	Stack,
+	Typography,
+} from '@mui/material'
+import MailOutlineIcon from '@mui/icons-material/MailOutlined'
+import type { CadastroForm } from '@/schemas/register-schemas'
+import { colors, radii } from '@/theme/tokens'
+import { LGPD_CONSENT_PARAGRAPHS } from '@/constants/lgpd'
+
+export default function LgpdStep() {
+	const {
+		control,
+		formState: { errors },
+	} = useFormContext<CadastroForm>()
+	const email = useWatch({ control, name: 'email' })
+
+	return (
+		<Stack sx={{ gap: 4, width: '100%' }}>
+			<Stack sx={{ gap: 1 }}>
+				<Typography variant="h4" component="h1">
+					Consentimento e confirmação
+				</Typography>
+				<Typography variant="body1" sx={{ color: 'text.secondary' }}>
+					Tratamento de dados pessoais conforme a LGPD.
+				</Typography>
+			</Stack>
+
+			<Box
+				sx={(theme) => ({
+					bgcolor: colors.papel[50],
+					border: 1,
+					borderColor: 'divider',
+					borderRadius: radii.card,
+					p: 3,
+					// Tema escuro: superfície escura em vez do papel claro fixo.
+					...theme.applyStyles('dark', { bgcolor: 'rgba(255, 255, 255, 0.04)' }),
+				})}
+			>
+				<Stack sx={{ gap: 1 }}>
+					{LGPD_CONSENT_PARAGRAPHS.map((text) => (
+						<Typography key={text} variant="body2" sx={{ color: 'text.secondary', lineHeight: '22px' }}>
+							{text}
+						</Typography>
+					))}
+				</Stack>
+			</Box>
+
+			<FormControl error={Boolean(errors.lgpdConsent)} component="fieldset" variant="standard">
+				<Controller
+					name="lgpdConsent"
+					control={control}
+					render={({ field }) => (
+						<FormControlLabel
+							control={
+								<Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+							}
+							label="Concordo com o tratamento dos meus dados pessoais conforme descrito acima."
+						/>
+					)}
+				/>
+				<Controller
+					name="marketingConsent"
+					control={control}
+					render={({ field }) => (
+						<FormControlLabel
+							control={
+								<Checkbox checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+							}
+							label="Quero receber avisos sobre novas obras nas minhas áreas de interesse."
+						/>
+					)}
+				/>
+				{errors.lgpdConsent && <FormHelperText>{errors.lgpdConsent.message}</FormHelperText>}
+			</FormControl>
+
+			<Stack
+				direction="row"
+				sx={(theme) => ({
+					alignItems: 'center',
+					gap: 1.5,
+					bgcolor: colors.primary[50],
+					border: 1,
+					borderColor: colors.primary[300],
+					borderRadius: radii.card,
+					p: 2,
+					// Tema escuro: fundo/borda escuros para o texto (branco) ter contraste.
+					...theme.applyStyles('dark', {
+						bgcolor: 'rgba(30, 58, 138, 0.28)',
+						borderColor: colors.primary[800],
+					}),
+				})}
+			>
+				<MailOutlineIcon sx={{ fontSize: 20, color: 'primary.main' }} />
+				<Typography variant="caption" sx={{ color: 'text.primary' }}>
+					Ao concluir, enviamos um link de confirmação para{' '}
+					<Box component="span" sx={{ fontWeight: 500 }}>
+						{email || 'seu e-mail'}
+					</Box>
+					. A conta é ativada após a confirmação.
+				</Typography>
+			</Stack>
+		</Stack>
+	)
+}
