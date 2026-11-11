@@ -7,7 +7,7 @@ import { contactSchema, initialContactForm, MESSAGE_MAX, type ContactForm } from
 import { sendContactMessage } from '@/utils/support'
 
 // E-mail alternativo exibido como fallback ao formulário.
-const SUPPORT_EMAIL = 'suporte@livremente.com.br'
+const SUPPORT_EMAIL = 'suportelivrementeapp@gmail.com'
 
 /**
  * Formulário de contato do Suporte (#84 — follow-up do front). Faz
