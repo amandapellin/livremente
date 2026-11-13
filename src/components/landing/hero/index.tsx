@@ -15,11 +15,18 @@ export default function Hero(){
                 px: 2,
                 pt: { xs: 8, md: 12 },
                 pb: { xs: 12, md: 20 },
-                textAlign: 'center',   
+                textAlign: 'center',
+                // Telas baixas (notebooks ~768px de altura): hero mais compacto para
+                // a primeira linha de cards aparecer sem scroll.
+                '@media (min-width:900px) and (max-height:820px)': { pt: 4, pb: 9 },
             }}
         >
-            <Stack sx={{ maxWidth: 1089, mx: 'auto', alignItems: 'center', gap: 3 }}>
-                <Typography variant="h1" component="h1" sx={{ color: colors.primary[200], fontSize: { xs: '2.5rem', md: '3.75rem' } }}>
+            <Stack sx={{ maxWidth: 1089, mx: 'auto', alignItems: 'center', gap: 3, '@media (min-width:900px) and (max-height:820px)': { gap: 2 } }}>
+                <Typography
+                    variant="h1"
+                    component="h1"
+                    sx={{ color: colors.primary[200], fontSize: { xs: '2.5rem', md: '3.75rem' }, '@media (min-width:900px) and (max-height:820px)': { fontSize: '2.75rem' } }}
+                >
                     Acesso aberto para toda {' '}
                     <Box component="span" sx={{ color: colors.gold[500]}}>
                         mente curiosa
@@ -28,7 +35,7 @@ export default function Hero(){
                 <Typography variant="h6" component="p" sx={{ color: colors.papel[200], fontWeight:500, maxWidth: 680 }}>
                     Descubra um vasto acervo de obras clássicas, acadêmicas e ficcionais, cuidadosamente organizadas para uma leitura fluida e acessível.
                 </Typography>
-                <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2, pt: 3, width: {xs: '100%', sm: 'auto'} }}>
+                <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 2, pt: 3, width: {xs: '100%', sm: 'auto'}, '@media (min-width:900px) and (max-height:820px)': { pt: 1 } }}>
                     <Button
                         component={NavLink}
                         to="/catalogo"

@@ -41,7 +41,7 @@ export default function InstitucionalPage() {
 				{
 					heading: 'Projeto acadêmico',
 					paragraphs: [
-						'O LivreMente foi desenvolvido no âmbito do componente curricular de Projeto Integrador do Instituto Federal do Paraná (IFPR). O sistema constitui uma aplicação funcional com fins estritamente educacionais e científicos, sem finalidade comercial. O catálogo disponibilizado utiliza metadados e arquivos de repositórios abertos, respeitando integralmente as licenças originais de distribuição.',
+						'O LivreMente foi desenvolvido por Amanda Pelozato e Julia Azevedo no âmbito do componente curricular de Projeto Integrador do Instituto Federal do Paraná (IFPR). O sistema constitui uma aplicação funcional com fins estritamente educacionais e científicos, sem finalidade comercial. O catálogo disponibilizado utiliza metadados e arquivos de repositórios abertos, respeitando integralmente as licenças originais de distribuição.',
 					],
 				},
 			]}
