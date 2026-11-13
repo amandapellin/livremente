@@ -24,7 +24,16 @@ export default function Footer() {
         >
             <Stack
                 direction={{ xs: 'column', md: 'row' }}
-                sx={{ alignItems: 'center', justifyContent: 'space-between', gap: 2, px: 3, py: 2, minHeight: 81 }}
+                sx={{
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: 2,
+                    px: 3,
+                    py: 2,
+                    minHeight: 81,
+                    // Telas baixas (notebooks): footer mais baixo para não dominar a home.
+                    '@media (min-width:900px) and (max-height:820px)': { py: 1.25, minHeight: 56 },
+                }}
             >
                 <Stack direction="row" sx={{ alignItems: 'center', gap: 1 }}>
                     <AutoStoriesIcon sx={{ fontSize: 24, color: colors.gold[500] }} />

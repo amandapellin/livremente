@@ -10,6 +10,7 @@ interface Props {
 	onRemove?: () => void
 	size?: 'small' | 'medium'
 	disabled?: boolean
+	fullWidth?: boolean
 }
 
 /**
@@ -17,7 +18,7 @@ interface Props {
  * visão Lista, prateleira e tabela de artigos. Mesmo padrão de `detail-actions`
  * (readingStatusOptions + Menu + opção "Remover da estante").
  */
-export default function ShelfStatusMenu({ status, onSelect, onRemove, size = 'small', disabled }: Props) {
+export default function ShelfStatusMenu({ status, onSelect, onRemove, size = 'small', disabled, fullWidth }: Props) {
 	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 	const open = Boolean(anchorEl)
 	const close = () => setAnchorEl(null)
@@ -35,6 +36,7 @@ export default function ShelfStatusMenu({ status, onSelect, onRemove, size = 'sm
 				color="primary"
 				size={size}
 				disabled={disabled}
+				fullWidth={fullWidth}
 				startIcon={<BookmarkAddOutlined />}
 				endIcon={<ArrowDropDown />}
 				onClick={(e) => setAnchorEl(e.currentTarget)}
