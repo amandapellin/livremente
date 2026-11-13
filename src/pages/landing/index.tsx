@@ -19,7 +19,7 @@ export default function LandingPage() {
 				sx={{
 					maxWidth: 1100, mx: 'auto', px: 2, mt: { xs: -8, md: -12 }, position: 'relative',
 					display: 'grid', gap: 4.5, gridTemplateColumns: { xs: 'minmax(0, 1fr)', md: 'repeat(3, minmax(0, 1fr))' },
-					'@media (min-width:900px) and (max-height:820px)': { mt: -6, gap: 3 },
+					'@media (min-width:900px) and (max-height:820px)': { mt: -3, gap: 3 },
 				}}
 			>
 				{features.map((f) => (

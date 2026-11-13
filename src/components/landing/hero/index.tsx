@@ -18,7 +18,7 @@ export default function Hero(){
                 textAlign: 'center',
                 // Telas baixas (notebooks ~768px de altura): hero mais compacto para
                 // a primeira linha de cards aparecer sem scroll.
-                '@media (min-width:900px) and (max-height:820px)': { pt: 5, pb: 9 },
+                '@media (min-width:900px) and (max-height:820px)': { pt: 4, pb: 9 },
             }}
         >
             <Stack sx={{ maxWidth: 1089, mx: 'auto', alignItems: 'center', gap: 3, '@media (min-width:900px) and (max-height:820px)': { gap: 2 } }}>
