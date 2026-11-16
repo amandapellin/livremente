@@ -1,6 +1,6 @@
 # LivreMente — Frontend
 
-Interface web do LivreMente, plataforma de leitura que integra livros em domínio público (Project Gutenberg, via Gutendex) e artigos científicos de acesso aberto (arXiv). Este repositório contém o frontend, em React + TypeScript.
+Interface web do LivreMente, plataforma de leitura que integra livros em domínio público (Project Gutenberg, via Gutendex) e artigos científicos de acesso aberto (arXiv). Este repositório contém o frontend, em React + TypeScript. O projeto é acadêmico, desenvolvido por Amanda Pelozato e Julia Azevedo como Projeto Integrador do Instituto Federal do Paraná (IFPR): uma aplicação funcional com fins estritamente educacionais e científicos, sem finalidade comercial, cujo catálogo utiliza metadados e arquivos de repositórios abertos, respeitando as licenças originais de distribuição.
 
 Repositório do backend: [livremente_backend](https://github.com/amandapellin/livremente_backend)
 
