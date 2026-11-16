@@ -15,7 +15,7 @@ Repositório do backend: [livremente_backend](https://github.com/amandapellin/li
 
 ## Pré-requisitos
 
-- [Node.js](https://nodejs.org/) 18 ou superior
+- [Node.js](https://nodejs.org/) 20.19 ou superior (exigido pelo Vite 8)
 - [pnpm](https://pnpm.io/installation) instalado globalmente (`npm i -g pnpm`)
 - O backend ([livremente_backend](https://github.com/amandapellin/livremente_backend)) rodando localmente, para que as chamadas à API funcionem
 
@@ -73,18 +73,33 @@ O roteamento usa o **Data Mode** do React Router: as rotas são declaradas num m
 | `/leitura/:id` | `LeitorPage` | Leitor de EPUB (livros) e PDF (artigos) |
 | `/estante` | `EstantePage` | Minha Estante |
 | `/recomendacoes` | `RecomendacoesPage` | Recomendações personalizadas |
+| `/institucional` | `InstitucionalPage` | Página institucional |
+| `/privacidade` | `PrivacidadePage` | Política de privacidade |
+| `/termos` | `TermosPage` | Termos de uso |
+| `/suporte` | `SuportePage` | Suporte (FAQ + formulário de contato) |
 | `*` | `NotFoundPage` | 404 — rota não encontrada |
 
-> Já implementadas: landing (`/`), login (`/login`), cadastro (`/cadastro`), edição de perfil (`/perfil`), busca/catálogo (`/catalogo`), detalhes da obra (`/obra/:id`) e leitor de EPUB/PDF (`/leitura/:id`). As demais telas (estante e recomendações) seguem como placeholders e serão implementadas nas issues correspondentes. O header/navegação e a alternância de tema já estão no layout base.
+> Todas as telas principais estão implementadas: landing, login, cadastro, perfil, busca/catálogo, detalhes da obra, leitor de EPUB/PDF, Minha Estante e recomendações, além das páginas institucionais (institucional, privacidade, termos e suporte). O header/navegação e a alternância de tema (claro/escuro) ficam no layout base. A leitura (`/leitura/:id`) e a estante (`/estante`) exigem login; o acervo é público.
 
 ## Design system
 
 As definições de cores, tipografia, espaçamento e o mapeamento dos tokens para os componentes do MUI estão documentadas no figma. Antes de estilizar uma tela nova, conferir esse arquivo — em especial a regra de uso de cor por modo (claro/escuro), que já foi validada por contraste (WCAG AA).
 
+## Deploy (produção)
+
+O frontend está publicado no **Azure Static Web Apps**, com **CI/CD por GitHub Actions a cada push na `main`** (integração segue na `develop`):
+
+- O build (`pnpm build`) recebe a URL da API em `VITE_API_URL`; o SWA também pode fazer *proxy* de `/api` para o App Service, evitando CORS.
+- O backend libera a origem do SWA no CORS.
+
+Detalhes de infraestrutura (serviços Azure, variáveis e passo a passo) estão em [`docs/deploy-azure.md`](https://github.com/amandapellin/livremente_backend/blob/main/docs/deploy-azure.md) no repositório do backend.
+
 ## Fluxo de contribuição
 
-- Branches: `feature/rfXX-descricao-curta` (código do requisito + descrição curta)
-- Pull requests devem referenciar a issue correspondente (`Closes #N`) e passar por revisão da outra desenvolvedora antes do merge
+- Branches: `feat/<n>-descricao` (n = número da issue) a partir de `develop`
+- Pull requests referenciam a issue correspondente (`Closes #N`) e passam por revisão da outra desenvolvedora antes do merge
+- A cada pull request, os workflows de CI (GitHub Actions: build/verificação e análise de segurança CodeQL) são executados automaticamente
+- Integração na `develop`; a `main` é produção e dispara o deploy automático
 - Board de acompanhamento: [Project "Livremente"](https://github.com/users/amandapellin/projects/3)
 
 ## Padrão de commits
